@@ -31,17 +31,6 @@ namespace RobotGamepad
         private DateTime? chargeStartTime;
 
         /// <summary>
-        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
-        /// </summary>
-        private void CheckRobotHelper()
-        {
-            if (this.robotHelper == null)
-            {
-                throw new NullReferenceException("GunHelper не инициализирован.");
-            }
-        }
-
-        /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
         /// </summary>
         /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
@@ -58,12 +47,12 @@ namespace RobotGamepad
         /// </returns>
         public byte GetChargePercent()
         {
-            if (chargeStartTime == null)
+            if (this.chargeStartTime == null)
             {
                 return 100;
             }
 
-            double chargePercent = (DateTime.Now - (DateTime)chargeStartTime).TotalMilliseconds / Settings.GunChargeTime.TotalMilliseconds * 100;
+            double chargePercent = (DateTime.Now - (DateTime)this.chargeStartTime).TotalMilliseconds / Settings.GunChargeTime.TotalMilliseconds * 100;
             byte result = chargePercent > 100 ? Convert.ToByte(100) : Convert.ToByte(chargePercent);
             return result;
         }
@@ -82,6 +71,17 @@ namespace RobotGamepad
 
             this.robotHelper.SendCommandToRobot("FR000");
             this.chargeStartTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
+        /// </summary>
+        private void CheckRobotHelper()
+        {
+            if (this.robotHelper == null)
+            {
+                throw new NullReferenceException("GunHelper не инициализирован.");
+            }
         }
     }
 }

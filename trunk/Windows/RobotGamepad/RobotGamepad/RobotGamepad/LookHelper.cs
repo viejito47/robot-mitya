@@ -74,156 +74,119 @@ namespace RobotGamepad
         private string lastVerticalServoCommand = string.Empty;
 
         /// <summary>
-        /// Формирование команды горизонтального поворота головы.
+        /// Gets Последняя команда, переданная "горизонтальному" сервоприводу.
         /// </summary>
-        /// <param name="degree">
-        /// Угол поворота в градусах.
-        /// </param>
-        /// <param name="horizontalServoCommand">
-        /// Выходной параметр. Сформированная команда.
-        /// </param>
-        private void GenerateHorizontalServoCommandByDegree(float degree, out string horizontalServoCommand)
-        {
-            horizontalServoCommand = "HH" + CommandHelper.IntToCommandValue(Convert.ToInt32(degree));
+        public string LastHorizontalServoCommand 
+        { 
+            get 
+            { 
+                return this.lastHorizontalServoCommand; 
+            } 
         }
 
         /// <summary>
-        /// Формирование команды горизонтального поворота головы.
+        /// Gets Последняя команда, переданная "вертикальному" сервоприводу.
         /// </summary>
-        /// <param name="x">
-        /// x-координата ThumbStick-джойстика поворота головы.
-        /// </param>
-        /// <param name="horizontalServoCommand">
-        /// Выходной параметр. Сформированная команда.
-        /// </param>
-        private void GenerateHorizontalServoCommand(float x, out string horizontalServoCommand)
-        {
-            double degree = (1 - x) * (Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) / 2 + Settings.HorizontalMinimumDegree;
-            this.GenerateHorizontalServoCommandByDegree(Convert.ToInt32(degree), out horizontalServoCommand);
+        public string LastVerticalServoCommand 
+        { 
+            get 
+            { 
+                return this.lastVerticalServoCommand; 
+            } 
         }
 
         /// <summary>
-        /// Формирование команды вертикального поворота головы.
+        /// Gets or sets a value indicating whether установлен режим медленного поворота головы.
         /// </summary>
-        /// <param name="degree">
-        /// Угол поворота в градусах.
-        /// </param>
-        /// <param name="horizontalServoCommand">
-        /// Выходной параметр. Сформированная команда.
-        /// </param>
-        private void GenerateVerticalServoCommandByDegree(float degree, out string verticalServoCommand)
+        /// <remarks>
+        /// Используется только в режиме фиксированного обзора (джойстик DPAD).
+        /// </remarks>
+        public bool SlowModeOn
         {
-            verticalServoCommand = "HV" + CommandHelper.IntToCommandValue(Convert.ToInt32(degree));
-        }
-
-        /// <summary>
-        /// Формирование команды вертикального поворота головы.
-        /// </summary>
-        /// <param name="y">
-        /// y-координата ThumbStick-джойстика поворота головы.
-        /// </param>
-        /// <param name="horizontalServoCommand">
-        /// Выходной параметр. Сформированная команда.
-        /// </param>
-        private void GenerateVerticalServoCommand(float y, out string verticalServoCommand)
-        {
-            double degree = (y + 1) * (Settings.VerticalMaximumDegree - Settings.VerticalMinimumDegree) / 2 + Settings.VerticalMinimumDegree;
-            degree = Settings.VerticalMinimumDegree + Settings.VerticalMaximumDegree - degree; // Удобнее, когда если джойстик от себя, робот смотрит вниз (увеличение "y" должно уменьшать угол.
-            this.GenerateVerticalServoCommandByDegree(Convert.ToInt32(degree), out verticalServoCommand);
-        }
-
-        /// <summary>
-        /// Формирование команд горизонтального и вертикального поворотов головы по координатам ThumbStick-джойстика (нефиксируемый обзор).
-        /// </summary>
-        /// <param name="x">x-координата ThumbStick-джойстика.</param>
-        /// <param name="y">y-координата ThumbStick-джойстика.</param>
-        /// <param name="horizontalServoCommand">Выходной параметр. Сформированная команда горизонтального поворота головы.</param>
-        /// <param name="verticalServoCommand">Выходной параметр. Сформированная команда вертикального поворота головы.</param>
-        private void GenerateServoCommand(float x, float y, out string horizontalServoCommand, out string verticalServoCommand)
-        {
-            this.GenerateHorizontalServoCommand(x, out horizontalServoCommand);
-            this.GenerateVerticalServoCommand(y, out verticalServoCommand);
-        }
-
-        /// <summary>
-        /// Формирование команд горизонтального и вертикального поворотов головы для установки взгляда вперёд.
-        /// </summary>
-        /// <param name="horizontalServoCommand">Выходной параметр. Сформированная команда горизонтального поворота головы.</param>
-        /// <param name="verticalServoCommand">Выходной параметр. Сформированная команда вертикального поворота головы.</param>
-        private void GenerateLookForwardServoCommand(out string horizontalServoCommand, out string verticalServoCommand)
-        {
-            this.GenerateHorizontalServoCommandByDegree(Settings.HorizontalForwardDegree, out horizontalServoCommand);
-            this.GenerateVerticalServoCommandByDegree(Settings.VerticalForwardDegree, out verticalServoCommand);
-        }
-
-        /// <summary>
-        /// Уменьшение горизонтального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Уменьшаемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void DecrementHorizontalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.slowModeOn ? Settings.HorizontalLowSpeed : Settings.HorizontalHighSpeed;
-            degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree < Settings.HorizontalMinimumDegree) ? Settings.HorizontalMinimumDegree : degree;
-        }
-
-        /// <summary>
-        /// Увеличение горизонтального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Увеличиваемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void IncrementHorizontalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.slowModeOn ? Settings.HorizontalLowSpeed : Settings.HorizontalHighSpeed;
-            degree += gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree > Settings.HorizontalMaximumDegree) ? Settings.HorizontalMaximumDegree : degree;
-        }
-
-        /// <summary>
-        /// Уменьшение вертикального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Уменьшаемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void DecrementVerticalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.slowModeOn ? Settings.VerticalLowSpeed : Settings.VerticalHighSpeed;
-            degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree < Settings.VerticalMinimumDegree) ? Settings.VerticalMinimumDegree : degree;
-        }
-
-        /// <summary>
-        /// Увеличение вертикального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Увеличиваемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void IncrementVerticalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.slowModeOn ? Settings.VerticalLowSpeed : Settings.VerticalHighSpeed;
-            degree += gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree > Settings.VerticalMaximumDegree) ? Settings.VerticalMaximumDegree : degree;
-        }
-
-        /// <summary>
-        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
-        /// </summary>
-        private void CheckRobotHelper()
-        {
-            if (this.robotHelper == null)
+            get
             {
-                throw new NullReferenceException("LookHelper не инициализирован.");
+                return this.slowModeOn;
+            }
+
+            set
+            {
+                this.slowModeOn = value;
             }
         }
 
         /// <summary>
-        /// Последняя команда, переданная "горизонтальному" сервоприводу.
+        /// Gets or sets a value indicating whether установлен боевой режим. В этом режиме центральное положение 
+        /// ThumbStick-джойстика по вертикали соответствует направлению взгляда, параллельному плоскости поверхности 
+        /// пола. Режим введён для упрощения прицеливания. В небоевом режиме направление взгляда робота при 
+        /// центральном положении джойстика направлено чуть вверх.
         /// </summary>
-        public string LastHorizontalServoCommand { get { return this.lastHorizontalServoCommand; } }
+        public bool WarModeOn
+        {
+            get
+            {
+                return Settings.VerticalForwardDegree == Settings.VerticalForwardDegree2;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree2;
+                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree2;
+                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree2;
+                }
+                else
+                {
+                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree1;
+                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree1;
+                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree1;
+                }
+            }
+        }
 
         /// <summary>
-        /// Последняя команда, переданная "вертикальному" сервоприводу.
+        /// Преобразование координат для поворота головы из пространства круга (область ThumbStick-джойстика)
+        /// в пространсво квадрата (область поворота головы, доступная сервоприводам).
         /// </summary>
-        public string LastVerticalServoCommand { get { return this.lastVerticalServoCommand; } }
+        /// <param name="x">x-координата. Инициируется x-координатой ThumbStick-джойстика. После работы функции
+        /// заполняется x-координатой в квадратном пространстве.</param>
+        /// <param name="y">y-координата. Инициируется x-координатой ThumbStick-джойстика. После работы функции
+        /// заполняется y-координатой в квадратном пространстве.</param>
+        /// <remarks>
+        /// При координате джойстика (1, 0) голова повёрнута вправо (0 градусов). При координате (0, 1) голова 
+        /// повёрнута вверх (0 градусов). Но если джойстик отклоняется не по горизонтали или вертикали, а по 
+        /// диагонали, голова уже не сможет добраться до нуля градусов ни по одному, ни по другому сервоприводу. 
+        /// Область джойстика окружность, поэтому, например, координата (1, 1) не будет доступна. Отсюда вывод: 
+        /// круговую область джойстика с центром в начале координат и диаметром равным 2 надо «растянуть» на 
+        /// квадратную область с тем же центром и стороной равной 2.
+        /// </remarks>
+        public static void CorrectCoordinatesFromCyrcleToSquareArea(ref float x, ref float y)
+        {
+            if ((x >= 0) && (y >= 0))
+            {
+                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
+            }
+            else if ((x < 0) && (y >= 0))
+            {
+                x = -x;
+                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
+                x = -x;
+            }
+            else if ((x < 0) && (y < 0))
+            {
+                x = -x;
+                y = -y;
+                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
+                x = -x;
+                y = -y;
+            }
+            else if ((x >= 0) && (y < 0))
+            {
+                y = -y;
+                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
+                y = -y;
+            }
+        }
 
         /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
@@ -254,6 +217,7 @@ namespace RobotGamepad
                 }
 
                 string horizontalServoCommand;
+
                 // x = f(x)...
                 this.GenerateHorizontalServoCommand(x, out horizontalServoCommand);
                 this.lastLookX = x;
@@ -274,6 +238,7 @@ namespace RobotGamepad
                 }
 
                 string verticalServoCommand;
+
                 // y = f(y)...
                 this.GenerateVerticalServoCommand(y, out verticalServoCommand);
                 this.lastLookY = y;
@@ -303,42 +268,6 @@ namespace RobotGamepad
             this.robotHelper.SendCommandToRobot(this.lastVerticalServoCommand);
         }
         
-        /// <summary>
-        /// Признак медленного поворота головы.
-        /// </summary>
-        /// <remarks>
-        /// Используется только в режиме фиксированного обзора (джойстик DPAD).
-        /// </remarks>
-        public bool SlowModeOn { get { return this.slowModeOn; } set { this.slowModeOn = value; } }
-
-        /// <summary>
-        /// Боевой режим. В этом режиме центральное положение ThumbStick-джойстика по вертикали соответствует 
-        /// направлению взгляда, параллельному плоскости поверхности пола. Режим введён для упрощения прицеливания.
-        /// В небоевом режиме направление взгляда робота при центральном положении джойстика направлено чуть вверх.
-        /// </summary>
-        public bool WarModeOn
-        {
-            get
-            {
-                return Settings.VerticalForwardDegree == Settings.VerticalForwardDegree2;
-            }
-            set
-            {
-                if (value)
-                {
-                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree2;
-                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree2;
-                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree2;
-                }
-                else
-                {
-                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree1;
-                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree1;
-                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree1;
-                }
-            }
-        }
-
         /// <summary>
         /// Поворот головы влево в режиме фиксации головы (DPad-джойстик).
         /// </summary>
@@ -433,50 +362,6 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Преобразование координат для поворота головы из пространства круга (область ThumbStick-джойстика)
-        /// в пространсво квадрата (область поворота головы, доступная сервоприводам).
-        /// </summary>
-        /// <param name="x">x-координата. Инициируется x-координатой ThumbStick-джойстика. После работы функции
-        /// заполняется x-координатой в квадратном пространстве.</param>
-        /// <param name="y">y-координата. Инициируется x-координатой ThumbStick-джойстика. После работы функции
-        /// заполняется y-координатой в квадратном пространстве.</param>
-        /// <remarks>
-        /// При координате джойстика (1, 0) голова повёрнута вправо (0 градусов). При координате (0, 1) голова 
-        /// повёрнута вверх (0 градусов). Но если джойстик отклоняется не по горизонтали или вертикали, а по 
-        /// диагонали, голова уже не сможет добраться до нуля градусов ни по одному, ни по другому сервоприводу. 
-        /// Область джойстика окружность, поэтому, например, координата (1, 1) не будет доступна. Отсюда вывод: 
-        /// круговую область джойстика с центром в начале координат и диаметром равным 2 надо «растянуть» на 
-        /// квадратную область с тем же центром и стороной равной 2.
-        /// </remarks>
-        public static void CorrectCoordinatesFromCyrcleToSquareArea(ref float x, ref float y)
-        {
-            if ((x >= 0) && (y >= 0))
-            {
-                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
-            }
-            else if ((x < 0) && (y >= 0))
-            {
-                x = -x;
-                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
-                x = -x;
-            }
-            else if ((x < 0) && (y < 0))
-            {
-                x = -x;
-                y = -y;
-                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
-                x = -x;
-                y = -y;
-            }
-            else if ((x >= 0) && (y < 0))
-            {
-                y = -y;
-                LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
-                y = -y;
-            }
-        }
-
-        /// <summary>
         /// Преобразование координат для первой половины первого квадранта (остальные получаются отражением).
         /// </summary>
         /// <param name="x">Координата x, полученная от джойстика.</param>
@@ -499,7 +384,7 @@ namespace RobotGamepad
                     y = temp;
                 }
 
-                double resultX = Math.Sqrt(x * x + y * y);
+                double resultX = Math.Sqrt((x * x) + (y * y));
                 double resultY = y * resultX / x;
                 x = (float)resultX;
                 y = (float)resultY;
@@ -514,6 +399,148 @@ namespace RobotGamepad
             else
             {
                 throw new InvalidOperationException("Неверные координаты для первого квадранта.");
+            }
+        }
+
+        /// <summary>
+        /// Формирование команды горизонтального поворота головы.
+        /// </summary>
+        /// <param name="degree">
+        /// Угол поворота в градусах.
+        /// </param>
+        /// <param name="horizontalServoCommand">
+        /// Выходной параметр. Сформированная команда.
+        /// </param>
+        private void GenerateHorizontalServoCommandByDegree(float degree, out string horizontalServoCommand)
+        {
+            horizontalServoCommand = "HH" + CommandHelper.IntToCommandValue(Convert.ToInt32(degree));
+        }
+
+        /// <summary>
+        /// Формирование команды горизонтального поворота головы.
+        /// </summary>
+        /// <param name="x">
+        /// x-координата ThumbStick-джойстика поворота головы.
+        /// </param>
+        /// <param name="horizontalServoCommand">
+        /// Выходной параметр. Сформированная команда.
+        /// </param>
+        private void GenerateHorizontalServoCommand(float x, out string horizontalServoCommand)
+        {
+            double degree = ((1 - x) * ((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) / 2)) + Settings.HorizontalMinimumDegree;
+            this.GenerateHorizontalServoCommandByDegree(Convert.ToInt32(degree), out horizontalServoCommand);
+        }
+
+        /// <summary>
+        /// Формирование команды вертикального поворота головы.
+        /// </summary>
+        /// <param name="degree">
+        /// Угол поворота в градусах.
+        /// </param>
+        /// <param name="verticalServoCommand">
+        /// Выходной параметр. Сформированная команда.
+        /// </param>
+        private void GenerateVerticalServoCommandByDegree(float degree, out string verticalServoCommand)
+        {
+            verticalServoCommand = "HV" + CommandHelper.IntToCommandValue(Convert.ToInt32(degree));
+        }
+
+        /// <summary>
+        /// Формирование команды вертикального поворота головы.
+        /// </summary>
+        /// <param name="y">
+        /// y-координата ThumbStick-джойстика поворота головы.
+        /// </param>
+        /// <param name="verticalServoCommand">
+        /// Выходной параметр. Сформированная команда.
+        /// </param>
+        private void GenerateVerticalServoCommand(float y, out string verticalServoCommand)
+        {
+            double degree = ((y + 1) * ((Settings.VerticalMaximumDegree - Settings.VerticalMinimumDegree) / 2)) + Settings.VerticalMinimumDegree;
+            degree = Settings.VerticalMinimumDegree + Settings.VerticalMaximumDegree - degree; // Удобнее, когда если джойстик от себя, робот смотрит вниз (увеличение "y" должно уменьшать угол.
+            this.GenerateVerticalServoCommandByDegree(Convert.ToInt32(degree), out verticalServoCommand);
+        }
+
+        /// <summary>
+        /// Формирование команд горизонтального и вертикального поворотов головы по координатам ThumbStick-джойстика (нефиксируемый обзор).
+        /// </summary>
+        /// <param name="x">x-координата ThumbStick-джойстика.</param>
+        /// <param name="y">y-координата ThumbStick-джойстика.</param>
+        /// <param name="horizontalServoCommand">Выходной параметр. Сформированная команда горизонтального поворота головы.</param>
+        /// <param name="verticalServoCommand">Выходной параметр. Сформированная команда вертикального поворота головы.</param>
+        private void GenerateServoCommand(float x, float y, out string horizontalServoCommand, out string verticalServoCommand)
+        {
+            this.GenerateHorizontalServoCommand(x, out horizontalServoCommand);
+            this.GenerateVerticalServoCommand(y, out verticalServoCommand);
+        }
+
+        /// <summary>
+        /// Формирование команд горизонтального и вертикального поворотов головы для установки взгляда вперёд.
+        /// </summary>
+        /// <param name="horizontalServoCommand">Выходной параметр. Сформированная команда горизонтального поворота головы.</param>
+        /// <param name="verticalServoCommand">Выходной параметр. Сформированная команда вертикального поворота головы.</param>
+        private void GenerateLookForwardServoCommand(out string horizontalServoCommand, out string verticalServoCommand)
+        {
+            this.GenerateHorizontalServoCommandByDegree(Settings.HorizontalForwardDegree, out horizontalServoCommand);
+            this.GenerateVerticalServoCommandByDegree(Settings.VerticalForwardDegree, out verticalServoCommand);
+        }
+
+        /// <summary>
+        /// Уменьшение горизонтального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
+        /// </summary>
+        /// <param name="degree">Уменьшаемая переменная, инициированная значением угла на момент последнего вызова.</param>
+        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
+        private void DecrementHorizontalDegree(ref float degree, GameTime gameTime)
+        {
+            float speed = this.slowModeOn ? Settings.HorizontalLowSpeed : Settings.HorizontalHighSpeed;
+            degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
+            degree = (degree < Settings.HorizontalMinimumDegree) ? Settings.HorizontalMinimumDegree : degree;
+        }
+
+        /// <summary>
+        /// Увеличение горизонтального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
+        /// </summary>
+        /// <param name="degree">Увеличиваемая переменная, инициированная значением угла на момент последнего вызова.</param>
+        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
+        private void IncrementHorizontalDegree(ref float degree, GameTime gameTime)
+        {
+            float speed = this.slowModeOn ? Settings.HorizontalLowSpeed : Settings.HorizontalHighSpeed;
+            degree += gameTime.ElapsedGameTime.Milliseconds * speed;
+            degree = (degree > Settings.HorizontalMaximumDegree) ? Settings.HorizontalMaximumDegree : degree;
+        }
+
+        /// <summary>
+        /// Уменьшение вертикального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
+        /// </summary>
+        /// <param name="degree">Уменьшаемая переменная, инициированная значением угла на момент последнего вызова.</param>
+        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
+        private void DecrementVerticalDegree(ref float degree, GameTime gameTime)
+        {
+            float speed = this.slowModeOn ? Settings.VerticalLowSpeed : Settings.VerticalHighSpeed;
+            degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
+            degree = (degree < Settings.VerticalMinimumDegree) ? Settings.VerticalMinimumDegree : degree;
+        }
+
+        /// <summary>
+        /// Увеличение вертикального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
+        /// </summary>
+        /// <param name="degree">Увеличиваемая переменная, инициированная значением угла на момент последнего вызова.</param>
+        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
+        private void IncrementVerticalDegree(ref float degree, GameTime gameTime)
+        {
+            float speed = this.slowModeOn ? Settings.VerticalLowSpeed : Settings.VerticalHighSpeed;
+            degree += gameTime.ElapsedGameTime.Milliseconds * speed;
+            degree = (degree > Settings.VerticalMaximumDegree) ? Settings.VerticalMaximumDegree : degree;
+        }
+
+        /// <summary>
+        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
+        /// </summary>
+        private void CheckRobotHelper()
+        {
+            if (this.robotHelper == null)
+            {
+                throw new NullReferenceException("LookHelper не инициализирован.");
             }
         }
     }

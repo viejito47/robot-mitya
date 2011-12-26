@@ -35,45 +35,25 @@ namespace RobotGamepad
         private string lastFlashlightCommand = string.Empty;
 
         /// <summary>
-        /// Формирование команды включения фонаря.
+        /// Gets a value indicating whether Состояние фар робота.
         /// </summary>
-        private void GenerateFlashlightTurnOnCommand()
-        {
-            this.lastFlashlightCommand = "FL001";
+        public bool FlashlightTurnedOn 
+        { 
+            get 
+            { 
+                return this.flashlightTurnedOn; 
+            } 
         }
 
         /// <summary>
-        /// Формирование команды выключения фонаря.
+        /// Gets Последняя команда управления фонарём, переданная роботу.
         /// </summary>
-        private void GenerateFlashlightTurnOffCommand()
-        {
-            this.lastFlashlightCommand = "FL000";
-        }
-
-        /// <summary>
-        /// Формирование команды изменения состояния фар робота - вкл./выкл.
-        /// </summary>
-        private void GenerateSwitchFlashlightCommand()
-        {
-            if (this.flashlightTurnedOn)
-            {
-                this.GenerateFlashlightTurnOffCommand();
-            }
-            else
-            {
-                this.GenerateFlashlightTurnOnCommand();
-            }
-        }
-
-        /// <summary>
-        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
-        /// </summary>
-        private void CheckRobotHelper()
-        {
-            if (this.robotHelper == null)
-            {
-                throw new NullReferenceException("FlashlightHelper не инициализирован.");
-            }
+        public string LastFlashlightCommand 
+        { 
+            get 
+            { 
+                return this.lastFlashlightCommand; 
+            } 
         }
 
         /// <summary>
@@ -84,16 +64,6 @@ namespace RobotGamepad
         {
             this.robotHelper = robotHelper;
         }
-
-        /// <summary>
-        /// Состояние фар робота.
-        /// </summary>
-        public bool FlashlightTurnedOn { get { return this.flashlightTurnedOn; } }
-
-        /// <summary>
-        /// Последняя команда управления фонарём, переданная роботу.
-        /// </summary>
-        public string LastFlashlightCommand { get { return this.lastFlashlightCommand; } }
 
         /// <summary>
         /// Включить фонарь робота.
@@ -126,6 +96,48 @@ namespace RobotGamepad
             this.GenerateSwitchFlashlightCommand();
             this.flashlightTurnedOn = !this.flashlightTurnedOn;
             this.robotHelper.SendCommandToRobot(this.LastFlashlightCommand);
+        }
+
+        /// <summary>
+        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
+        /// </summary>
+        private void CheckRobotHelper()
+        {
+            if (this.robotHelper == null)
+            {
+                throw new NullReferenceException("FlashlightHelper не инициализирован.");
+            }
+        }
+
+        /// <summary>
+        /// Формирование команды включения фонаря.
+        /// </summary>
+        private void GenerateFlashlightTurnOnCommand()
+        {
+            this.lastFlashlightCommand = "FL001";
+        }
+
+        /// <summary>
+        /// Формирование команды выключения фонаря.
+        /// </summary>
+        private void GenerateFlashlightTurnOffCommand()
+        {
+            this.lastFlashlightCommand = "FL000";
+        }
+
+        /// <summary>
+        /// Формирование команды изменения состояния фар робота - вкл./выкл.
+        /// </summary>
+        private void GenerateSwitchFlashlightCommand()
+        {
+            if (this.flashlightTurnedOn)
+            {
+                this.GenerateFlashlightTurnOffCommand();
+            }
+            else
+            {
+                this.GenerateFlashlightTurnOnCommand();
+            }
         }
     }
 }

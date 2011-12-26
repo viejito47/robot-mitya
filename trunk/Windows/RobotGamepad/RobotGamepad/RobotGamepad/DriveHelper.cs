@@ -54,18 +54,57 @@ namespace RobotGamepad
         private string lastRightMotorCommand = string.Empty;
 
         /// <summary>
-        /// Масштабирование значения в интервале [0, 1] на заданный целочисленный интервал.
+        /// Gets or sets a value indicating whether турбо-режим включен.
         /// </summary>
-        /// <param name="value">Значение в интервале [0, 1].</param>
-        /// <param name="minResult">Начало целевого интервала.</param>
-        /// <param name="maxResult">Конец целевого интервала.</param>
-        /// <returns>Целое значение на целевом интервале.</returns>
-        private int Map(double value, int minResult, int maxResult)
+        public bool TurboModeOn
         {
-            value = value < 0 ? 0 : value;
-            value = value > 1 ? 1 : value;
-            double result = minResult + value * (maxResult - minResult);
-            return Convert.ToInt32(result);
+            get
+            {
+                return this.turboModeOn;
+            }
+
+            set
+            {
+                this.turboModeOn = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether режим разворота включен.
+        /// </summary>
+        public bool RotationModeOn
+        {
+            get
+            {
+                return this.rotationModeOn;
+            }
+
+            set
+            {
+                this.rotationModeOn = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets Последняя команда, переданная на левый мотор.
+        /// </summary>
+        public string LastLeftMotorCommand 
+        { 
+            get 
+            { 
+                return this.lastLeftMotorCommand; 
+            } 
+        }
+
+        /// <summary>
+        /// Gets Последняя команда, переданная на правый мотор.
+        /// </summary>
+        public string LastRightMotorCommand 
+        { 
+            get 
+            {
+                return this.lastRightMotorCommand; 
+            } 
         }
 
         /// <summary>
@@ -77,7 +116,7 @@ namespace RobotGamepad
         {            
             double floatSpeed = Math.Abs(speed);
             floatSpeed = floatSpeed / 255.0;
-            double floatResult = Math.Sqrt(2 * floatSpeed - floatSpeed * floatSpeed);
+            double floatResult = Math.Sqrt((2 * floatSpeed) - (floatSpeed * floatSpeed));
             floatResult = floatResult * 255.0;
             int result = (int)Math.Round(floatResult);
             result = result > 255 ? 255 : result;
@@ -88,6 +127,109 @@ namespace RobotGamepad
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Формирование команд остановки двигателей.
+        /// </summary>
+        /// <param name="leftMotorCommand">Команда остановки левых двигателей.</param>
+        /// <param name="rightMotorCommand">Команда остановки правых двигателей.</param>
+        public void GenerateStopMotorCommands(out string leftMotorCommand, out string rightMotorCommand)
+        {
+            this.GenerateMotorCommands(0, 0, out leftMotorCommand, out rightMotorCommand);
+        }
+
+        /// <summary>
+        /// Формирование команд на двигатели исходя из координат джойстика движения.
+        /// </summary>
+        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
+        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
+        /// <param name="leftMotorCommand">Команда на левые двигатели.</param>
+        /// <param name="rightMotorCommand">Команда на правые двигатели.</param>
+        public void GenerateMotorCommands(double x, double y, out string leftMotorCommand, out string rightMotorCommand)
+        {
+            int leftSpeed;
+            int rightSpeed;
+            this.CalculateMotorsSpeed(x, y, out leftSpeed, out rightSpeed);
+            leftMotorCommand = this.SpeedToMotorCommand('L', leftSpeed);
+            rightMotorCommand = this.SpeedToMotorCommand('R', rightSpeed);
+        }
+
+        /// <summary>
+        /// Инициализация экземпляра класса для взаимодействия с роботом.
+        /// </summary>
+        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
+        public void Initialize(RobotHelper robotHelper)
+        {
+            this.robotHelper = robotHelper;
+        }
+
+        /// <summary>
+        /// Организует движение робота в соответсятвии с заданными координатами джойстака движения.
+        /// </summary>
+        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
+        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
+        public void Drive(double x, double y)
+        {
+            this.CheckRobotHelper();
+
+            string leftMotorCommand;
+            string rightMotorCommand;
+            this.GenerateMotorCommands(x, y, out leftMotorCommand, out rightMotorCommand);
+
+            if (Settings.RepeatCommandsFlag || (leftMotorCommand != this.lastLeftMotorCommand))
+            {
+                this.robotHelper.SendCommandToRobot(leftMotorCommand);
+                this.lastLeftMotorCommand = leftMotorCommand;
+            }
+
+            if (Settings.RepeatCommandsFlag || (rightMotorCommand != this.lastRightMotorCommand))
+            {
+                this.robotHelper.SendCommandToRobot(rightMotorCommand);
+                this.lastRightMotorCommand = rightMotorCommand;
+            }
+        }
+
+        /// <summary>
+        /// Остановка движения робота.
+        /// </summary>
+        public void Stop()
+        {
+            this.Drive(0, 0);
+        }
+
+        /// <summary>
+        /// Переключение турбо-режима.
+        /// </summary>
+        public void SwitchTurboMode()
+        {
+            this.turboModeOn = !this.turboModeOn;
+        }
+
+        /// <summary>
+        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
+        /// </summary>
+        private void CheckRobotHelper()
+        {
+            if (this.robotHelper == null)
+            {
+                throw new NullReferenceException("DriveHelper не инициализирован.");
+            }
+        }
+
+        /// <summary>
+        /// Масштабирование значения в интервале [0, 1] на заданный целочисленный интервал.
+        /// </summary>
+        /// <param name="value">Значение в интервале [0, 1].</param>
+        /// <param name="minResult">Начало целевого интервала.</param>
+        /// <param name="maxResult">Конец целевого интервала.</param>
+        /// <returns>Целое значение на целевом интервале.</returns>
+        private int Map(double value, int minResult, int maxResult)
+        {
+            value = value < 0 ? 0 : value;
+            value = value > 1 ? 1 : value;
+            double result = minResult + (value * (maxResult - minResult));
+            return Convert.ToInt32(result);
         }
 
         /// <summary>
@@ -116,14 +258,15 @@ namespace RobotGamepad
         /// <param name="rightSpeed">Возвращаемая скорость правого двигателя.</param>
         private void CalculateMotorsSpeed(double x, double y, out int leftSpeed, out int rightSpeed)
         {
-            double vectorLength = Math.Sqrt(x * x + y * y);
+            double vectorLength = Math.Sqrt((x * x) + (y * y));
             vectorLength = vectorLength < 0 ? 0 : vectorLength;
             vectorLength = vectorLength > 1 ? 1 : vectorLength;
 
             double sinAlpha = vectorLength == 0 ? 0 : (y >= 0 ? y / vectorLength : -y / vectorLength);
+
             // Аж два раза корректирую синус. Дошёл до этого эмпирически. Только так чувствуется эффект.
-            sinAlpha = 1 - Math.Sqrt(1 - sinAlpha * sinAlpha); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
-            sinAlpha = 1 - Math.Sqrt(1 - sinAlpha * sinAlpha); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
+            sinAlpha = 1 - Math.Sqrt(1 - (sinAlpha * sinAlpha)); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
+            sinAlpha = 1 - Math.Sqrt(1 - (sinAlpha * sinAlpha)); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
             sinAlpha = sinAlpha < 0 ? 0 : sinAlpha;
             sinAlpha = sinAlpha > 1 ? 1 : sinAlpha;
 
@@ -132,23 +275,23 @@ namespace RobotGamepad
 
             if ((x >= 0) && (y >= 0))
             {
-                leftSpeed = Map(vectorLength, 0, 255);
-                rightSpeed = rotationModeOn ? -leftSpeed : Map(sinAlpha * vectorLength, 0, 255);
+                leftSpeed = this.Map(vectorLength, 0, 255);
+                rightSpeed = this.rotationModeOn ? -leftSpeed : this.Map(sinAlpha * vectorLength, 0, 255);
             }
             else if ((x < 0) && (y >= 0))
             {
-                rightSpeed = Map(vectorLength, 0, 255);
-                leftSpeed = rotationModeOn ? -rightSpeed : Map(sinAlpha * vectorLength, 0, 255);
+                rightSpeed = this.Map(vectorLength, 0, 255);
+                leftSpeed = this.rotationModeOn ? -rightSpeed : this.Map(sinAlpha * vectorLength, 0, 255);
             }
             else if ((x < 0) && (y < 0))
             {
-                rightSpeed = Map(vectorLength, 0, -255);
-                leftSpeed = rotationModeOn ? -rightSpeed : Map(sinAlpha * vectorLength, 0, -255);
+                rightSpeed = this.Map(vectorLength, 0, -255);
+                leftSpeed = this.rotationModeOn ? -rightSpeed : this.Map(sinAlpha * vectorLength, 0, -255);
             }
-            else // (x >= 0) && (y < 0)
-            {
-                leftSpeed = Map(vectorLength, 0, -255);
-                rightSpeed = rotationModeOn ? -leftSpeed : Map(sinAlpha * vectorLength, 0, -255);
+            else
+            { // (x >= 0) && (y < 0)
+                leftSpeed = this.Map(vectorLength, 0, -255);
+                rightSpeed = this.rotationModeOn ? -leftSpeed : this.Map(sinAlpha * vectorLength, 0, -255);
             }
 
             this.CorrectMotorsSpeed(ref leftSpeed, ref rightSpeed);
@@ -177,113 +320,5 @@ namespace RobotGamepad
 
             return result;
         }
-
-        /// <summary>
-        /// Формирование команд остановки двигателей.
-        /// </summary>
-        /// <param name="leftMotorCommand">Команда остановки левых двигателей.</param>
-        /// <param name="rightMotorCommand">Команда остановки правых двигателей.</param>
-        public void GenerateStopMotorCommands(out string leftMotorCommand, out string rightMotorCommand)
-        {
-            GenerateMotorCommands(0, 0, out leftMotorCommand, out rightMotorCommand);
-        }
-
-        /// <summary>
-        /// Формирование команд на двигатели исходя из координат джойстика движения.
-        /// </summary>
-        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
-        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
-        /// <param name="leftMotorCommand">Команда на левые двигатели.</param>
-        /// <param name="rightMotorCommand">Команда на правые двигатели.</param>
-        public void GenerateMotorCommands(double x, double y, out string leftMotorCommand, out string rightMotorCommand)
-        {
-            int leftSpeed;
-            int rightSpeed;
-            this.CalculateMotorsSpeed(x, y, out leftSpeed, out rightSpeed);
-            leftMotorCommand = SpeedToMotorCommand('L', leftSpeed);
-            rightMotorCommand = SpeedToMotorCommand('R', rightSpeed);
-        }
-
-        /// <summary>
-        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
-        /// </summary>
-        private void CheckRobotHelper()
-        {
-            if (this.robotHelper == null)
-            {
-                throw new NullReferenceException("DriveHelper не инициализирован.");
-            }
-        }
-
-        /// <summary>
-        /// Инициализация экземпляра класса для взаимодействия с роботом.
-        /// </summary>
-        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
-        public void Initialize(RobotHelper robotHelper)
-        {
-            this.robotHelper = robotHelper;
-        }
-
-        /// <summary>
-        /// Организует движение робота в соответсятвии с заданными координатами джойстака движения.
-        /// </summary>
-        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
-        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
-        public void Drive(double x, double y)
-        {
-            this.CheckRobotHelper();
-
-            string leftMotorCommand;
-            string rightMotorCommand;
-            this.GenerateMotorCommands(x, y, out leftMotorCommand, out rightMotorCommand);
-
-            if ((Settings.RepeatCommandsFlag) || (leftMotorCommand != this.lastLeftMotorCommand))
-            {
-                robotHelper.SendCommandToRobot(leftMotorCommand);
-                this.lastLeftMotorCommand = leftMotorCommand;
-            }
-
-            if ((Settings.RepeatCommandsFlag) || (rightMotorCommand != this.lastRightMotorCommand))
-            {
-                robotHelper.SendCommandToRobot(rightMotorCommand);
-                this.lastRightMotorCommand = rightMotorCommand;
-            }
-        }
-
-        /// <summary>
-        /// Остановка движения робота.
-        /// </summary>
-        public void Stop()
-        {
-            this.Drive(0, 0);
-        }
-
-        /// <summary>
-        /// Признак влючённости турбо-режима.
-        /// </summary>
-        public bool TurboModeOn { get { return this.turboModeOn; } set { this.turboModeOn = value; } }
-
-        /// <summary>
-        /// Переключение турбо-режима.
-        /// </summary>
-        public void SwitchTurboMode()
-        {
-            this.turboModeOn = !this.turboModeOn;
-        }
-
-        /// <summary>
-        /// Признак влючённости режима разворота.
-        /// </summary>
-        public bool RotationModeOn { get { return this.rotationModeOn; } set { this.rotationModeOn = value; } }
-
-        /// <summary>
-        /// Последняя команда, переданная на левый мотор.
-        /// </summary>
-        public string LastLeftMotorCommand { get { return this.lastLeftMotorCommand; } }
-
-        /// <summary>
-        /// Последняя команда, переданная на правый мотор.
-        /// </summary>
-        public string LastRightMotorCommand { get { return this.lastRightMotorCommand; } }
     }
 }
