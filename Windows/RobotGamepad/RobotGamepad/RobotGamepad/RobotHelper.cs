@@ -11,11 +11,11 @@ namespace RobotGamepad
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.IO.Ports;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
+    using System.Text;
 
     /// <summary>
     /// Класс для взаимодействия с контроллером Arduino.
@@ -38,14 +38,26 @@ namespace RobotGamepad
         private string lastErrorMessage = string.Empty;
 
         /// <summary>
-        /// Текст последней ошибки.
+        /// Gets Текст последней ошибки.
         /// </summary>
-        public string LastErrorMessage { get { return this.lastErrorMessage; } }
+        public string LastErrorMessage 
+        { 
+            get 
+            { 
+                return this.lastErrorMessage; 
+            } 
+        }
 
         /// <summary>
-        /// Признак соединения с сервером.
+        /// Gets a value indicating whether Признак соединения с сервером.
         /// </summary>
-        public bool Connected { get { return this.connected; } }
+        public bool Connected 
+        { 
+            get 
+            { 
+                return this.connected; 
+            } 
+        }
 
         /// <summary>
         /// Установка соединения с сервером. Сервером является Android-приложение.
@@ -74,7 +86,7 @@ namespace RobotGamepad
             {
                 this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 this.socket.Connect(Settings.TcpSocketServerAddress, Settings.TcpSocketServerPort);
-                this.connected = socket.Connected;
+                this.connected = this.socket.Connected;
             }
             catch (Exception e)
             {
@@ -96,17 +108,17 @@ namespace RobotGamepad
         /// </returns>
         public bool SendCommandToRobot(string command)
         {
-            if (connected)
+            if (this.connected)
             {
                 try
                 {
-                    Byte[] bytesSent = Encoding.ASCII.GetBytes(command + (char)13 + (char)10);
-                    socket.Send(bytesSent, bytesSent.Length, 0);
+                    byte[] bytesSent = Encoding.ASCII.GetBytes(command + (char)13 + (char)10);
+                    this.socket.Send(bytesSent, bytesSent.Length, 0);
                 }
                 catch (Exception e)
                 {
                     this.lastErrorMessage = e.Message;
-                    connected = false;
+                    this.connected = false;
                     return false;
                 }
             }

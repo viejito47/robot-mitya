@@ -15,12 +15,15 @@ namespace RobotGamepad
     /// <summary>
     /// Главный класс приложения.
     /// </summary>
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        /// <param name="args">
+        /// Параметры командной строки.
+        /// </param>
+        public static void Main(string[] args)
         {
             using (GameRobot game = new GameRobot())
             {
@@ -30,4 +33,3 @@ namespace RobotGamepad
     }
 #endif
 }
-

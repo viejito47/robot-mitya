@@ -23,52 +23,160 @@ namespace RobotGamepad
     /// <summary>
     /// Состояние приложения: главное меню или управление роботом.
     /// </summary>
-    internal enum GameState { gsMenu, gsRobotControl };
+    internal enum GameState 
+    { 
+        /// <summary>
+        /// Режим отображения меню.
+        /// </summary>
+        gsMenu,
+
+        /// <summary>
+        /// Режим управления роботом.
+        /// </summary>
+        gsRobotControl 
+    }
     
     /// <summary>
     /// This is the main type for your game
     /// </summary>
     public class GameRobot : Microsoft.Xna.Framework.Game
     {
+        /// <summary>
+        /// Вертикальный интервал между строками на экране.
+        /// </summary>
+        private static int debugStringInterval = 25;
+
+        /// <summary>
+        /// Ширина строк на экране.
+        /// </summary>
+        private static int debugStringColumnWidth = 100;
+
+        /// <summary>
+        /// Координаты первой ячейки 1-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition1 = new Vector2(20, 20);
+
+        /// <summary>
+        /// Координаты второй ячейки 1-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition1c1 = new Vector2(debugStringPosition1.X + debugStringColumnWidth, debugStringPosition1.Y);
+
+        /// <summary>
+        /// Координаты первой ячейки 2-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition2 = new Vector2(20, debugStringPosition1.Y + debugStringInterval);
+
+        /// <summary>
+        /// Координаты второй ячейки 2-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition2c1 = new Vector2(debugStringPosition2.X + debugStringColumnWidth, debugStringPosition2.Y);
+
+        /// <summary>
+        /// Координаты первой ячейки 3-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition3 = new Vector2(20, debugStringPosition2.Y + debugStringInterval);
+
+        /// <summary>
+        /// Координаты второй ячейки 3-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition3c1 = new Vector2(debugStringPosition3.X + debugStringColumnWidth, debugStringPosition3.Y);
+
+        /// <summary>
+        /// Координаты первой ячейки 4-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition4 = new Vector2(20, debugStringPosition3.Y + debugStringInterval);
+
+        /// <summary>
+        /// Координаты второй ячейки 4-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition4c1 = new Vector2(debugStringPosition4.X + debugStringColumnWidth, debugStringPosition4.Y);
+
+        /// <summary>
+        /// Координаты первой ячейки 5-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition5 = new Vector2(20, debugStringPosition4.Y + debugStringInterval);
+
+        /// <summary>
+        /// Координаты первой ячейки 6-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition6 = new Vector2(20, debugStringPosition5.Y + debugStringInterval);
+
+        /// <summary>
+        /// Координаты первой ячейки 7-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition7 = new Vector2(20, debugStringPosition6.Y + debugStringInterval);
+
+        /// <summary>
+        /// Координаты первой ячейки 8-й строки.
+        /// </summary>
+        private static Vector2 debugStringPosition8 = new Vector2(20, debugStringPosition7.Y + debugStringInterval);
+
+        /// <summary>
+        /// Объект для взаимодействия с роботом.
+        /// </summary>
         private RobotHelper robotHelper = new RobotHelper();
+
+        /// <summary>
+        /// Объект для работы с фарами робота.
+        /// </summary>
         private FlashlightHelper flashlightHelper = new FlashlightHelper();
+
+        /// <summary>
+        /// Объект для работы с ходовыми двигателями робота.
+        /// </summary>
         private DriveHelper driveHelper = new DriveHelper();
+
+        /// <summary>
+        /// Объект для работы с сервоприводами головы робота.
+        /// </summary>
         private LookHelper lookHelper = new LookHelper();
+
+        /// <summary>
+        /// Объект для установки эмоций робота.
+        /// </summary>
         private MoodHelper moodHelper = new MoodHelper();
+
+        /// <summary>
+        /// Объект для работы с ИК-пушкой робота.
+        /// </summary>
         private GunHelper gunHelper = new GunHelper();
 
+        /// <summary>
+        /// Менеджер графического устройства.
+        /// </summary>
         private GraphicsDeviceManager graphics;
+        
+        /// <summary>
+        /// Область для рисования.
+        /// </summary>
         private SpriteBatch spriteBatch;
         
-        // Константы для вывода текста:
+        /// <summary>
+        /// Шрифт для вывода текста.
+        /// </summary>
         private SpriteFont debugFont;
-        private static int DebugStringInterval = 25;
-        private static int DebugStringColumnWidth = 100;
-        private static Vector2 DebugStringPosition1 = new Vector2(20, 20);
-        private static Vector2 DebugStringPosition1_1 = new Vector2(DebugStringPosition1.X + DebugStringColumnWidth, DebugStringPosition1.Y);
-        private static Vector2 DebugStringPosition2 = new Vector2(20, DebugStringPosition1.Y + DebugStringInterval);
-        private static Vector2 DebugStringPosition2_1 = new Vector2(DebugStringPosition2.X + DebugStringColumnWidth, DebugStringPosition2.Y);
-        private static Vector2 DebugStringPosition3 = new Vector2(20, DebugStringPosition2.Y + DebugStringInterval);
-        private static Vector2 DebugStringPosition3_1 = new Vector2(DebugStringPosition3.X + DebugStringColumnWidth, DebugStringPosition3.Y);
-        private static Vector2 DebugStringPosition4 = new Vector2(20, DebugStringPosition3.Y + DebugStringInterval);
-        private static Vector2 DebugStringPosition4_1 = new Vector2(DebugStringPosition4.X + DebugStringColumnWidth, DebugStringPosition4.Y);
-        private static Vector2 DebugStringPosition5 = new Vector2(20, DebugStringPosition4.Y + DebugStringInterval);
-        private static Vector2 DebugStringPosition6 = new Vector2(20, DebugStringPosition5.Y + DebugStringInterval);
-        private static Vector2 DebugStringPosition7 = new Vector2(20, DebugStringPosition6.Y + DebugStringInterval);
-        private static Vector2 DebugStringPosition8 = new Vector2(20, DebugStringPosition7.Y + DebugStringInterval);
 
+        /// <summary>
+        /// Текущее состояние приложения.
+        /// </summary>
         private GameState gameState = GameState.gsMenu;
 
+        /// <summary>
+        /// Последний момент времени, когда отправлялись команды управления двигателями и поворотом головы.
+        /// </summary>
         private DateTime lastTimeCommandSent = new DateTime();
 
+        /// <summary>
+        /// Предыдущее состояние геймпэда.
+        /// </summary>
         private GamePadState previousGamePadState;
 
         /// <summary>
-        /// Конструктор класса.
+        /// Initializes a new instance of the GameRobot class.
         /// </summary>
         public GameRobot()
         {
-            graphics = new GraphicsDeviceManager(this);
+            this.graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -112,9 +220,9 @@ namespace RobotGamepad
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            this.spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            debugFont = Content.Load<SpriteFont>("CourierNew");
+            this.debugFont = Content.Load<SpriteFont>("CourierNew");
         }
 
         /// <summary>
@@ -183,7 +291,7 @@ namespace RobotGamepad
         /// <returns>true, если кнопка была нажата.</returns>
         private bool IsButtonChangedToDown(GamePadState gamePadState, Buttons button)
         {
-            return (gamePadState.IsButtonDown(button)) && (this.previousGamePadState.IsButtonDown(button) == false);
+            return gamePadState.IsButtonDown(button) && (this.previousGamePadState.IsButtonDown(button) == false);
         }
 
         /// <summary>
@@ -232,7 +340,7 @@ namespace RobotGamepad
             {
                 // В боевом режиме центральное направление взгляда по вертикали - строго горизонтально.
                 // Так проще целиться и стрелять. В обычном режиме - чуть вверх.
-                this.lookHelper.WarModeOn = ! this.lookHelper.WarModeOn;
+                this.lookHelper.WarModeOn = !this.lookHelper.WarModeOn;
                 this.lookHelper.LookForward();
             }
 
@@ -267,15 +375,15 @@ namespace RobotGamepad
 
             // Скорости двигателей и углы сервоприводов головы определяются и устанавливаются с заданной периодичностью.
             DateTime nowTime = DateTime.Now;
-            TimeSpan timePassed = nowTime - lastTimeCommandSent;
-            if (timePassed >= Settings.minCommandInterval)
+            TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
+            if (timePassed >= Settings.MinCommandInterval)
             {
                 this.driveHelper.RotationModeOn = gamePadState.Buttons.LeftShoulder == ButtonState.Pressed;
                 this.driveHelper.Drive(gamePadState.ThumbSticks.Left.X, gamePadState.ThumbSticks.Left.Y);
 
                 this.lookHelper.Look(gamePadState.ThumbSticks.Right.X, gamePadState.ThumbSticks.Right.Y);
 
-                lastTimeCommandSent = nowTime;
+                this.lastTimeCommandSent = nowTime;
             }
         }
 
@@ -287,44 +395,44 @@ namespace RobotGamepad
         /// </param>
         private void DrawInRobotControlState(GameTime gameTime)
         {
-            spriteBatch.Begin();
+            this.spriteBatch.Begin();
 
             Color color;
             string motorCommand;
 
             motorCommand = this.driveHelper.LastLeftMotorCommand;
             color = (motorCommand.Length > 1) && (motorCommand[1] == 'F') ? Color.White : Color.Orange;
-            spriteBatch.DrawString(debugFont, motorCommand, DebugStringPosition1, color);
+            this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition1, color);
 
             motorCommand = this.driveHelper.LastRightMotorCommand;
             color = (motorCommand.Length > 1) && (motorCommand[1] == 'F') ? Color.White : Color.Orange;
-            spriteBatch.DrawString(debugFont, motorCommand, DebugStringPosition2, color);
+            this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition2, color);
 
             if (this.driveHelper.TurboModeOn)
             {
-                spriteBatch.DrawString(debugFont, "Турбо режим", DebugStringPosition1_1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Турбо режим", debugStringPosition1c1, Color.Orange);
             }
 
             if (this.driveHelper.RotationModeOn)
             {
-                spriteBatch.DrawString(debugFont, "Режим разворота", DebugStringPosition2_1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Режим разворота", debugStringPosition2c1, Color.Orange);
             }
 
             if (this.lookHelper.SlowModeOn)
             {
-                spriteBatch.DrawString(debugFont, "Плавный обзор", DebugStringPosition3_1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Плавный обзор", debugStringPosition3c1, Color.Orange);
             }
 
             if (this.lookHelper.WarModeOn)
             {
-                spriteBatch.DrawString(debugFont, "Боевой настрой", DebugStringPosition4_1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Боевой настрой", debugStringPosition4c1, Color.Orange);
             }
 
-            spriteBatch.DrawString(debugFont, this.lookHelper.LastHorizontalServoCommand, DebugStringPosition3, Color.White);
-            spriteBatch.DrawString(debugFont, this.lookHelper.LastVerticalServoCommand, DebugStringPosition4, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.LastHorizontalServoCommand, debugStringPosition3, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.LastVerticalServoCommand, debugStringPosition4, Color.White);
 
             color = this.flashlightHelper.FlashlightTurnedOn ? Color.Yellow : Color.White;
-            spriteBatch.DrawString(debugFont, this.flashlightHelper.LastFlashlightCommand, DebugStringPosition5, color);
+            this.spriteBatch.DrawString(this.debugFont, this.flashlightHelper.LastFlashlightCommand, debugStringPosition5, color);
 
             string moodText = "Настроение: ";
             switch (this.moodHelper.Mood)
@@ -345,13 +453,14 @@ namespace RobotGamepad
                     moodText += "нормально";
                     break;
             }
-            spriteBatch.DrawString(debugFont, moodText, DebugStringPosition6, Color.White);
 
-            spriteBatch.DrawString(debugFont, this.PercentToText(this.gunHelper.GetChargePercent()), DebugStringPosition7, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, moodText, debugStringPosition6, Color.White);
 
-            spriteBatch.DrawString(debugFont, this.robotHelper.LastErrorMessage, DebugStringPosition8, Color.Orange);
+            this.spriteBatch.DrawString(this.debugFont, this.PercentToText(this.gunHelper.GetChargePercent()), debugStringPosition7, Color.White);
 
-            spriteBatch.End();
+            this.spriteBatch.DrawString(this.debugFont, this.robotHelper.LastErrorMessage, debugStringPosition8, Color.Orange);
+
+            this.spriteBatch.End();
         }
 
         /// <summary>

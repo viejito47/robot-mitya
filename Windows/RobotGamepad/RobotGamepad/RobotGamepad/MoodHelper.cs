@@ -17,7 +17,33 @@ namespace RobotGamepad
     /// <summary>
     /// Настроения робота.
     /// </summary>
-    public enum Mood { Normal, Happy, Blue, Angry, Disaster };
+    public enum Mood 
+    { 
+        /// <summary>
+        /// Нормальное настроение.
+        /// </summary>
+        Normal,
+
+        /// <summary>
+        /// Счастливое настроение.
+        /// </summary>
+        Happy,
+
+        /// <summary>
+        /// Грустное настроение.
+        /// </summary>
+        Blue,
+
+        /// <summary>
+        /// Злое настроение.
+        /// </summary>
+        Angry,
+
+        /// <summary>
+        /// Убитое настроение.
+        /// </summary>
+        Disaster
+    }
 
     /// <summary>
     /// Вспомогательный класс, предназначенный для управления настроением робота.
@@ -28,11 +54,22 @@ namespace RobotGamepad
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
         private RobotHelper robotHelper;
-        
+
         /// <summary>
         /// Текущее настроение робота.
         /// </summary>
         private Mood mood = Mood.Normal;
+
+        /// <summary>
+        /// Gets Текущее настроение робота.
+        /// </summary>
+        public Mood Mood
+        {
+            get
+            {
+                return this.mood;
+            }
+        }
 
         /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
@@ -46,7 +83,9 @@ namespace RobotGamepad
         /// <summary>
         /// Установка настроения робота.
         /// </summary>
-        /// <param name="mood"></param>
+        /// <param name="mood">
+        /// Новое настроение.
+        /// </param>
         public void SetMood(Mood mood)
         {
             this.CheckRobotHelper();
@@ -59,17 +98,6 @@ namespace RobotGamepad
             string command = this.GenerateCommand(mood);
             this.robotHelper.SendCommandToRobot(command);
             this.mood = mood;
-        }
-
-        /// <summary>
-        /// Текущее настроение робота.
-        /// </summary>
-        public Mood Mood
-        {
-            get
-            {
-                return this.mood;
-            }
         }
 
         /// <summary>

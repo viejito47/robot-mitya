@@ -1,4 +1,13 @@
-﻿using System.Reflection;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="Dzakhov's jag">
+//   Copyright © Dmitry Dzakhov 2011
+// </copyright>
+// <summary>
+//   Информация о сборке.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -30,5 +39,4 @@ using System.Runtime.InteropServices;
 //      Minor Version 
 //      Build Number
 //      Revision
-//
 [assembly: AssemblyVersion("1.0.0.0")]
