@@ -1,0 +1,16 @@
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\RobotGamepad.exe
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\RobotGamepad.pdb
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\RobotGamepad.exe
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\RobotGamepad.pdb
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\Content\CourierNew.xnb
+C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\RobotGamepad.exe.config
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\Content\CourierNew.xnb
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\RobotGamepad.exe.config
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\RobotGamepad.exe
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\bin\x86\Debug\RobotGamepad.pdb
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\RobotGamepad.exe
+C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepad\obj\x86\Debug\RobotGamepad.pdb
