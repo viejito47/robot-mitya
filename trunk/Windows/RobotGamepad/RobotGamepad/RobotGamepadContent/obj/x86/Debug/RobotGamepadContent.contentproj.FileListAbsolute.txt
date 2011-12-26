@@ -1,2 +1,0 @@
-C:\Develop\Arduino\RobotGamepad\RobotGamepad\RobotGamepadContent\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\robot-mitya\RobotGamepad\RobotGamepad\RobotGamepadContent\obj\x86\Debug\ResolveAssemblyReference.cache
