@@ -57,6 +57,7 @@ namespace RobotGamepad
 
             // byte[] serverAddress = { 192, 168, 1, 40 };
             byte[] serverAddress = { 192, 168, 1, 1 };
+            TcpSocketServerAddress = new IPAddress(serverAddress);
 
             TcpSocketServerPort = 51974;
 
