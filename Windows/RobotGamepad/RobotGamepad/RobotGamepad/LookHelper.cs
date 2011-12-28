@@ -186,6 +186,11 @@ namespace RobotGamepad
                 LookHelper.CorrectCoordinatesFromCyrcleToSquareAreaForFirstQuadrant(ref x, ref y);
                 y = -y;
             }
+
+            x = x < -1 ? -1 : x;
+            x = x > 1 ? 1 : x;
+            y = y < -1 ? -1 : y;
+            y = y > 1 ? 1 : y;
         }
 
         /// <summary>
