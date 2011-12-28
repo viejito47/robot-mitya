@@ -1,13 +1,14 @@
-#summary One-sentence summary of this page.
+#summary Планы по развитию Мити.
+#labels Featured
 
-= Introduction =
+= Ближайшие планы =
+# Выложить исходники.
+# Избавиться от DC-DC преобразователя. Надо как-то победить помехи от двигателей на входе по питанию Arduino.
+# Избавиться от заряда телефона от аккумуляторов Мити.
+# По возможности демонтировать 4-ый мой протошилд из Мити и сделать Митю пониже на сантиметр.
 
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Дальнейшие =
+# Передача потокового видео от смартфона к ПК.
+# Передача потокового звука от смартфона к ПК.
+# Передача потокового звука от ПК к смартфону.
+# Передача потокового видео от ПК к смартфону.
