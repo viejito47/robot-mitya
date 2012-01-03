@@ -24,6 +24,9 @@
 #include <parsetools.h>
 #include <IRremote.h>
 
+// Режим отладки.
+boolean debugMode = true;
+
 // Пин контроллера, использующийся для ИК-выстрела (цифровой выход).
 int gunPin = 3;
 // Пин, использующийся для фиксации попаданий (аналоговый вход).
@@ -89,6 +92,9 @@ void setup()
   pinMode(servoVerticalPin, OUTPUT);
   servoVertical.attach(servoVerticalPin);
   servoVertical.write(90);
+  
+  // Индикация режима отладки:
+  indicate();
 }
 
 // Функция главного цикла:
@@ -102,11 +108,19 @@ void loop()
   
   // Обработка ИК-попадания:
   if (irrecv.decode(&results)) {
-    bool gotHit = (results.decode_type == SONY) && (results.value == 0xABC1);
+    unsigned long hitValue;
+    if (debugMode) {
+      hitValue = 0xA90;
+    }
+    else {
+      hitValue = 0xABC1;
+    }
+    boolean gotHit = (results.decode_type == SONY) && (results.value == hitValue);
     irrecv.resume();
     
     // В случае попадания:
     if (gotHit) {
+      indicate();
       serialPrintln("Hit ");
       // Шлю команду 'HT000' (hit - попадание) Android-приложению:
       message[0] = (uint8_t)'H';
@@ -129,6 +143,7 @@ void loop()
     return;
   }
   if (messageLength != 5) {
+    indicate();
     serialPrintln("Invalid command.");
     return;
   }
@@ -173,6 +188,7 @@ void loop()
   }
   else
   {
+    indicate();
     serialFlush();
     serialPrintln("Unknown command.");
   }
@@ -237,17 +253,37 @@ void testRobot(int testNumber)
 
 // Инициализация последовательного порта.
 void serialBegin(int serialSpeed) {
-  Serial.begin(115200);
+  if (debugMode) {
+    Serial.begin(115200);
+  }
 }
 
 // Вывод строки в последовательный порт.
 void serialPrintln(String outputText) {
-  Serial.println(outputText);
+  if (debugMode) {
+    Serial.println(outputText);
+  }
 }
 
 // Очистка входного буфера последовательного порта.
 void serialFlush() {
-  Serial.flush();
+  if (debugMode) {
+    Serial.flush();
+  }
+}
+
+// Функция для отладки. Индикация какого-либо события светодиодом,
+// подключенным вместо ИК-пушки.
+void indicate() {
+  if (debugMode) {
+    digitalWrite(gunPin, HIGH);
+    delay(30);
+    digitalWrite(gunPin, HIGH);
+    delay(30);
+    digitalWrite(gunPin, HIGH);
+    delay(30);
+    digitalWrite(gunPin, LOW);
+  }
 }
 
 // Система каманд:
