@@ -25,9 +25,9 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	private MessageAccessoryReceiver mReceiver;
 	
 	/**
-	 * Нить, взаимодействующая с уровнем Windows-приложения.
+	 * Runnable объект, для нити, взаимодействующей с уровнем Windows-приложения.
 	 */
-	private Thread mTcpServerThread = null;
+	private TcpServer mTcpServer = null;
 	
 	/**
 	 * Объект Handler, с помощью которого передаются команды от уровня Windows-приложения
@@ -250,7 +250,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 			buffer[i] = (byte) command.charAt(i);
 		}		
 		getOpenAccessory().write(buffer);
-		Logger.d("Sent command: " + command);
+		Logger.d("RoboHeadActivity: Sent to Robot: " + command);
 	}
 	
 	/**
@@ -259,22 +259,21 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 * сообщений от робота.
 	 */
 	private void startTcpServer(final Handler handler) {
-		if (mTcpServerThread != null) {
+		if (mTcpServer != null) {
 			return;
 		}
-		TcpServer tcpServer = new TcpServer(handler);
-		mTcpServerThread = new Thread(tcpServer);
-		mTcpServerThread.start();
+		mTcpServer = new TcpServer(handler);
+		Thread thread = new Thread(mTcpServer);
+		thread.start();
 	}	
 	
 	/**
 	 * Остановка нити с серверным сокетом.
 	 */
 	private void stopTcpServer() {
-		if ((mTcpServerThread != null) && (mTcpServerThread.isAlive())) {
-			mTcpServerThread.interrupt();
-			mTcpServerThread = null;
+		if (mTcpServer != null) {
+			mTcpServer.stopRun();
+			mTcpServer = null;
 		}
 	}
-	
 }
