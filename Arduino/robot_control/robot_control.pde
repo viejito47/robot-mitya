@@ -102,6 +102,11 @@ void loop()
 {
   Usb.Task();
 
+  // Установка соединения с Andriod-приложением:
+  if (adk.isReady() == false) {
+    return;
+  }
+
   // Инициализация структуры для передачи данных в Android-приложение:
   uint8_t message[5] = { 0x00 };
   uint16_t messageLength = sizeof(message);
@@ -130,11 +135,6 @@ void loop()
       message[4] = (uint8_t)'0';
       adk.SndData(messageLength, message);
     }
-  }
-
-  // Установка соединения с Andriod-приложением:
-  if (adk.isReady() == false) {
-    return;
   }
 
   // Чтение команды из входной очереди:
