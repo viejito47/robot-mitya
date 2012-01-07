@@ -1,11 +1,13 @@
 package ru.dzakhov;
 
-import java.io.BufferedReader; 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;	 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;	 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.os.Handler;
 import android.os.Message;
@@ -19,7 +21,7 @@ public class TcpServer implements Runnable {
 	/**
 	 * Объект, управляющий фарами робота.
 	 */
-	private Flashlight flashlight = new Flashlight();
+	private Flashlight mFlashlight = new Flashlight();
 	
 	/**
 	 * Ссылка на объект Handler из RoboHeadActivity. Им обрабатываются все поступающие
@@ -30,23 +32,14 @@ public class TcpServer implements Runnable {
 	/**
 	 * Признак остановки сервиса сокета.
 	 */
-	private boolean terminate = false;
-	
+	private boolean mTerminate = false;
+
 	/**
-	 * Адрес серверного сокета.
+	 * При чтении команд из потока сокета часть команды может не успеть загрузиться на момент чтения
+	 * и будет дочитана на следующих итерациях чтения. Поле используется для сохранения недочитанной
+	 * команды.
 	 */
-	//public static final String SERVERIP = "192.168.1.1";
-	public static final String SERVERIP = "localhost";
-	
-	/**
-	 * Порт сокета.
-	 */
-	public static final int SERVERPORT = 51974;
-	
-	/**
-	 * Длина сообщений/команд.
-	 */
-	public static final int COMMANDLENGTH = 5;
+	private String mPreviousCommandsRest = "";
 	
 	/**
 	 * Конструктор класса.
@@ -61,77 +54,57 @@ public class TcpServer implements Runnable {
 	 * Остановка сервиса сокета (установка признака terminate для выхода из метода run()).
 	 */
 	public final void stopRun() {
-		terminate = true;
+		mTerminate = true;
 	}
 	
 	/**
 	 * Реализация интерфейса Runnable.
 	 */
 	public final void run() {
-		flashlight.open();
+		mFlashlight.open();
 		try {
 			while (true) {
 				Socket socket = null;
 				ServerSocket serverSocket = null;
 				try {
 					Logger.d("TcpServer: Waiting for client to connect...");
-					serverSocket = new ServerSocket(SERVERPORT);
+					serverSocket = new ServerSocket(Settings.COMMANDSOCKETPORT);
 					socket = serverSocket.accept();
 					Logger.d("TcpServer: Connected.");
-					String previousCommandsRest = "";
-					while (true) {              
-						//Logger.d("TcpServer: Receiving...");
-		
-						BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-						String commands = previousCommandsRest + in.readLine();
+					while (true) {
+						// Получить список принятых на данный момент команд:
+						List<String> commandList = getCommandsFromStream(socket.getInputStream());
+						if (commandList.size() > 0) {
+							Logger.d("commandList.size() = " + commandList.size());
+						}						
 						
-						String temp = in.readLine();
-						if (temp != null) {
-							Logger.d("TcpServer: ********** THE PROBLEM IS HERE: " + temp);
-						}
-						
-						previousCommandsRest = "";
-						int commandsLength = commands.length();
-						Logger.d("TcpServer will execute: '" + commands + "'");
-		
-						int i = 0;
-						while (i < commandsLength) {
-							int currentCommandsLength = commandsLength - i;
-	
-							if (currentCommandsLength >= TcpServer.COMMANDLENGTH) {
-								String command = "";
-								for (int j = 0; j < TcpServer.COMMANDLENGTH; j++) {
-									command += commands.charAt(i + j);
-								}
-	
-								echoCommand(socket.getOutputStream(), command);
-								
-								if (command.equalsIgnoreCase("FL000")) {
-									Logger.d("Выключить фары");
-									flashlight.turnLightOff();
-								} else if (command.equalsIgnoreCase("FL001")) {
-									Logger.d("Включить фары");
-									flashlight.turnLightOn();
-								} else {
-									Message message = new Message();
-									message.obj = command;
-									mHandler.sendMessage(message);
-								}
-								
-								i += TcpServer.COMMANDLENGTH;
+						// Выполнить каждую принятую команду:
+						for (int i = 0; i < commandList.size(); i++) {
+							String command = commandList.get(i);
+							
+							// Эхо-возврат команды в Windows-приложение (для отладки):
+							echoCommand(socket.getOutputStream(), command);
+							
+							// Команды работы с фарами робота (вспышка фото) выполняются здесь,
+							// остальные команды передаются в RoboHeadActivity:
+							if (command.equalsIgnoreCase("FL000")) {
+								Logger.d("Выключить фары");
+								mFlashlight.turnLightOff();
+							} else if (command.equalsIgnoreCase("FL001")) {
+								Logger.d("Включить фары");
+								mFlashlight.turnLightOn();
 							} else {
-								previousCommandsRest = "";
-								for (int j = i; j < commandsLength; j++) {
-									previousCommandsRest += commands.charAt(i + j);
-								}
-								i = commandsLength;
+								Message message = new Message();
+								message.arg1 = Settings.COMMAND;
+								message.obj = command;
+								mHandler.sendMessage(message);
 							}
 						}
 						
-						if (terminate) {
+						if (mTerminate) {
 							break;
 						}
-					} // while (true)
+					} // read while cycle
 				} catch (Exception e) {
 					Logger.d("TcpServer error (1): " + e.getLocalizedMessage());
 				}
@@ -154,15 +127,55 @@ public class TcpServer implements Runnable {
 				}
 				serverSocket = null;
 				
-				if (terminate) {
+				if (mTerminate) {
 					break;
 				}
-			} // while (true)
+			} // accept while cycle
 		} finally {
-			flashlight.release();
+			mFlashlight.release();
 		}
 	} // run
 
+	/**
+	 * Извлекает из входного потока пятибайтовые команды, разделённые символами #13, #10.
+	 * Команда, ещё неполностью попавшая во входной поток не возвращается в выходной список команд.
+	 * Попавший в выходной поток кусок команды откладывается до следующего вызова метода.
+	 * @param inputStream поток ввода (поступает из сокета).
+	 * @return список команд роботу.
+	 * @throws IOException ошибка чтения из потока ввода (из сокета).
+	 */
+	public final List<String> getCommandsFromStream(final InputStream inputStream) throws IOException {
+		List<String> result = new ArrayList<String>();
+		
+		DataInputStream dataInputStream = new DataInputStream(inputStream);
+		while (true) {
+			int bytesAvailable = dataInputStream.available(); 
+			if (bytesAvailable <= 0) {
+				break;
+			}
+			
+			String command = dataInputStream.readLine();
+			if (command == null) { // (входной поток пуст)
+				break;
+			} else {
+				// Если на предыдущей итерации часть команды была прочитана, дочитываю команду:
+				if (!mPreviousCommandsRest.equals("")) {
+					command = mPreviousCommandsRest + command;
+				}
+				
+				// Если не вся команда прочитана, сохраняю что прочиталось до следующей итерации,
+				// иначе добавляю прочитанную команду в список:
+				if (command.length() < Settings.COMMANDLENGTH) {
+					mPreviousCommandsRest = command;
+				} else {
+					result.add(command);
+					mPreviousCommandsRest = "";
+				}
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Эхо-возврат обработанной комманды. Используется для отладки. 
 	 * @param outputStream поток вывода сокета.
