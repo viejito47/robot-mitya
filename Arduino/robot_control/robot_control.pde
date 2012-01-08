@@ -27,6 +27,11 @@
 // Режим отладки.
 boolean debugMode = true;
 
+// Длина команды:
+const int COMMANDLENGTH = 5;
+// Неуместившаяся команда из буфера, прочитанного на предыдущей итерации чтения:
+String previousBufferRest = "";
+
 // Пин контроллера, использующийся для ИК-выстрела (цифровой выход).
 int gunPin = 3;
 // Пин, использующийся для фиксации попаданий (аналоговый вход).
@@ -107,11 +112,39 @@ void loop()
     return;
   }
 
-  // Инициализация структуры для передачи данных в Android-приложение:
-  uint8_t message[5] = { 0x00 };
-  uint16_t messageLength = sizeof(message);
+  // Проверка ИК-попадания в робота:
+  if (checkIrHit())
+  {
+    // Инициализация структуры для передачи данных в Android-приложение:
+    uint8_t message[5] = { 0x00 };
+    uint16_t messageLength = sizeof(message);
+    
+    indicate();
+    serialPrintln("Hit ");
+    // Шлю сообщение Android-приложению об ИК-попадании в нас: 'HT000' (hit - попадание):
+    message[0] = (uint8_t)'H';
+    message[1] = (uint8_t)'T';
+    message[2] = (uint8_t)'0';
+    message[3] = (uint8_t)'0';
+    message[4] = (uint8_t)'0';
+    adk.SndData(messageLength, message);
+  }
   
-  // Обработка ИК-попадания:
+  // Инициализация структуры для приёма данных от Android-приложения:
+  uint8_t buffer[5] = { 0x00 };
+  uint16_t bufferLength = sizeof(buffer);
+
+  // Чтение команд из входной очереди:
+  adk.RcvData(&bufferLength, buffer);
+  
+  // Извлечение и обработка команд из входного буфера:
+  processCommandBuffer(bufferLength, buffer);
+}
+
+// Проверка ИК-попадания в робота:
+boolean checkIrHit()
+{
+  boolean result = false;
   if (irrecv.decode(&results)) {
     unsigned long hitValue;
     if (debugMode) {
@@ -120,67 +153,95 @@ void loop()
     else {
       hitValue = 0xABC1;
     }
-    boolean gotHit = (results.decode_type == SONY) && (results.value == hitValue);
+    result = (results.decode_type == SONY) && (results.value == hitValue);
     irrecv.resume();
-    
-    // В случае попадания:
-    if (gotHit) {
-      indicate();
-      serialPrintln("Hit ");
-      // Шлю команду 'HT000' (hit - попадание) Android-приложению:
-      message[0] = (uint8_t)'H';
-      message[1] = (uint8_t)'T';
-      message[2] = (uint8_t)'0';
-      message[3] = (uint8_t)'0';
-      message[4] = (uint8_t)'0';
-      adk.SndData(messageLength, message);
-    }
   }
+  return result;
+}
 
-  // Чтение команды из входной очереди:
-  adk.RcvData(&messageLength, message);
-  if (messageLength == 0) {
-    return;
-  }
-  if (messageLength != 5) {
-    indicate();
-    serialPrintln("Invalid command.");
-    return;
+// Извлечение и обработка команд из входного буфера:
+void processCommandBuffer(uint16_t bufferSize, uint8_t *buffer)
+{
+  // Перевожу буфер в строку:
+  String bufferText = "";
+  for (int i = 0; i < bufferSize; i++)
+  {
+    bufferText += (char) buffer[i];
   }
   
+  // Если от предыдущей итерации остался кусок команды, прибавляю его слева:
+  bufferText = previousBufferRest + bufferText;
+  previousBufferRest = "";
+  
+  // Последовательно извлекаю из полученной строки команды длиной COMMANDLENGTH символов.
+  // Что не уместилось пойдёт в "довесок" (previousBufferRest) к следующей итереции.
+  int i = 0;
+  int bufferLength = bufferText.length();
+  while (i < bufferLength)
+  {
+    int currentBufferLength = bufferLength - i;
+    
+    if (currentBufferLength >= COMMANDLENGTH)
+    {
+      String command = "";
+      for (int j = 0; j < COMMANDLENGTH; j++)
+      {
+        command += bufferText[i + j];
+      }
+
+      // Обработка команды:      
+      processCommand(command);
+    }
+    else
+    {
+      // "Довесок" к следующей итерации:
+      previousBufferRest = "";
+      for (int j = 0; j < currentBufferLength; j++)
+      {
+        previousBufferRest += bufferText[i + j];
+      }
+    }
+
+    i += COMMANDLENGTH;
+  }
+}
+
+// Процедура обработки команды:
+void processCommand(String command)
+{
   // Парсер команды:
-  String command;
+  String operation;
   int paramValue;
-  command = (char)message[0];
-  command += (char)message[1];
-  int digit100 = message[2] - '0';
-  int digit10 = message[3] - '0';
-  int digit1 = message[4] - '0';
+  operation = command[0];
+  operation += command[1];
+  int digit100 = command[2] - '0';
+  int digit10 = command[3] - '0';
+  int digit1 = command[4] - '0';
   paramValue = 100 * digit100 + 10 * digit10 + digit1;
-  serialPrintln(command + (char)(digit100 + '0') + (char)(digit10 + '0') + (char)(digit1 + '0'));
+  serialPrintln(operation + (char)(digit100 + '0') + (char)(digit10 + '0') + (char)(digit1 + '0'));
   
-  if ((command == "LF") || (command == "RF")
-   || (command == "LB") || (command == "RB")
-   || (command == "DF") || (command == "DB")) 
+  if ((operation == "LF") || (operation == "RF")
+   || (operation == "LB") || (operation == "RB")
+   || (operation == "DF") || (operation == "DB")) 
   {
     // Команда двигателям:
-    moveMotor(command[0], command[1], paramValue);
+    moveMotor(operation[0], operation[1], paramValue);
     serialPrintln("MOVE: OK");
   }
-  else if ((command == "HH") || (command == "HV"))
+  else if ((operation == "HH") || (operation == "HV"))
   {
     // Команда голове:
-    moveHead(command[1], paramValue);
+    moveHead(operation[1], paramValue);
     serialPrintln("HEAD: OK");
   }
-  else if (command == "FR")
+  else if (operation == "FR")
   {
     // Команда выстрела пушке:
     irsend.sendSony(0xABC0, 16);
     irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
     serialPrintln("GUN: OK");
   }
-  else if (command == "TE")
+  else if (operation == "TE")
   {
     // Команда выполнения теста робота:
     testRobot(paramValue);
