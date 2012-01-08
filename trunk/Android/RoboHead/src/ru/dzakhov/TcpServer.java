@@ -185,7 +185,7 @@ public class TcpServer implements Runnable {
 	private void echoCommand(final OutputStream outputStream, final String command) throws IOException {
 		Logger.d("TcpServer: echo command " + command);
 
-		String outputText = command + '\n' + '\r';
+		String outputText = command + "\r\n";
 
 		byte[] buffer = new byte[outputText.length()];
 		for (int i = 0; i < outputText.length(); i++) {
