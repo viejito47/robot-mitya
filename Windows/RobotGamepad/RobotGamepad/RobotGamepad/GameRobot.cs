@@ -12,6 +12,7 @@ namespace RobotGamepad
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Audio;
     using Microsoft.Xna.Framework.Content;
@@ -24,7 +25,7 @@ namespace RobotGamepad
     /// Состояние приложения: главное меню или управление роботом.
     /// </summary>
     internal enum GameState 
-    { 
+    {
         /// <summary>
         /// Режим отображения меню.
         /// </summary>
@@ -209,7 +210,7 @@ namespace RobotGamepad
 
             if (this.gameState == GameState.gsRobotControl)
             {
-                this.InitializeRobot();
+                this.FinalizeRobot();
             }
         }
 
@@ -495,6 +496,7 @@ namespace RobotGamepad
         /// </summary>
         private void InitializeRobot()
         {
+            this.robotHelper.ClearCommandLogs();
             this.robotHelper.Connect();
             this.driveHelper.Stop();
             this.lookHelper.LookForward();
@@ -509,6 +511,10 @@ namespace RobotGamepad
             this.driveHelper.Stop();
             this.lookHelper.LookForward();
             this.flashlightHelper.TurnOff();
+            Thread.Sleep(1000); // (немного ждем прихода последних эхо-команд от Android-приложения)
+#if DEBUG
+            this.robotHelper.SaveLogsToFile();
+#endif
         }
     }
 }
