@@ -19,11 +19,6 @@ import android.os.Message;
  */
 public class TcpServer implements Runnable {
 	/**
-	 * Объект, управляющий фарами робота.
-	 */
-	private Flashlight mFlashlight = new Flashlight();
-	
-	/**
 	 * Ссылка на объект Handler из RoboHeadActivity. Им обрабатываются все поступающие
 	 * в Android-приложение сообщения: и от Arduino, и от Windows.
 	 */
@@ -61,79 +56,65 @@ public class TcpServer implements Runnable {
 	 * Реализация интерфейса Runnable.
 	 */
 	public final void run() {
-		mFlashlight.open();
-		try {
-			while (true) {
-				Socket socket = null;
-				ServerSocket serverSocket = null;
+		while (true) {
+			Socket socket = null;
+			ServerSocket serverSocket = null;
+			try {
+				Logger.d("TcpServer: Waiting for client to connect...");
+				serverSocket = new ServerSocket(Settings.COMMANDSOCKETPORT);
+				socket = serverSocket.accept();
+				Logger.d("TcpServer: Connected.");
+				while (true) {
+					// Получить список принятых на данный момент команд:
+					List<String> commandList = getCommandsFromStream(socket.getInputStream());
+					if (commandList.size() > 0) {
+						Logger.d("commandList.size() = " + commandList.size());
+					}						
+					
+					// Выполнить каждую принятую команду:
+					for (int i = 0; i < commandList.size(); i++) {
+						String command = commandList.get(i);
+						
+						// Эхо-возврат команды в Windows-приложение (для отладки):
+						echoCommand(socket.getOutputStream(), command);
+						
+						// Команды передаются в RoboHeadActivity:
+						Message message = new Message();
+						message.arg1 = Settings.COMMAND;
+						message.obj = command;
+						mHandler.sendMessage(message);
+					}
+					
+					if (mTerminate) {
+						break;
+					}
+				} // read while cycle
+			} catch (Exception e) {
+				Logger.d("TcpServer error (1): " + e.getLocalizedMessage());
+			}
+	
+			if (!socket.isClosed()) {
 				try {
-					Logger.d("TcpServer: Waiting for client to connect...");
-					serverSocket = new ServerSocket(Settings.COMMANDSOCKETPORT);
-					socket = serverSocket.accept();
-					Logger.d("TcpServer: Connected.");
-					while (true) {
-						// Получить список принятых на данный момент команд:
-						List<String> commandList = getCommandsFromStream(socket.getInputStream());
-						if (commandList.size() > 0) {
-							Logger.d("commandList.size() = " + commandList.size());
-						}						
-						
-						// Выполнить каждую принятую команду:
-						for (int i = 0; i < commandList.size(); i++) {
-							String command = commandList.get(i);
-							
-							// Эхо-возврат команды в Windows-приложение (для отладки):
-							echoCommand(socket.getOutputStream(), command);
-							
-							// Команды работы с фарами робота (вспышка фото) выполняются здесь,
-							// остальные команды передаются в RoboHeadActivity:
-							if (command.equalsIgnoreCase("FL000")) {
-								Logger.d("Выключить фары");
-								mFlashlight.turnLightOff();
-							} else if (command.equalsIgnoreCase("FL001")) {
-								Logger.d("Включить фары");
-								mFlashlight.turnLightOn();
-							} else {
-								Message message = new Message();
-								message.arg1 = Settings.COMMAND;
-								message.obj = command;
-								mHandler.sendMessage(message);
-							}
-						}
-						
-						if (mTerminate) {
-							break;
-						}
-					} // read while cycle
-				} catch (Exception e) {
-					Logger.d("TcpServer error (1): " + e.getLocalizedMessage());
+					socket.close();
+				} catch (Exception e2) {
+					Logger.d("TcpServer error (socket.close()): " + e2.getLocalizedMessage());
 				}
-		
-				if (!socket.isClosed()) {
-					try {
-						socket.close();
-					} catch (Exception e2) {
-						Logger.d("TcpServer error (socket.close()): " + e2.getLocalizedMessage());
-					}
+			}
+			socket = null;
+	
+			if (!serverSocket.isClosed()) {
+				try {
+					serverSocket.close();
+				} catch (Exception e2) {
+					Logger.d("TcpServer error (serverSocket.close()): " + e2.getLocalizedMessage());
 				}
-				socket = null;
-		
-				if (!serverSocket.isClosed()) {
-					try {
-						serverSocket.close();
-					} catch (Exception e2) {
-						Logger.d("TcpServer error (serverSocket.close()): " + e2.getLocalizedMessage());
-					}
-				}
-				serverSocket = null;
-				
-				if (mTerminate) {
-					break;
-				}
-			} // accept while cycle
-		} finally {
-			mFlashlight.release();
-		}
+			}
+			serverSocket = null;
+			
+			if (mTerminate) {
+				break;
+			}
+		} // accept while cycle
 	} // run
 
 	/**

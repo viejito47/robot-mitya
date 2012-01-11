@@ -36,6 +36,11 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	private Handler mHandler;
 
 	/**
+	 * Объект, управляющий видеокамерой телефона и её вспышкой.
+	 */
+	private CameraManager mCameraManager;
+	
+	/**
 	 * Установка картинки с мордочкой робота.
 	 * @param faceResouceId идентификатор ресурса-картинки.
 	 */
@@ -72,6 +77,10 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 					setFace(R.drawable.mitya_is_angry);
 				} else if (command.equalsIgnoreCase("MD004")) {
 					setFace(R.drawable.mitya_is_ill);
+				} else if (command.equalsIgnoreCase("FL000")) {
+					mCameraManager.turnLightOff();
+				} else if (command.equalsIgnoreCase("FL001")) {
+					mCameraManager.turnLightOn();
 				} else if (command.equalsIgnoreCase("HT000")) {
 	                new Thread() {
 	                    public void run() {
@@ -95,6 +104,8 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		getOpenAccessory().setListener(mReceiver);
 
     	startTcpServer(mHandler);
+    	
+    	mCameraManager = new CameraManager(this);
     }
 	
 	@Override
@@ -105,10 +116,12 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	
 	@Override
 	protected final void afterOnResume() {
+		mCameraManager.open();
 	}
 
 	@Override
 	protected final void afterOnPause() {
+		mCameraManager.release();
 	}
 
 	/**
