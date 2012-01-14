@@ -212,8 +212,8 @@ void processCommand(String command)
   // Парсер команды:
   String operation;
   int paramValue;
-  operation = command[0];
-  operation += command[1];
+  operation = (String)command[0];
+  operation += (String)command[1];
   int digit100 = command[2] - '0';
   int digit10 = command[3] - '0';
   int digit1 = command[4] - '0';
