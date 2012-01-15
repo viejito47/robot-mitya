@@ -93,7 +93,7 @@ public class TcpServer implements Runnable {
 				Logger.d("TcpServer error (1): " + e.getLocalizedMessage());
 			}
 	
-			if (!socket.isClosed()) {
+			if ((socket != null) && (!socket.isClosed())) {
 				try {
 					socket.close();
 				} catch (Exception e2) {
@@ -102,7 +102,7 @@ public class TcpServer implements Runnable {
 			}
 			socket = null;
 	
-			if (!serverSocket.isClosed()) {
+			if ((serverSocket != null) && (!serverSocket.isClosed())) {
 				try {
 					serverSocket.close();
 				} catch (Exception e2) {
