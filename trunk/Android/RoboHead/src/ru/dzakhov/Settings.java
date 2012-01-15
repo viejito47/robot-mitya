@@ -10,14 +10,24 @@ import android.preference.PreferenceActivity;
  */
 public class Settings extends PreferenceActivity {
 	/**
-	 * Адрес серверного сокета.
+	 * Адрес сервера.
 	 */
-	public static final String COMMANDSERVERSOCKETIP = "localhost";
+	public static final String SERVERIP = "localhost";
 	
 	/**
-	 * Порт сокета.
+	 * Адрес клиента.
+	 */
+	public static final String CLIENTIP = "192.168.1.41";
+	
+	/**
+	 * Порт сокета для приёма команд от Windows-приложения.
 	 */
 	public static final int COMMANDSOCKETPORT = 51974;
+	
+	/**
+	 * Порт сокета для передачи видео в Windows-приложение.
+	 */
+	public static final int MEDIASOCKETPORT = 51973;
 	
 	/**
 	 * Длина команд, передаваемых роботу.

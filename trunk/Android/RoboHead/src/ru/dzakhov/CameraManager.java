@@ -1,9 +1,17 @@
 package ru.dzakhov;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
 
 import android.app.Activity;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.view.SurfaceHolder;
@@ -32,6 +40,11 @@ public final class CameraManager implements SurfaceHolder.Callback, Camera.Previ
 	private Camera mCamera = null;
 	
 	/**
+	 * Порядковый номер камеры. Передаётся в Camera.Open.
+	 */
+	private int mCameraId = -1;
+	
+	/**
 	 * Параметры камеры телефона.
 	 */
 	private Camera.Parameters mParameters = null;
@@ -42,6 +55,11 @@ public final class CameraManager implements SurfaceHolder.Callback, Camera.Previ
 	private boolean mFlashlightOn = false;
 
 	/**
+	 * Сокет для передачи видеопотока.
+	 */
+	private DatagramSocket mDatagramSocket = null;
+	
+	/**
 	 * Конструктор класа.
 	 * @param activity активити для превью.
 	 */
@@ -51,15 +69,35 @@ public final class CameraManager implements SurfaceHolder.Callback, Camera.Previ
 		mSurfaceView = (SurfaceView) mActivity.findViewById(R.id.surfaceViewCamera);
 		SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
 		surfaceHolder.addCallback(this);
-		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //TODO Deprecated? Да без этой строки всё падает!
+		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //Deprecated? Да без этой строки всё падает!
+		
+        CameraInfo cameraInfo = new CameraInfo();
+		int numberOfCameras = Camera.getNumberOfCameras();
+		mCameraId = -1;
+		for (int i = 0; i < numberOfCameras; i++) {
+			Camera.getCameraInfo(i, cameraInfo);
+			if (cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT) {
+				mCameraId = i;
+				break;
+			}
+		}
 	}
 	
 	/**
 	 * Открыть ресурс (камеру).
 	 */
 	public void open() {
-		if (mCamera == null) {
-			mCamera = Camera.open();
+		try {
+			if (mDatagramSocket == null) {
+				mDatagramSocket = new DatagramSocket(Settings.MEDIASOCKETPORT);
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		
+		if ((mCamera == null) && (mCameraId != -1)) {
+			mCamera = Camera.open(mCameraId);
+			//mCamera = Camera.open();
 	        if (mCamera != null) {
 	        	mParameters = mCamera.getParameters();
 	        }
@@ -76,6 +114,11 @@ public final class CameraManager implements SurfaceHolder.Callback, Camera.Previ
 			mCamera.release();
 			mCamera = null;
 			mParameters = null;
+		}
+		
+		if (mDatagramSocket != null) {
+			mDatagramSocket.close();
+			mDatagramSocket = null;
 		}
 	}
 	
@@ -175,6 +218,41 @@ public final class CameraManager implements SurfaceHolder.Callback, Camera.Previ
 	 * @param camera камера.
 	 */
 	public void onPreviewFrame(final byte[] data, final Camera camera) {
-		// TODO Вот тут мой поток
+		if (mDatagramSocket == null) {
+			return;
+		}
+		
+		Camera.Parameters parameters = camera.getParameters();
+		int format = parameters.getPreviewFormat();
+		int width = parameters.getPreviewSize().width;
+		int height = parameters.getPreviewSize().height;
+		
+		// Получить YUV изображение:
+		YuvImage yuvImage = new YuvImage(data, format, width, height, null);
+		// Получить Jpeg изображение:
+	    Rect rect = new Rect(0, 0, width, height);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final int quality = 20;
+        yuvImage.compressToJpeg(rect, quality, outputStream);
+        byte[] jpegData = outputStream.toByteArray();
+
+        int i = 0;
+        int length = jpegData.length;
+        final int packageSize = 512;
+        while (i < length) {
+            try {
+            	DatagramPacket packet = new DatagramPacket(jpegData, i, packageSize, 
+						new InetSocketAddress(Settings.CLIENTIP, Settings.MEDIASOCKETPORT));
+				mDatagramSocket.send(packet);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+            i += packageSize;
+        }
+//        Logger.d(String.valueOf(jpegData.length) + " "
+//        		+ String.valueOf(format) + " " 
+//        		+ String.valueOf(width) + "x"
+//        		+ String.valueOf(height));
 	}
 }

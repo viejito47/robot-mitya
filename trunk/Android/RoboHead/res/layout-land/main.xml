@@ -17,8 +17,11 @@
 
 	<SurfaceView 
         android:id="@+id/surfaceViewCamera"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_gravity="right|bottom"
         />	        
+<!--
+        android:visibility="gone"
+ -->
 </FrameLayout>
