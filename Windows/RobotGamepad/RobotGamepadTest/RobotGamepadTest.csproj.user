@@ -11,11 +11,15 @@
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <StartWorkingDirectory>C:\Develop\Arduino\RobotGamepad\RobotGamepadTest\bin\Debug\</StartWorkingDirectory>
-    <StartArguments>RobotGamepadTest.exe</StartArguments>
+    <StartWorkingDirectory>
+    </StartWorkingDirectory>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <StartWorkingDirectory>C:\Develop\Arduino\RobotGamepad\RobotGamepadTest\bin\Debug\</StartWorkingDirectory>
-    <StartArguments>RobotGamepadTest.exe</StartArguments>
+    <StartWorkingDirectory>
+    </StartWorkingDirectory>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
 </Project>
