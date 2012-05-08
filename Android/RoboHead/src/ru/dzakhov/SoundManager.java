@@ -115,8 +115,10 @@ public final class SoundManager {
 	 * Освобождение ресурсов.
 	 */
 	public static void cleanup() {
-		mSoundPool.release();
-		mSoundPool = null;
+		if (mSoundPool != null) {
+			mSoundPool.release();
+			mSoundPool = null;
+		}
 	    mSoundPoolMap.clear();
 	    mAudioManager.unloadSoundEffects();
 	    mInstance = null;

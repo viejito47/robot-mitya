@@ -55,8 +55,8 @@ namespace RobotGamepad
 
             MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
-            // byte[] serverAddress = { 192, 168, 1, 1 };
-            byte[] serverAddress = { 192, 168, 1, 40 };
+            byte[] serverAddress = { 192, 168, 1, 1 };
+            //byte[] serverAddress = { 192, 168, 1, 40 };
             TcpSocketServerAddress = new IPAddress(serverAddress);
 
             TcpSocketServerPort = 51974;
