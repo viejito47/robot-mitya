@@ -6,7 +6,8 @@
 	<item 
 	    android:id="@+id/test"
 	    android:title="@string/menu_test_label" />
-	<item 
+	<item android:id="@+id/test_record" android:title="@string/menu_test_record_label"></item><item 
 	    android:id="@+id/about"
 	    android:title="@string/menu_about_label" />
+	
 </menu>

@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 /**
  * Главная активити приложения.
@@ -38,7 +39,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	/**
 	 * Объект, управляющий видеокамерой телефона и её вспышкой.
 	 */
-	private CameraManager mCameraManager;
+//dsd	private CameraManager mCameraManager;
 	
 	/**
 	 * Установка картинки с мордочкой робота.
@@ -55,7 +56,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 */
 	@Override
 	protected final void afterOnCreate(final Bundle savedInstanceState) {
-        setContentView(R.layout.main);
+        setContentView(R.layout.face);
 
         SoundManager.getInstance();
         SoundManager.initSounds(this);
@@ -77,10 +78,10 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 					setFace(R.drawable.mitya_is_angry);
 				} else if (command.equalsIgnoreCase("MD004")) {
 					setFace(R.drawable.mitya_is_ill);
-				} else if (command.equalsIgnoreCase("FL000")) {
-					mCameraManager.turnLightOff();
-				} else if (command.equalsIgnoreCase("FL001")) {
-					mCameraManager.turnLightOn();
+//				} else if (command.equalsIgnoreCase("FL000")) {
+////dsd					mCameraManager.turnLightOff();
+//				} else if (command.equalsIgnoreCase("FL001")) {
+////dsd					mCameraManager.turnLightOn();
 				} else if (command.equalsIgnoreCase("HT000")) {
 	                new Thread() {
 	                    public void run() {
@@ -105,7 +106,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 
     	startTcpServer(mHandler);
     	
-    	mCameraManager = new CameraManager(this);
+//dsd    	mCameraManager = new CameraManager(this);
     }
 	
 	@Override
@@ -116,12 +117,12 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	
 	@Override
 	protected final void afterOnResume() {
-		mCameraManager.open();
+//dsd		mCameraManager.open();
 	}
 
 	@Override
 	protected final void afterOnPause() {
-		mCameraManager.release();
+//dsd		mCameraManager.release();
 	}
 
 	/**
@@ -148,6 +149,9 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		case R.id.test:
 			selectCommand();
 			return true;
+		case R.id.test_record:
+			recordVideo();
+			return true;
 		case R.id.about:
 			startActivity(new Intent(this, About.class));
 			return true;
@@ -156,6 +160,30 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Проверка записи и передачи видео.
+	 */
+	private void recordVideo() {
+		Toast.makeText(this, "Проверка записи и передачи видео", Toast.LENGTH_SHORT).show();
+
+		Intent launcher = new Intent().setAction(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
+		Intent ipWebcam = 
+			new Intent()
+			.setClassName("com.pas.webcam", "com.pas.webcam.Rolling")
+			.putExtra("cheats", new String[] { 
+					//"set(Photo,1024,768)",         // set photo resolution to 1024x768
+					"set(DisableVideo,false)",      // Disable video streaming (only photo and immediate photo)
+					"reset(Port)",                 // Use default port 8080
+					"set(HtmlPath,/sdcard/html/)", // Override server pages with ones in this directory 
+					})
+			.putExtra("hidebtn1", true)                // Hide help button
+			.putExtra("caption2", "Run in background") // Change caption on "Actions..."
+			.putExtra("intent2", launcher)             // And give button another purpose
+		    .putExtra("returnto", new Intent().setClassName(
+		    		RoboHeadActivity.this, RoboHeadActivity.class.getName())); // Set activity to return to
+		startActivity(ipWebcam);
 	}
 	
 	/**
