@@ -20,6 +20,7 @@ namespace RobotGamepad
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
     using Microsoft.Xna.Framework.Media;
+    using MjpegProcessor;
 
     /// <summary>
     /// Состояние приложения: главное меню или управление роботом.
@@ -151,7 +152,10 @@ namespace RobotGamepad
         /// Область для рисования.
         /// </summary>
         private SpriteBatch spriteBatch;
-        
+
+        private Texture2D texture;
+        private MjpegDecoder mjpeg;
+
         /// <summary>
         /// Шрифт для вывода текста.
         /// </summary>
@@ -177,7 +181,13 @@ namespace RobotGamepad
         /// </summary>
         public GameRobot()
         {
+            this.IsFixedTimeStep = false;
             this.graphics = new GraphicsDeviceManager(this);
+            this.graphics.SynchronizeWithVerticalRetrace = false;
+            this.graphics.IsFullScreen = true;
+            this.graphics.PreferredBackBufferWidth = 640;
+            this.graphics.PreferredBackBufferHeight = 368;
+
             Content.RootDirectory = "Content";
         }
 
@@ -199,6 +209,10 @@ namespace RobotGamepad
             this.lookHelper.Initialize(this.robotHelper);
             this.moodHelper.Initialize(this.robotHelper);
             this.gunHelper.Initialize(this.robotHelper);
+
+            this.mjpeg = new MjpegDecoder();
+            this.mjpeg.ParseStream(new Uri(String.Format("http://{0}:{1}/videofeed", 
+                Settings.RoboHeadAddress, Settings.IpWebcamPort)));
         }
 
         /// <summary>
@@ -262,6 +276,8 @@ namespace RobotGamepad
             }
 
             this.previousGamePadState = gamePadState;
+
+            this.texture = mjpeg.GetMjpegFrame(this.GraphicsDevice);
 
             base.Update(gameTime);
         }
@@ -397,6 +413,11 @@ namespace RobotGamepad
         private void DrawInRobotControlState(GameTime gameTime)
         {
             this.spriteBatch.Begin();
+
+            if (this.texture != null)
+            {
+                this.spriteBatch.Draw(this.texture, Vector2.Zero, Color.White);
+            }
 
             Color color;
             string motorCommand;
