@@ -96,7 +96,7 @@ namespace RobotGamepad
             try
             {
                 this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                this.socket.Connect(Settings.TcpSocketServerAddress, Settings.TcpSocketServerPort);
+                this.socket.Connect(Settings.RoboHeadAddress, Settings.TcpSocketServerPort);
                 this.connected = this.socket.Connected;
 
                 // this.socketEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(this.SocketEventArgsCompleted);

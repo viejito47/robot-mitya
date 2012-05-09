@@ -55,9 +55,11 @@ namespace RobotGamepad
 
             MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
-            byte[] serverAddress = { 192, 168, 1, 1 };
-            //byte[] serverAddress = { 192, 168, 1, 40 };
-            TcpSocketServerAddress = new IPAddress(serverAddress);
+            byte[] roboHeadAddress = { 192, 168, 1, 1 };
+            //byte[] roboHeadAddress = { 192, 168, 1, 40 };
+            RoboHeadAddress = new IPAddress(roboHeadAddress);
+
+            IpWebcamPort = 8080;
 
             TcpSocketServerPort = 51974;
 
@@ -170,7 +172,12 @@ namespace RobotGamepad
         /// <summary>
         /// Gets Адрес серверного сокета.
         /// </summary>
-        public static IPAddress TcpSocketServerAddress { get; private set; }
+        public static IPAddress RoboHeadAddress { get; private set; }
+
+        /// <summary>
+        /// Gets Порт для связи с сервером.
+        /// </summary>
+        public static int IpWebcamPort { get; private set; }
 
         /// <summary>
         /// Gets Порт для связи с сервером.
