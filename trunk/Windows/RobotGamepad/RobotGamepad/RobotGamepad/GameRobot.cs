@@ -153,7 +153,14 @@ namespace RobotGamepad
         /// </summary>
         private SpriteBatch spriteBatch;
 
-        private Texture2D texture;
+        /// <summary>
+        /// Текстура для вывода видео.
+        /// </summary>
+        private Texture2D videoTexture;
+
+        /// <summary>
+        /// Декодер MJPEG.
+        /// </summary>
         private MjpegDecoder mjpeg;
 
         /// <summary>
@@ -185,8 +192,7 @@ namespace RobotGamepad
             this.graphics = new GraphicsDeviceManager(this);
             this.graphics.SynchronizeWithVerticalRetrace = false;
             this.graphics.IsFullScreen = true;
-            this.graphics.PreferredBackBufferWidth = 640;
-            this.graphics.PreferredBackBufferHeight = 368;
+            this.IsMouseVisible = false;
 
             Content.RootDirectory = "Content";
         }
@@ -211,8 +217,10 @@ namespace RobotGamepad
             this.gunHelper.Initialize(this.robotHelper);
 
             this.mjpeg = new MjpegDecoder();
-            this.mjpeg.ParseStream(new Uri(String.Format("http://{0}:{1}/videofeed", 
-                Settings.RoboHeadAddress, Settings.IpWebcamPort)));
+            this.mjpeg.ParseStream(new Uri(String.Format(
+                "http://{0}:{1}/videofeed", 
+                Settings.RoboHeadAddress, 
+                Settings.IpWebcamPort)));
         }
 
         /// <summary>
@@ -277,7 +285,7 @@ namespace RobotGamepad
 
             this.previousGamePadState = gamePadState;
 
-            this.texture = mjpeg.GetMjpegFrame(this.GraphicsDevice);
+            this.videoTexture = this.mjpeg.GetMjpegFrame(this.GraphicsDevice);
 
             base.Update(gameTime);
         }
@@ -414,9 +422,20 @@ namespace RobotGamepad
         {
             this.spriteBatch.Begin();
 
-            if (this.texture != null)
+            if (this.videoTexture != null)
             {
-                this.spriteBatch.Draw(this.texture, Vector2.Zero, Color.White);
+                // this.spriteBatch.Draw(this.videoTexture, Vector2.Zero, Color.White);
+                // Rectangle rectangle = new Rectangle(
+                //    this.graphics.PreferredBackBufferWidth - this.videoTexture.Width - 10,
+                //    (this.graphics.PreferredBackBufferHeight - this.videoTexture.Height) / 2,
+                //    this.videoTexture.Width,
+                //    this.videoTexture.Height);
+                Rectangle rectangle = new Rectangle(
+                    0,
+                    0,
+                    this.graphics.PreferredBackBufferWidth,
+                    this.graphics.PreferredBackBufferHeight);
+                this.spriteBatch.Draw(this.videoTexture, rectangle, Color.White);
             }
 
             Color color;
