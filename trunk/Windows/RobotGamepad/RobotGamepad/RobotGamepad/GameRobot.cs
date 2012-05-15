@@ -13,6 +13,9 @@ namespace RobotGamepad
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+
+    using AXVLC;
+
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Audio;
     using Microsoft.Xna.Framework.Content;
@@ -20,6 +23,7 @@ namespace RobotGamepad
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
     using Microsoft.Xna.Framework.Media;
+
     using MjpegProcessor;
 
     /// <summary>
@@ -160,8 +164,22 @@ namespace RobotGamepad
 
         /// <summary>
         /// Декодер MJPEG.
+        /// Используется для воспроизведения потокового видео (точнее, MJPEG), полученного от IP Webcam.
         /// </summary>
+        /// <remarks>
+        /// Требует подключения .NET библиотеки "MjpegProcessorXna4".
+        /// </remarks>
         private MjpegDecoder mjpeg;
+
+        /// <summary>
+        /// Плагин VLC. 
+        /// Используется для воспроизведения потокового аудио, полученного от IP Webcam.
+        /// </summary>
+        /// <remarks>
+        /// Объект из ActiveX-библиотеки VLC (www.videolan.org).
+        /// Требует установки VLC, регистрации ActiveX-библиотеки axvlc.dll, а затем добавления в ссылки проекта COM-компоненты "VideoLAN VLC ActiveX Plugin" (в обозревателе решений отображается как "AXVLC").
+        /// </remarks>
+        private AXVLC.VLCPlugin2 audio;
 
         /// <summary>
         /// Шрифт для вывода текста.
@@ -191,9 +209,9 @@ namespace RobotGamepad
             this.IsFixedTimeStep = false;
             this.graphics = new GraphicsDeviceManager(this);
             this.graphics.SynchronizeWithVerticalRetrace = false;
-            this.graphics.IsFullScreen = true;
-            this.IsMouseVisible = false;
-
+            
+            // this.graphics.IsFullScreen = true;
+            // this.IsMouseVisible = false;
             Content.RootDirectory = "Content";
         }
 
@@ -217,10 +235,7 @@ namespace RobotGamepad
             this.gunHelper.Initialize(this.robotHelper);
 
             this.mjpeg = new MjpegDecoder();
-            this.mjpeg.ParseStream(new Uri(String.Format(
-                "http://{0}:{1}/videofeed", 
-                Settings.RoboHeadAddress, 
-                Settings.IpWebcamPort)));
+            this.audio = new AXVLC.VLCPlugin2Class();
         }
 
         /// <summary>
@@ -541,6 +556,27 @@ namespace RobotGamepad
             this.driveHelper.Stop();
             this.lookHelper.LookForward();
             this.flashlightHelper.TurnOff();
+
+            // Запуск воспроизведения видео:
+            this.mjpeg.ParseStream(new Uri(String.Format(
+                @"http://{0}:{1}/videofeed",
+                Settings.RoboHeadAddress,
+                Settings.IpWebcamPort)));
+
+            // Запуск воспроизведения аудио:
+            this.audio.Visible = false;
+            this.audio.playlist.items.clear();
+            this.audio.AutoPlay = true;
+            this.audio.Volume = 200;
+            string[] options = new string[] { @":network-caching=20" };
+            this.audio.playlist.add(
+                String.Format(
+                    @"http://{0}:{1}/audio.wav",
+                    Settings.RoboHeadAddress,
+                    Settings.IpWebcamPort),
+                null,
+                options);
+            this.audio.playlist.playItem(0);
         }
         
         /// <summary>
@@ -552,6 +588,13 @@ namespace RobotGamepad
             this.lookHelper.LookForward();
             this.flashlightHelper.TurnOff();
             Thread.Sleep(1000); // (немного ждем прихода последних эхо-команд от Android-приложения)
+
+            this.mjpeg.StopStream();
+            if (this.audio.playlist.isPlaying)
+            {
+                this.audio.playlist.stop();
+            }
+
 #if DEBUG
             this.robotHelper.SaveLogsToFile();
 #endif
