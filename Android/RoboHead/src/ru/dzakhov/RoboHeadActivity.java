@@ -37,11 +37,6 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	private Handler mHandler;
 
 	/**
-	 * Объект, управляющий видеокамерой телефона и её вспышкой.
-	 */
-//dsd	private CameraManager mCameraManager;
-	
-	/**
 	 * Установка картинки с мордочкой робота.
 	 * @param faceResouceId идентификатор ресурса-картинки.
 	 */
@@ -78,10 +73,6 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 					setFace(R.drawable.mitya_is_angry);
 				} else if (command.equalsIgnoreCase("MD004")) {
 					setFace(R.drawable.mitya_is_ill);
-//				} else if (command.equalsIgnoreCase("FL000")) {
-////dsd					mCameraManager.turnLightOff();
-//				} else if (command.equalsIgnoreCase("FL001")) {
-////dsd					mCameraManager.turnLightOn();
 				} else if (command.equalsIgnoreCase("HT000")) {
 	                new Thread() {
 	                    public void run() {
@@ -105,8 +96,6 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		getOpenAccessory().setListener(mReceiver);
 
     	startTcpServer(mHandler);
-    	
-//dsd    	mCameraManager = new CameraManager(this);
     }
 	
 	@Override
@@ -117,12 +106,11 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	
 	@Override
 	protected final void afterOnResume() {
-//dsd		mCameraManager.open();
 	}
 
 	@Override
 	protected final void afterOnPause() {
-//dsd		mCameraManager.release();
+		sendBroadcast(new Intent("com.pas.webcam.CONTROL").putExtra("action", "stop"));
 	}
 
 	/**
