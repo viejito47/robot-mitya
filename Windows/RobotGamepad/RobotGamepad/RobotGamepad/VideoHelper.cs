@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="VideoHelper.cs" company="Dzakhov's jag">
-//   Copyright © Dmitry Dzakhov 2011
+//   Copyright © Dmitry Dzakhov 2012
 // </copyright>
 // <summary>
 //   Класс для приёма и воспроизведения видео.
@@ -33,7 +33,7 @@ namespace RobotGamepad
         private MjpegDecoder mjpeg = new MjpegDecoder();
 
         /// <summary>
-        /// Подключение к видеотрансляции.
+        /// Инициализация видеотрансляции.
         /// </summary>
         public void InitializeVideo()
         {
