@@ -122,6 +122,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="GameRobot.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="VideoHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

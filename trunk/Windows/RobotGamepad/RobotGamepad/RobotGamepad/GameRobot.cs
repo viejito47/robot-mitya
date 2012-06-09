@@ -24,8 +24,6 @@ namespace RobotGamepad
     using Microsoft.Xna.Framework.Input;
     using Microsoft.Xna.Framework.Media;
 
-    using MjpegProcessor;
-
     /// <summary>
     /// Состояние приложения: главное меню или управление роботом.
     /// </summary>
@@ -148,6 +146,11 @@ namespace RobotGamepad
         private GunHelper gunHelper = new GunHelper();
 
         /// <summary>
+        /// Объект для приёма и воспроизведения видеопотока.
+        /// </summary>
+        private VideoHelper videoHelper = new VideoHelper();
+
+        /// <summary>
         /// Менеджер графического устройства.
         /// </summary>
         private GraphicsDeviceManager graphics;
@@ -161,15 +164,6 @@ namespace RobotGamepad
         /// Текстура для вывода видео.
         /// </summary>
         private Texture2D videoTexture;
-
-        /// <summary>
-        /// Декодер MJPEG.
-        /// Используется для воспроизведения потокового видео (точнее, MJPEG), полученного от IP Webcam.
-        /// </summary>
-        /// <remarks>
-        /// Требует подключения .NET библиотеки "MjpegProcessorXna4".
-        /// </remarks>
-        private MjpegDecoder mjpeg;
 
         /// <summary>
         /// Плагин VLC. 
@@ -202,6 +196,11 @@ namespace RobotGamepad
         private GamePadState previousGamePadState;
 
         /// <summary>
+        /// Предыдущее состояние клавиатуры.
+        /// </summary>
+        private KeyboardState previousKeyboardState;
+
+        /// <summary>
         /// Initializes a new instance of the GameRobot class.
         /// </summary>
         public GameRobot()
@@ -228,13 +227,13 @@ namespace RobotGamepad
             base.Initialize();
 
             this.previousGamePadState = GamePad.GetState(PlayerIndex.One);
+            this.previousKeyboardState = Keyboard.GetState(PlayerIndex.One);
             this.flashlightHelper.Initialize(this.robotHelper);
             this.driveHelper.Initialize(this.robotHelper);
             this.lookHelper.Initialize(this.robotHelper);
             this.moodHelper.Initialize(this.robotHelper);
             this.gunHelper.Initialize(this.robotHelper);
 
-            this.mjpeg = new MjpegDecoder();
             this.audio = new AXVLC.VLCPlugin2Class();
         }
 
@@ -280,14 +279,15 @@ namespace RobotGamepad
         protected override void Update(GameTime gameTime)
         {
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+            KeyboardState keyboardState = Keyboard.GetState(PlayerIndex.One);
 
-            if (gamePadState.Buttons.Back == ButtonState.Pressed)
+            if (this.IsButtonPressed(gamePadState, gamePadState.Buttons.Back))
             {
                 this.Exit();
             }
 
             // Запуск режима управления роботом.
-            if (this.IsButtonChangedToDown(gamePadState, Buttons.Start))
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.Start) || this.IsKeyChangedToDown(keyboardState, Keys.Space))
             {
                 this.gameState = GameState.gsRobotControl;
                 this.InitializeRobot();
@@ -296,11 +296,11 @@ namespace RobotGamepad
             if (this.gameState == GameState.gsRobotControl)
             {
                 this.UpdateInRobotControlState(gameTime, gamePadState);
+                this.videoTexture = this.videoHelper.GetVideoTexture(this.GraphicsDevice);
             }
 
             this.previousGamePadState = gamePadState;
-
-            this.videoTexture = this.mjpeg.GetMjpegFrame(this.GraphicsDevice);
+            this.previousKeyboardState = keyboardState;
 
             base.Update(gameTime);
         }
@@ -331,7 +331,39 @@ namespace RobotGamepad
         /// <returns>true, если кнопка была нажата.</returns>
         private bool IsButtonChangedToDown(GamePadState gamePadState, Buttons button)
         {
+            if (gamePadState.IsConnected == false)
+            {
+                return false;
+            }
+
             return gamePadState.IsButtonDown(button) && (this.previousGamePadState.IsButtonDown(button) == false);
+        }
+
+        /// <summary>
+        /// Проверка зажата ли кнопка геймпэда.
+        /// </summary>
+        /// <param name="gamePadState">Текущее состояние геймпэда.</param>
+        /// <param name="buttonState">Отслеживаемая кнопка.</param>
+        /// <returns>true, если кнопка зажата.</returns>
+        private bool IsButtonPressed(GamePadState gamePadState, ButtonState buttonState)
+        {
+            if (gamePadState.IsConnected == false)
+            {
+                return false;
+            }
+
+            return buttonState == ButtonState.Pressed;
+        }
+
+        /// <summary>
+        /// Обнаружение нажатия на клавишу клавиатуры.
+        /// </summary>
+        /// <param name="keyboardState">Текущее состояние клавиатуры.</param>
+        /// <param name="key">Отслеживаемая клавиша.</param>
+        /// <returns>true, если клавиша была нажата.</returns>
+        private bool IsKeyChangedToDown(KeyboardState keyboardState, Keys key)
+        {
+            return keyboardState.IsKeyDown(key) && (this.previousKeyboardState.IsKeyDown(key) == false);
         }
 
         /// <summary>
@@ -387,43 +419,46 @@ namespace RobotGamepad
             // Установка признака плавного фиксированного обзора (джойстик DPAD - при отпускании кнопок 
             // джойстика голова остаётся в установленном положении). При плавном фиксированном обзоре 
             // голова поворачивается с меньшей скоростью.
-            this.lookHelper.SlowModeOn = gamePadState.Buttons.RightShoulder == ButtonState.Pressed;
+            this.lookHelper.SlowModeOn = this.IsButtonPressed(gamePadState, gamePadState.Buttons.RightShoulder);
 
-            if (gamePadState.DPad.Left == ButtonState.Pressed)
+            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Left))
             {
                 // Поворот головы влево с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookLeft(gameTime);
             }
 
-            if (gamePadState.DPad.Right == ButtonState.Pressed)
+            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Right))
             {
                 // Поворот головы вправо с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookRight(gameTime);
             }
 
-            if (gamePadState.DPad.Up == ButtonState.Pressed)
+            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Up))
             {
                 // Поворот головы вверх с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookUp(gameTime);
             }
 
-            if (gamePadState.DPad.Down == ButtonState.Pressed)
+            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Down))
             {
                 // Поворот головы вниз с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookDown(gameTime);
             }
 
             // Скорости двигателей и углы сервоприводов головы определяются и устанавливаются с заданной периодичностью.
-            DateTime nowTime = DateTime.Now;
-            TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
-            if (timePassed >= Settings.MinCommandInterval)
+            if (gamePadState.IsConnected)
             {
-                this.driveHelper.RotationModeOn = gamePadState.Buttons.LeftShoulder == ButtonState.Pressed;
-                this.driveHelper.Drive(gamePadState.ThumbSticks.Left.X, gamePadState.ThumbSticks.Left.Y);
+                DateTime nowTime = DateTime.Now;
+                TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
+                if (timePassed >= Settings.MinCommandInterval)
+                {
+                    this.driveHelper.RotationModeOn = gamePadState.Buttons.LeftShoulder == ButtonState.Pressed;
+                    this.driveHelper.Drive(gamePadState.ThumbSticks.Left.X, gamePadState.ThumbSticks.Left.Y);
 
-                this.lookHelper.Look(gamePadState.ThumbSticks.Right.X, gamePadState.ThumbSticks.Right.Y);
+                    this.lookHelper.Look(gamePadState.ThumbSticks.Right.X, gamePadState.ThumbSticks.Right.Y);
 
-                this.lastTimeCommandSent = nowTime;
+                    this.lastTimeCommandSent = nowTime;
+                }
             }
         }
 
@@ -558,10 +593,7 @@ namespace RobotGamepad
             this.flashlightHelper.TurnOff();
 
             // Запуск воспроизведения видео:
-            this.mjpeg.ParseStream(new Uri(String.Format(
-                @"http://{0}:{1}/videofeed",
-                Settings.RoboHeadAddress,
-                Settings.IpWebcamPort)));
+            this.videoHelper.InitializeVideo();
 
             // Запуск воспроизведения аудио:
             this.audio.Visible = false;
@@ -589,10 +621,13 @@ namespace RobotGamepad
             this.flashlightHelper.TurnOff();
             Thread.Sleep(1000); // (немного ждем прихода последних эхо-команд от Android-приложения)
 
-            this.mjpeg.StopStream();
-            if (this.audio.playlist.isPlaying)
+            this.videoHelper.FinalizeVideo();
+            if (this.audio.playlist.items.count > 0)
             {
-                this.audio.playlist.stop();
+                if (this.audio.playlist.isPlaying)
+                {
+                    this.audio.playlist.stop();
+                }
             }
 
 #if DEBUG
