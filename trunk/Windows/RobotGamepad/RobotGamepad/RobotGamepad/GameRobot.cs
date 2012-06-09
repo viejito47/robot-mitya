@@ -14,8 +14,6 @@ namespace RobotGamepad
     using System.Linq;
     using System.Threading;
 
-    using AXVLC;
-
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Audio;
     using Microsoft.Xna.Framework.Content;
@@ -151,6 +149,11 @@ namespace RobotGamepad
         private VideoHelper videoHelper = new VideoHelper();
 
         /// <summary>
+        /// Объект для приёма и воспроизведения аудиопотока.
+        /// </summary>
+        private AudioHelper audioHelper = new AudioHelper();
+
+        /// <summary>
         /// Менеджер графического устройства.
         /// </summary>
         private GraphicsDeviceManager graphics;
@@ -164,16 +167,6 @@ namespace RobotGamepad
         /// Текстура для вывода видео.
         /// </summary>
         private Texture2D videoTexture;
-
-        /// <summary>
-        /// Плагин VLC. 
-        /// Используется для воспроизведения потокового аудио, полученного от IP Webcam.
-        /// </summary>
-        /// <remarks>
-        /// Объект из ActiveX-библиотеки VLC (www.videolan.org).
-        /// Требует установки VLC, регистрации ActiveX-библиотеки axvlc.dll, а затем добавления в ссылки проекта COM-компоненты "VideoLAN VLC ActiveX Plugin" (в обозревателе решений отображается как "AXVLC").
-        /// </remarks>
-        private AXVLC.VLCPlugin2 audio;
 
         /// <summary>
         /// Шрифт для вывода текста.
@@ -233,8 +226,6 @@ namespace RobotGamepad
             this.lookHelper.Initialize(this.robotHelper);
             this.moodHelper.Initialize(this.robotHelper);
             this.gunHelper.Initialize(this.robotHelper);
-
-            this.audio = new AXVLC.VLCPlugin2Class();
         }
 
         /// <summary>
@@ -596,19 +587,7 @@ namespace RobotGamepad
             this.videoHelper.InitializeVideo();
 
             // Запуск воспроизведения аудио:
-            this.audio.Visible = false;
-            this.audio.playlist.items.clear();
-            this.audio.AutoPlay = true;
-            this.audio.Volume = 200;
-            string[] options = new string[] { @":network-caching=20" };
-            this.audio.playlist.add(
-                String.Format(
-                    @"http://{0}:{1}/audio.wav",
-                    Settings.RoboHeadAddress,
-                    Settings.IpWebcamPort),
-                null,
-                options);
-            this.audio.playlist.playItem(0);
+            this.audioHelper.InitializeAudio();
         }
         
         /// <summary>
@@ -622,13 +601,7 @@ namespace RobotGamepad
             Thread.Sleep(1000); // (немного ждем прихода последних эхо-команд от Android-приложения)
 
             this.videoHelper.FinalizeVideo();
-            if (this.audio.playlist.items.count > 0)
-            {
-                if (this.audio.playlist.isPlaying)
-                {
-                    this.audio.playlist.stop();
-                }
-            }
+            this.audioHelper.FinalizeAudio();
 
 #if DEBUG
             this.robotHelper.SaveLogsToFile();
