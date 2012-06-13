@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 
 /**
  * Тесты класса TcpServer.
- * @author Дмитрий
+ * @author Дмитрий Дзахов
  *
  */
 public final class TcpServerTest extends TestCase {

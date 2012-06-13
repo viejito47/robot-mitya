@@ -577,8 +577,6 @@ namespace RobotGamepad
         /// </summary>
         private void InitializeRobot()
         {
-            this.robotHelper.ClearCommandLogs();
-            this.robotHelper.Connect();
             this.driveHelper.Stop();
             this.lookHelper.LookForward();
             this.flashlightHelper.TurnOff();
@@ -602,10 +600,6 @@ namespace RobotGamepad
 
             this.videoHelper.FinalizeVideo();
             this.audioHelper.FinalizeAudio();
-
-#if DEBUG
-            this.robotHelper.SaveLogsToFile();
-#endif
         }
     }
 }
