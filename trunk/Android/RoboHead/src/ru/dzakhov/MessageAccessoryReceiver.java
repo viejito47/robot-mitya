@@ -35,7 +35,7 @@ public final class MessageAccessoryReceiver implements AccessoryListener {
 	}
 	
 	/**
-	 * Срабатывает при получении сообщения от робота.
+	 * Срабатывает при получении сообщения от робота (контроллера).
 	 * @param buffer данные сообщения.
 	 */
 	public void onAccessoryMessage(final byte[] buffer) {
@@ -46,7 +46,6 @@ public final class MessageAccessoryReceiver implements AccessoryListener {
 		List<String> messages = getMessagesFromBuffer(buffer);
 		for (int i = 0; i < messages.size(); i++) {
 			Message message = new Message();
-			message.arg1 = Settings.MESSAGE;
 			message.obj = messages.get(i);
 			mHandler.sendMessage(message);
 		}
@@ -75,10 +74,10 @@ public final class MessageAccessoryReceiver implements AccessoryListener {
 		while (i < bufferLength) {
 			int currentBufferLength = bufferLength - i;
 
-			if (currentBufferLength >= Settings.MESSAGELENGTH) {
+			if (currentBufferLength >= Settings.MESSAGE_LENGTH) {
 				
 				String message = "";
-				for (int j = 0; j < Settings.MESSAGELENGTH; j++) {
+				for (int j = 0; j < Settings.MESSAGE_LENGTH; j++) {
 					message += bufferText.charAt(i + j);
 				}
 				
@@ -90,7 +89,7 @@ public final class MessageAccessoryReceiver implements AccessoryListener {
 				}
 			}
 			
-			i += Settings.MESSAGELENGTH;
+			i += Settings.MESSAGE_LENGTH;
 		}
 
 		return result;

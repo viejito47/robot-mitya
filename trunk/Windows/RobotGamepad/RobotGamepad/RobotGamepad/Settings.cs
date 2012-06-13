@@ -30,7 +30,7 @@ namespace RobotGamepad
         {
             SinAlphaBound = 0.06;
 
-            RepeatCommandsFlag = false;
+            RepeatCommandsFlag = true;
 
             HorizontalMinimumDegree = 0;
             HorizontalForwardDegree = 90;
@@ -61,7 +61,7 @@ namespace RobotGamepad
 
             IpWebcamPort = 8080;
 
-            TcpSocketServerPort = 51974;
+            CommandPort = 51974;
 
             DriveModeNormalCoef = 190;
             DriveModeTurboCoef = 255;
@@ -170,19 +170,19 @@ namespace RobotGamepad
         public static TimeSpan MinCommandInterval { get; private set; }
 
         /// <summary>
-        /// Gets Адрес серверного сокета.
+        /// Gets Адрес головы робота.
         /// </summary>
         public static IPAddress RoboHeadAddress { get; private set; }
 
         /// <summary>
-        /// Gets Порт для связи с сервером.
+        /// Gets Порт для связи с IP Webcam.
         /// </summary>
         public static int IpWebcamPort { get; private set; }
 
         /// <summary>
-        /// Gets Порт для связи с сервером.
+        /// Gets Порт для передачи команд голове робота.
         /// </summary>
-        public static int TcpSocketServerPort { get; private set; }
+        public static int CommandPort { get; private set; }
 
         /// <summary>
         /// Gets Определяет скорость в нормальном (не турбо) режиме движения. 

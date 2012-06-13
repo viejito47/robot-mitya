@@ -15,14 +15,9 @@ public class Settings extends PreferenceActivity {
 	public static final String SERVERIP = "localhost";
 	
 	/**
-	 * Адрес клиента.
+	 * Порт сокета для приёма сообщений от ПК.
 	 */
-	public static final String CLIENTIP = "192.168.1.41";
-	
-	/**
-	 * Порт сокета для приёма команд от Windows-приложения.
-	 */
-	public static final int COMMANDSOCKETPORT = 51974;
+	public static final int MESSAGESOCKETPORT = 51974;
 	
 	/**
 	 * Порт сокета для передачи видео в Windows-приложение.
@@ -30,26 +25,19 @@ public class Settings extends PreferenceActivity {
 	public static final int MEDIASOCKETPORT = 51973;
 	
 	/**
-	 * Длина команд, передаваемых роботу.
+	 * Длина сообщений, между уровнями ПК, телефон, контроллер.
 	 */
-	public static final int COMMANDLENGTH = 5;
+	public static final int MESSAGE_LENGTH = 5;
 	
 	/**
-	 * Длина сообщений, приходящих от робота.
+	 * Длина идентификатора в сообщении.
 	 */
-	public static final int MESSAGELENGTH = 5;
+	public static final int MESSAGE_IDENTIFIER_LENGTH = 2;
 	
 	/**
-	 * В приложении и команды роботу, и сообщения от робота обрабатываются в одном объекте Handle.
-	 * Константа задаёт тип сообщения "комманда роботу" для обработчика Handle.
+	 * Длина значения в сообщении.
 	 */
-	public static final int COMMAND = 1;
-	
-	/**
-	 * В приложении и команды роботу, и сообщения от робота обрабатываются в одном объекте Handle.
-	 * Константа задаёт тип сообщения "сообщение от робота" для обработчика Handle.
-	 */
-	public static final int MESSAGE = 2;
+	public static final int MESSAGE_VALUE_LENGTH = 3;
 	
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {

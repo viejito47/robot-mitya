@@ -3,7 +3,6 @@ package ru.dzakhov;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;	 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public class TcpServer implements Runnable {
 			ServerSocket serverSocket = null;
 			try {
 				Logger.d("TcpServer: Waiting for client to connect...");
-				serverSocket = new ServerSocket(Settings.COMMANDSOCKETPORT);
+				serverSocket = new ServerSocket(Settings.MESSAGESOCKETPORT);
 				socket = serverSocket.accept();
 				Logger.d("TcpServer: Connected.");
 				while (true) {
@@ -75,12 +74,8 @@ public class TcpServer implements Runnable {
 					for (int i = 0; i < commandList.size(); i++) {
 						String command = commandList.get(i);
 						
-						// Эхо-возврат команды в Windows-приложение (для отладки):
-						echoCommand(socket.getOutputStream(), command);
-						
 						// Команды передаются в RoboHeadActivity:
 						Message message = new Message();
-						message.arg1 = Settings.COMMAND;
 						message.obj = command;
 						mHandler.sendMessage(message);
 					}
@@ -146,7 +141,7 @@ public class TcpServer implements Runnable {
 				
 				// Если не вся команда прочитана, сохраняю что прочиталось до следующей итерации,
 				// иначе добавляю прочитанную команду в список:
-				if (command.length() < Settings.COMMANDLENGTH) {
+				if (command.length() < Settings.MESSAGE_LENGTH) {
 					mPreviousCommandsRest = command;
 				} else {
 					result.add(command);
@@ -156,23 +151,4 @@ public class TcpServer implements Runnable {
 		}
 		return result;
 	}
-	
-	/**
-	 * Эхо-возврат обработанной комманды. Используется для отладки. 
-	 * @param outputStream поток вывода сокета.
-	 * @param command текст, выводимый в поток (обработанная команда).
-	 * @throws IOException 
-	 */
-	private void echoCommand(final OutputStream outputStream, final String command) throws IOException {
-		Logger.d("TcpServer: echo command " + command);
-
-		String outputText = command + "\r\n";
-
-		byte[] buffer = new byte[outputText.length()];
-		for (int i = 0; i < outputText.length(); i++) {
-			buffer[i] = (byte) outputText.charAt(i);
-		}		
-		
-		outputStream.write(buffer);
-	}	
 } // class
