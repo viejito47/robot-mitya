@@ -32,12 +32,12 @@ public class Settings extends PreferenceActivity {
 	/**
 	 * Длина идентификатора в сообщении.
 	 */
-	public static final int MESSAGE_IDENTIFIER_LENGTH = 2;
+	public static final int MESSAGE_IDENTIFIER_LENGTH = 1;
 	
 	/**
 	 * Длина значения в сообщении.
 	 */
-	public static final int MESSAGE_VALUE_LENGTH = 3;
+	public static final int MESSAGE_VALUE_LENGTH = 4;
 	
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {

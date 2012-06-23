@@ -96,7 +96,7 @@ namespace RobotGamepad
             }
 
             string command = this.GenerateCommand(mood);
-            this.robotHelper.SendCommandToRobot(command);
+            this.robotHelper.SendMessageToRobot(command);
             this.mood = mood;
         }
 
@@ -121,15 +121,15 @@ namespace RobotGamepad
             switch (mood)
             {
                 case Mood.Happy:
-                    return "MD001";
+                    return "F0001";
                 case Mood.Blue:
-                    return "MD002";
+                    return "F0002";
                 case Mood.Angry:
-                    return "MD003";
+                    return "F0003";
                 case Mood.Disaster:
-                    return "MD004";
+                    return "F0004";
                 default:
-                    return "MD000";
+                    return "F0000";
             }
         }
     }

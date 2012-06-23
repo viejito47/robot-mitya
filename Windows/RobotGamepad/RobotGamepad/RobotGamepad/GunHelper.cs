@@ -69,7 +69,19 @@ namespace RobotGamepad
                 return;
             }
 
-            this.robotHelper.SendCommandToRobot("FR000");
+            // Выстрел передаётся шестью сообщениями: 3 повторения сообщения на выстрел и 3 повторения на сброс значения.
+            // Троекратное повторение требуется для увеличения надёжности передачи сообщения (всё-таки это UDP).
+            // Сброс нужен из-за алгоритма приёма сообщений в голове робота. Там есть хэш-таблица команд роботу,
+            // и одинаковые команды с повторяющимися значениями игнорируются. Поэтому чтобы выстрел обрабатывался
+            // в следующий раз, значение "0001" для команды "h" надо сменить на "0000" в этой хэш-таблице.
+            this.robotHelper.SendMessageToRobot("f0001");
+            this.robotHelper.SendMessageToRobot("f0001");
+            this.robotHelper.SendMessageToRobot("f0001");
+
+            this.robotHelper.SendMessageToRobot("f0000");
+            this.robotHelper.SendMessageToRobot("f0000");
+            this.robotHelper.SendMessageToRobot("f0000");
+            
             this.chargeStartTime = DateTime.Now;
         }
 

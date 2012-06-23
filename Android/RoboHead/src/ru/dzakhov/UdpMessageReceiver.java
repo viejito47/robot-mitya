@@ -64,7 +64,7 @@ public class UdpMessageReceiver implements Runnable {
 						Message message = new Message();					
 						message.obj = receivedText;
 						mHandler.sendMessage(message);
-						Logger.d("UdpMessageReceiver receive a command: " + receivedText);
+						Logger.d("UdpMessageReceiver receive a command to process: " + receivedText);
 					}
 					
 					if (mTerminate) {

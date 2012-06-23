@@ -32,7 +32,7 @@ namespace RobotGamepad
         /// <summary>
         /// Последняя команда управления фонарём, переданная роботу.
         /// </summary>
-        private string lastFlashlightCommand = string.Empty;
+        private string flashlightCommand = string.Empty;
 
         /// <summary>
         /// Gets a value indicating whether Состояние фар робота.
@@ -48,11 +48,11 @@ namespace RobotGamepad
         /// <summary>
         /// Gets Последняя команда управления фонарём, переданная роботу.
         /// </summary>
-        public string LastFlashlightCommand 
+        public string FlashlightCommand 
         { 
             get 
             { 
-                return this.lastFlashlightCommand; 
+                return this.flashlightCommand; 
             } 
         }
 
@@ -73,7 +73,7 @@ namespace RobotGamepad
             this.CheckRobotHelper();
             this.GenerateFlashlightTurnOnCommand();
             this.flashlightTurnedOn = true;
-            this.robotHelper.SendCommandToRobot(this.LastFlashlightCommand);
+            this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace RobotGamepad
             this.CheckRobotHelper();
             this.GenerateFlashlightTurnOffCommand();
             this.flashlightTurnedOn = false;
-            this.robotHelper.SendCommandToRobot(this.LastFlashlightCommand);
+            this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace RobotGamepad
             this.CheckRobotHelper();
             this.GenerateSwitchFlashlightCommand();
             this.flashlightTurnedOn = !this.flashlightTurnedOn;
-            this.robotHelper.SendCommandToRobot(this.LastFlashlightCommand);
+            this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace RobotGamepad
         /// </summary>
         private void GenerateFlashlightTurnOnCommand()
         {
-            this.lastFlashlightCommand = "FL001";
+            this.flashlightCommand = "I0001";
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace RobotGamepad
         /// </summary>
         private void GenerateFlashlightTurnOffCommand()
         {
-            this.lastFlashlightCommand = "FL000";
+            this.flashlightCommand = "I0000";
         }
 
         /// <summary>

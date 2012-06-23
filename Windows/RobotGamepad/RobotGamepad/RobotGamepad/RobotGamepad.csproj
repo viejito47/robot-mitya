@@ -115,7 +115,7 @@
     <Compile Include="GunHelper.cs" />
     <Compile Include="MoodHelper.cs" />
     <Compile Include="RobotHelper.cs" />
-    <Compile Include="CommandHelper.cs" />
+    <Compile Include="MessageHelper.cs" />
     <Compile Include="DriveHelper.cs" />
     <Compile Include="FlashlightHelper.cs" />
     <Compile Include="LookHelper.cs" />

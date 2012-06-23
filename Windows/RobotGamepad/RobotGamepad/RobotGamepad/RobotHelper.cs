@@ -11,6 +11,7 @@ namespace RobotGamepad
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.IO.Ports;
     using System.Linq;
@@ -33,31 +34,35 @@ namespace RobotGamepad
         /// </summary>
         public string LastErrorMessage 
         { 
-            get 
+            get
             { 
                 return this.lastErrorMessage; 
             } 
         }
 
         /// <summary>
-        /// Передать роботу команду.
+        /// Передать роботу сообщение.
         /// </summary>
-        /// <param name="command">
-        /// Текст команды.
+        /// <param name="message">
+        /// Текст сообщения.
         /// </param>
         /// <returns>
         /// true, если нет ошибок.
         /// </returns>
-        public bool SendCommandToRobot(string command)
+        public bool SendMessageToRobot(string message)
         {
+            /*if (message.StartsWith("L") || message.StartsWith("R"))
+            {
+                Debug.Print(message);
+            }*/
             try
             {
-                byte[] commandBytes = Encoding.ASCII.GetBytes(command + (char)13 + (char)10);
+                byte[] messageBytes = Encoding.ASCII.GetBytes(message + (char)13 + (char)10);
 
                 UdpClient udpClient = new UdpClient();
                 IPEndPoint endPoint = new IPEndPoint(Settings.RoboHeadAddress, Settings.CommandPort);
-                int bytesSent = udpClient.Send(commandBytes, commandBytes.Length, endPoint);
-                if (bytesSent != commandBytes.Length)
+                int bytesSent = udpClient.Send(messageBytes, messageBytes.Length, endPoint);
+                if (bytesSent != messageBytes.Length)
                 {
                     this.lastErrorMessage = "Нет связи с роботом";
                     return false;

@@ -46,12 +46,12 @@ namespace RobotGamepad
         /// <summary>
         /// Последняя команда, переданная на левый мотор.
         /// </summary>
-        private string lastLeftMotorCommand = string.Empty;
+        private string leftMotorCommand = string.Empty;
 
         /// <summary>
         /// Последняя команда, переданная на левый мотор.
         /// </summary>
-        private string lastRightMotorCommand = string.Empty;
+        private string rightMotorCommand = string.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether турбо-режим включен.
@@ -88,22 +88,22 @@ namespace RobotGamepad
         /// <summary>
         /// Gets Последняя команда, переданная на левый мотор.
         /// </summary>
-        public string LastLeftMotorCommand 
+        public string LeftMotorCommand 
         { 
             get 
             { 
-                return this.lastLeftMotorCommand; 
+                return this.leftMotorCommand; 
             } 
         }
 
         /// <summary>
         /// Gets Последняя команда, переданная на правый мотор.
         /// </summary>
-        public string LastRightMotorCommand 
+        public string RightMotorCommand 
         { 
             get 
             {
-                return this.lastRightMotorCommand; 
+                return this.rightMotorCommand; 
             } 
         }
 
@@ -165,7 +165,7 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Организует движение робота в соответсятвии с заданными координатами джойстака движения.
+        /// Организует движение робота в соответсятвии с заданными координатами джойстика движения.
         /// </summary>
         /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
         /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
@@ -173,21 +173,9 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
-            string leftMotorCommand;
-            string rightMotorCommand;
-            this.GenerateMotorCommands(x, y, out leftMotorCommand, out rightMotorCommand);
-
-            if (Settings.RepeatCommandsFlag || (leftMotorCommand != this.lastLeftMotorCommand))
-            {
-                this.robotHelper.SendCommandToRobot(leftMotorCommand);
-                this.lastLeftMotorCommand = leftMotorCommand;
-            }
-
-            if (Settings.RepeatCommandsFlag || (rightMotorCommand != this.lastRightMotorCommand))
-            {
-                this.robotHelper.SendCommandToRobot(rightMotorCommand);
-                this.lastRightMotorCommand = rightMotorCommand;
-            }
+            this.GenerateMotorCommands(x, y, out this.leftMotorCommand, out this.rightMotorCommand);
+            this.robotHelper.SendMessageToRobot(this.leftMotorCommand);
+            this.robotHelper.SendMessageToRobot(this.rightMotorCommand);
         }
 
         /// <summary>
@@ -306,18 +294,7 @@ namespace RobotGamepad
         private string SpeedToMotorCommand(char motor, int signedSpeed)
         {
             string result = motor.ToString();
-
-            if (signedSpeed >= 0)
-            {
-                result += "F";
-            }
-            else
-            {
-                result += "B";
-            }
-
-            result += CommandHelper.IntToCommandValue(Math.Abs(signedSpeed));
-
+            result += MessageHelper.IntToMessageValue(signedSpeed);
             return result;
         }
     }

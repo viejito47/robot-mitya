@@ -62,32 +62,45 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
     	mHandler = new Handler() {
 			@Override
 			public void handleMessage(final Message msg) {
-				String command = (String) msg.obj;
-				if (command.equalsIgnoreCase("MD000")) {
-					setFace(R.drawable.mitya_is_ok);
-				} else if (command.equalsIgnoreCase("MD001")) {
-					setFace(R.drawable.mitya_is_happy);
-				} else if (command.equalsIgnoreCase("MD002")) {
-					setFace(R.drawable.mitya_is_blue);
-				} else if (command.equalsIgnoreCase("MD003")) {
-					setFace(R.drawable.mitya_is_angry);
-				} else if (command.equalsIgnoreCase("MD004")) {
-					setFace(R.drawable.mitya_is_ill);
-				} else if (command.equalsIgnoreCase("HT000")) {
-	                new Thread() {
-	                    public void run() {
-							SoundManager.playSound(2, 1);
-	                    }
-	                } .start();
-				} else {
-					if (command.equalsIgnoreCase("FR000")) {
+				String message = (String) msg.obj;				
+				String command = MessageHelper.getMessageIdentifier(message);
+				String value = MessageHelper.getMessageValue(message);
+				
+				if (command.equals("F")) { // F [face] Ц смена мордочки
+					if (value.equals("0000")) {
+						setFace(R.drawable.mitya_is_ok);
+					} else if (value.equals("0001")) {
+						setFace(R.drawable.mitya_is_happy);
+					} else if (value.equals("0002")) {
+						setFace(R.drawable.mitya_is_blue);
+					} else if (value.equals("0003")) {
+						setFace(R.drawable.mitya_is_angry);
+					} else if (value.equals("0004")) {
+						setFace(R.drawable.mitya_is_ill);
+					}
+				} else if (command.equals("h")) { // h [hit] Ц попадание
+					if (value.equals("0001")) {
 		                new Thread() {
 		                    public void run() {
-								SoundManager.playSound(1, 1);
+								SoundManager.playSound(2, 1);
 		                    }
 		                } .start();
 					}
-					sendCommand(command);
+					// ќсознано ничего не делаем дл€ значени€ 0000. Ёто сообщение используетс€ дл€
+					// фиксации в хэш-таблице последних прин€тых сообщений значени€, отличного от 0001.
+				} else {
+					if (command.equals("f")) { // f [fire] Ц выстрел
+						if (value.equals("0001")) {
+			                new Thread() {
+			                    public void run() {
+									SoundManager.playSound(1, 1);
+			                    }
+			                } .start();
+						}
+						// ќсознано ничего не делаем дл€ значени€ 0000. Ёто сообщение используетс€ дл€
+						// фиксации в хэш-таблице последних прин€тых сообщений значени€, отличного от 0001.
+					}
+					sendMessageToRobot(message);
 				}
 			}
   		};
@@ -95,12 +108,12 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		mReceiver = new MessageAccessoryReceiver(mHandler);
 		getOpenAccessory().setListener(mReceiver);
 
-    	startTcpServer(mHandler);
+    	startUdpReceiver(mHandler);
     }
 	
 	@Override
 	protected final void afterOnDestroy() {
-		stopTcpServer();
+		stopUdpReceiver();
 		SoundManager.cleanup();
 	}
 	
@@ -198,65 +211,65 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		builder.setTitle("ƒействие:");
 		builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 		    public void onClick(final DialogInterface dialog, final int item) {
-		    	final int cDF255 = 0;
-		    	final int cDB100 = 1;
-		    	final int cLF127RB127 = 2;
-		    	final int cHH135 = 3;
-		    	final int cHH045 = 4;
-		    	final int cHV120 = 5;
-		    	final int cHV060 = 6;
-		    	final int cDF000 = 7;
-		    	final int cFACEOK = 8;
-		    	final int cFACEHAPPY = 9;
-		    	final int cFACEBLUE = 10;
-		    	final int cFACEANGRY = 11;
-		    	final int cFACEILL = 12;
-		    	final int cFIRE = 13;
+		    	final int cDriveForward255 = 0;
+		    	final int cDriveBackward100 = 1;
+		    	final int cLeftForward127RightBackward127 = 2;
+		    	final int cHeadHorizontal135 = 3;
+		    	final int cHeadHorizontal045 = 4;
+		    	final int cHeadVertical120 = 5;
+		    	final int cHeadVertical060 = 6;
+		    	final int cStop = 7;
+		    	final int cFaceOK = 8;
+		    	final int cFaceHappy = 9;
+		    	final int cFaceBlue = 10;
+		    	final int cFaceAngry = 11;
+		    	final int cFaceIll = 12;
+		    	final int cFire = 13;
 
 		    	switch (item) {
-		    	case cDF255:
-		    		sendCommand("DF255");
+		    	case cDriveForward255:
+		    		sendMessageToRobot("D00FF");
 		    		break;
-		    	case cDB100:
-		    		sendCommand("DB100");
+		    	case cDriveBackward100:
+		    		sendMessageToRobot("DFF9C");
 		    		break;
-		    	case cLF127RB127:
-		    		sendCommand("LF127");
-		    		sendCommand("RB127");
+		    	case cLeftForward127RightBackward127:
+		    		sendMessageToRobot("L007F");
+		    		sendMessageToRobot("RFF81");
 		    		break;
-		    	case cHH135:
-		    		sendCommand("HH135");
+		    	case cHeadHorizontal135:
+		    		sendMessageToRobot("H0087");
 		    		break;
-		    	case cHH045:
-		    		sendCommand("HH045");
+		    	case cHeadHorizontal045:
+		    		sendMessageToRobot("H002D");
 		    		break;
-		    	case cHV120:
-		    		sendCommand("HV120");
+		    	case cHeadVertical120:
+		    		sendMessageToRobot("V0078");
 		    		break;
-		    	case cHV060:
-		    		sendCommand("HV060");
+		    	case cHeadVertical060:
+		    		sendMessageToRobot("V003C");
 		    		break;
-		    	case cDF000:
-		    		sendCommand("DF000");
+		    	case cStop:
+		    		sendMessageToRobot("D0000");
 		    		break;
-		    	case cFACEOK:
+		    	case cFaceOK:
 		    		setFace(R.drawable.mitya_is_ok);
 		    		break;
-		    	case cFACEHAPPY:
+		    	case cFaceHappy:
 		    		setFace(R.drawable.mitya_is_happy);
 		    		break;
-		    	case cFACEBLUE:
+		    	case cFaceBlue:
 		    		setFace(R.drawable.mitya_is_blue);
 		    		break;
-		    	case cFACEANGRY:
+		    	case cFaceAngry:
 		    		setFace(R.drawable.mitya_is_angry);
 		    		break;
-		    	case cFACEILL:
+		    	case cFaceIll:
 		    		setFace(R.drawable.mitya_is_ill);
 		    		break;
-		    	case cFIRE:
+		    	case cFire:
 					Message message = new Message();
-					message.obj = "FR000";
+					message.obj = "f0000";
 					mHandler.sendMessage(message);
 		    		break;
 		    	default: 
@@ -270,16 +283,16 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	}
 	
 	/**
-	 * ќтправить команду роботу.
-	 * @param command текст команды.
+	 * ќтправить сообщение роботу.
+	 * @param message текст сообщени€.
 	 */
-	private void sendCommand(final String command) {
-		byte[] buffer = new byte[command.length()];
-		for (int i = 0; i < command.length(); i++) {
-			buffer[i] = (byte) command.charAt(i);
+	private void sendMessageToRobot(final String message) {
+		byte[] buffer = new byte[message.length()];
+		for (int i = 0; i < message.length(); i++) {
+			buffer[i] = (byte) message.charAt(i);
 		}		
 		getOpenAccessory().write(buffer);
-		Logger.d("RoboHeadActivity: Sent to Robot: " + command);
+		Logger.d("RoboHeadActivity: Sent to Robot: " + message);
 	}
 	
 	/**
@@ -287,7 +300,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 * @param handler дл€ передачи команд от уровн€ Windows-приложени€ и 
 	 * сообщений от робота.
 	 */
-	private void startTcpServer(final Handler handler) {
+	private void startUdpReceiver(final Handler handler) {
 		if (mUdpMessageReceiver != null) {
 			return;
 		}
@@ -299,7 +312,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	/**
 	 * ќстановка нити с серверным сокетом.
 	 */
-	private void stopTcpServer() {
+	private void stopUdpReceiver() {
 		if (mUdpMessageReceiver != null) {
 			mUdpMessageReceiver.stopRunning();
 			mUdpMessageReceiver = null;

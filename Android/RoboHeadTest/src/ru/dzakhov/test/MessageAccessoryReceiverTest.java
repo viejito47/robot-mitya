@@ -27,7 +27,7 @@ public final class MessageAccessoryReceiverTest extends TestCase {
 	 */
 	public void testOnAccessoryMessage2() {
 		MessageAccessoryReceiver messageAccessoryReceiver = new MessageAccessoryReceiver(null);
-		String messages = "HT0";
+		String messages = "h00";
 		List<String> messageList = messageAccessoryReceiver.getMessagesFromBuffer(messages.getBytes());
 		assertEquals(0, messageList.size());
 	}
@@ -37,10 +37,10 @@ public final class MessageAccessoryReceiverTest extends TestCase {
 	 */
 	public void testOnAccessoryMessage3() {
 		MessageAccessoryReceiver messageAccessoryReceiver = new MessageAccessoryReceiver(null);
-		String messages = "HT000";
+		String messages = "h0000";
 		List<String> messageList = messageAccessoryReceiver.getMessagesFromBuffer(messages.getBytes());
 		assertEquals(1, messageList.size());
-		assertEquals("HT000", messageList.get(0));
+		assertEquals("h0000", messageList.get(0));
 	}
 
 	/**
@@ -48,13 +48,13 @@ public final class MessageAccessoryReceiverTest extends TestCase {
 	 */
 	public void testOnAccessoryMessage4() {
 		MessageAccessoryReceiver messageAccessoryReceiver = new MessageAccessoryReceiver(null);
-		String messages = "HT001FR000FL000";
+		String messages = "h0000F0001F0002";
 		List<String> messageList = messageAccessoryReceiver.getMessagesFromBuffer(messages.getBytes());
 		final int numOfMessages = 3;
 		assertEquals(numOfMessages, messageList.size());
-		assertEquals("HT001", messageList.get(0));
-		assertEquals("FR000", messageList.get(1));
-		assertEquals("FL000", messageList.get(2));
+		assertEquals("h0000", messageList.get(0));
+		assertEquals("F0001", messageList.get(1));
+		assertEquals("F0002", messageList.get(2));
 	}
 
 	/**
@@ -63,15 +63,15 @@ public final class MessageAccessoryReceiverTest extends TestCase {
 	public void testOnAccessoryMessage5() {
 		MessageAccessoryReceiver messageAccessoryReceiver = new MessageAccessoryReceiver(null);
 		
-		String messages = "HT001FR0";
+		String messages = "h0000F00";
 		List<String> messageList = messageAccessoryReceiver.getMessagesFromBuffer(messages.getBytes());
 		assertEquals(1, messageList.size());
-		assertEquals("HT001", messageList.get(0));
+		assertEquals("h0000", messageList.get(0));
 		
-		messages = "00FL000";
+		messages = "01F0002";
 		messageList = messageAccessoryReceiver.getMessagesFromBuffer(messages.getBytes());
 		assertEquals(2, messageList.size());
-		assertEquals("FR000", messageList.get(0));
-		assertEquals("FL000", messageList.get(1));
+		assertEquals("F0001", messageList.get(0));
+		assertEquals("F0002", messageList.get(1));
 	}
 }
