@@ -46,52 +46,52 @@ namespace RobotGamepad
         /// <summary>
         /// Последняя обработанная x-координата (горизонтальная) для режима обзора без фиксации.
         /// </summary>
-        private float lastLookX = 0;
+        private float lookX = 0;
 
         /// <summary>
         /// Последняя обработанная y-координата (вертикальная) для режима обзора без фиксации.
         /// </summary>
-        private float lastLookY = 0;
+        private float lookY = 0;
 
         /// <summary>
         /// Последняя обработанная x-координата (горизонтальная) ThumbStick-джойстика для режима обзора с фиксацией.
         /// </summary>
-        private float lastFixedLookX = Settings.HorizontalForwardDegree;
+        private float fixedLookX = Settings.HorizontalForwardDegree;
 
         /// <summary>
         /// Последняя обработанная y-координата (вертикальная) ThumbStick-джойстика для режима обзора с фиксацией.
         /// </summary>
-        private float lastFixedLookY = Settings.VerticalForwardDegree;
+        private float fixedLookY = Settings.VerticalForwardDegree;
 
         /// <summary>
-        /// Последоняя отправленная "горизонтальному" сервоприводу команда.
+        /// Последняя отправленная "горизонтальному" сервоприводу команда.
         /// </summary>
-        private string lastHorizontalServoCommand = string.Empty;
+        private string horizontalServoCommand = string.Empty;
 
         /// <summary>
-        /// Последоняя отправленная "вертикальному" сервоприводу команда.
+        /// Последняя отправленная "вертикальному" сервоприводу команда.
         /// </summary>
-        private string lastVerticalServoCommand = string.Empty;
+        private string verticalServoCommand = string.Empty;
 
         /// <summary>
         /// Gets Последняя команда, переданная "горизонтальному" сервоприводу.
         /// </summary>
-        public string LastHorizontalServoCommand 
+        public string HorizontalServoCommand 
         { 
             get 
             { 
-                return this.lastHorizontalServoCommand; 
+                return this.horizontalServoCommand; 
             } 
         }
 
         /// <summary>
         /// Gets Последняя команда, переданная "вертикальному" сервоприводу.
         /// </summary>
-        public string LastVerticalServoCommand 
+        public string VerticalServoCommand 
         { 
             get 
             { 
-                return this.lastVerticalServoCommand; 
+                return this.verticalServoCommand; 
             } 
         }
 
@@ -213,46 +213,32 @@ namespace RobotGamepad
 
             LookHelper.CorrectCoordinatesFromCyrcleToSquareArea(ref x, ref y);
 
-            if (x != this.lastLookX)
+            if ((x != this.lookX) || (y != this.lookY))
             {
                 if (this.horizontalFixedControl)
                 {
                     this.horizontalFixedControl = false;
-                    this.lastFixedLookX = Settings.HorizontalForwardDegree;
+                    this.fixedLookX = Settings.HorizontalForwardDegree;
                 }
 
-                string horizontalServoCommand;
-
-                // x = f(x)...
-                this.GenerateHorizontalServoCommand(x, out horizontalServoCommand);
-                this.lastLookX = x;
-
-                if (horizontalServoCommand != this.lastHorizontalServoCommand)
-                {
-                    this.robotHelper.SendCommandToRobot(horizontalServoCommand);
-                    this.lastHorizontalServoCommand = horizontalServoCommand;
-                }
-            }
-
-            if (y != this.lastLookY)
-            {
                 if (this.verticalFixedControl)
                 {
                     this.verticalFixedControl = false;
-                    this.lastFixedLookY = Settings.VerticalForwardDegree;
+                    this.fixedLookY = Settings.VerticalForwardDegree;
                 }
+            }
 
-                string verticalServoCommand;
+            if ((this.horizontalFixedControl == false) && (this.verticalFixedControl == false))
+            {
+                // x = f(x)...
+                this.GenerateHorizontalServoCommand(x, out this.horizontalServoCommand);
+                this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+                this.lookX = x;
 
                 // y = f(y)...
-                this.GenerateVerticalServoCommand(y, out verticalServoCommand);
-                this.lastLookY = y;
-
-                if (verticalServoCommand != this.lastVerticalServoCommand)
-                {
-                    this.robotHelper.SendCommandToRobot(verticalServoCommand);
-                    this.lastVerticalServoCommand = verticalServoCommand;
-                }
+                this.GenerateVerticalServoCommand(y, out this.verticalServoCommand);
+                this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
+                this.lookY = y;
             }
         }
 
@@ -263,14 +249,14 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
-            this.lastFixedLookX = Settings.HorizontalForwardDegree;
-            this.lastFixedLookY = Settings.VerticalForwardDegree;
-            this.lastLookX = 0;
-            this.lastLookY = 0;
+            this.fixedLookX = Settings.HorizontalForwardDegree;
+            this.fixedLookY = Settings.VerticalForwardDegree;
+            this.lookX = 0;
+            this.lookY = 0;
             
-            this.GenerateServoCommand(0, 0, out this.lastHorizontalServoCommand, out this.lastVerticalServoCommand);
-            this.robotHelper.SendCommandToRobot(this.lastHorizontalServoCommand);
-            this.robotHelper.SendCommandToRobot(this.lastVerticalServoCommand);
+            this.GenerateServoCommand(0, 0, out this.horizontalServoCommand, out this.verticalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
         }
         
         /// <summary>
@@ -288,13 +274,13 @@ namespace RobotGamepad
             if (this.horizontalFixedControl == false)
             {
                 this.horizontalFixedControl = true;
-                this.lastLookX = 0;
+                this.lookX = 0;
             }
 
-            this.IncrementHorizontalDegree(ref this.lastFixedLookX, gameTime);
+            this.IncrementHorizontalDegree(ref this.fixedLookX, gameTime);
 
-            this.GenerateHorizontalServoCommandByDegree(this.lastFixedLookX, out this.lastHorizontalServoCommand);
-            this.robotHelper.SendCommandToRobot(this.lastHorizontalServoCommand);
+            this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
         }
 
         /// <summary>
@@ -312,12 +298,12 @@ namespace RobotGamepad
             if (this.horizontalFixedControl == false)
             {
                 this.horizontalFixedControl = true;
-                this.lastLookX = 0;
+                this.lookX = 0;
             }
 
-            this.DecrementHorizontalDegree(ref this.lastFixedLookX, gameTime);
-            this.GenerateHorizontalServoCommandByDegree(this.lastFixedLookX, out this.lastHorizontalServoCommand);
-            this.robotHelper.SendCommandToRobot(this.lastHorizontalServoCommand);
+            this.DecrementHorizontalDegree(ref this.fixedLookX, gameTime);
+            this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
         }
 
         /// <summary>
@@ -335,12 +321,12 @@ namespace RobotGamepad
             if (this.verticalFixedControl == false)
             {
                 this.verticalFixedControl = true;
-                this.lastLookY = 0;
+                this.lookY = 0;
             }
 
-            this.DecrementVerticalDegree(ref this.lastFixedLookY, gameTime);
-            this.GenerateVerticalServoCommandByDegree(this.lastFixedLookY, out this.lastVerticalServoCommand);
-            this.robotHelper.SendCommandToRobot(this.lastVerticalServoCommand);
+            this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
+            this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
         }
 
         /// <summary>
@@ -358,12 +344,12 @@ namespace RobotGamepad
             if (this.verticalFixedControl == false)
             {
                 this.verticalFixedControl = true;
-                this.lastLookY = 0;
+                this.lookY = 0;
             }
 
-            this.IncrementVerticalDegree(ref this.lastFixedLookY, gameTime);
-            this.GenerateVerticalServoCommandByDegree(this.lastFixedLookY, out this.lastVerticalServoCommand);
-            this.robotHelper.SendCommandToRobot(this.lastVerticalServoCommand);
+            this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
+            this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
         }
 
         /// <summary>
@@ -418,7 +404,7 @@ namespace RobotGamepad
         /// </param>
         private void GenerateHorizontalServoCommandByDegree(float degree, out string horizontalServoCommand)
         {
-            horizontalServoCommand = "HH" + CommandHelper.IntToCommandValue(Convert.ToInt32(degree));
+            horizontalServoCommand = "H" + MessageHelper.IntToMessageValue(Convert.ToInt32(degree));
         }
 
         /// <summary>
@@ -447,7 +433,7 @@ namespace RobotGamepad
         /// </param>
         private void GenerateVerticalServoCommandByDegree(float degree, out string verticalServoCommand)
         {
-            verticalServoCommand = "HV" + CommandHelper.IntToCommandValue(Convert.ToInt32(degree));
+            verticalServoCommand = "V" + MessageHelper.IntToMessageValue(Convert.ToInt32(degree));
         }
 
         /// <summary>

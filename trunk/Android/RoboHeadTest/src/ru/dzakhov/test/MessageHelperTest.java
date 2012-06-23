@@ -31,10 +31,10 @@ public final class MessageHelperTest extends TestCase {
 	 */
 	public void testMakeMessage() {
 		String message = MessageHelper.makeMessage("L", "74");
-		assertEquals(" L074", message);
+		assertEquals("L0074", message);
 		
-		message = MessageHelper.makeMessage("MOVE", "1974");
-		assertEquals("MO197", message);
+		message = MessageHelper.makeMessage("MOVE", "19741001");
+		assertEquals("M1974", message);
 	}
 	
 	/**
@@ -42,32 +42,32 @@ public final class MessageHelperTest extends TestCase {
 	 */
 	public void testGetMessageIdentifier() {
 		String identifier = MessageHelper.getMessageIdentifier("DI123");
-		assertEquals("DI", identifier);
+		assertEquals("D", identifier);
 		
 		identifier = MessageHelper.getMessageIdentifier("D");
-		assertEquals(" D", identifier);
+		assertEquals("D", identifier);
 		
 		identifier = MessageHelper.getMessageIdentifier("");
-		assertEquals("  ", identifier);
+		assertEquals(" ", identifier);
 	}
 	
 	/**
 	 * Тест метода getMessageValue.
 	 */
 	public void testGetMessageValue() {
-		String value = MessageHelper.getMessageValue("DI123");
-		assertEquals("123", value);
+		String value = MessageHelper.getMessageValue("D1234");
+		assertEquals("1234", value);
 		
-		value = MessageHelper.getMessageValue("DI12");
-		assertEquals("012", value);
+		value = MessageHelper.getMessageValue("D123");
+		assertEquals("0123", value);
 		
 		value = MessageHelper.getMessageValue("D");
-		assertEquals("000", value);
+		assertEquals("0000", value);
 		
 		value = MessageHelper.getMessageValue("");
-		assertEquals("000", value);
+		assertEquals("0000", value);
 		
-		value = MessageHelper.getMessageValue("DI12345");
-		assertEquals("123", value);
+		value = MessageHelper.getMessageValue("D12345");
+		assertEquals("1234", value);
 	}
 }

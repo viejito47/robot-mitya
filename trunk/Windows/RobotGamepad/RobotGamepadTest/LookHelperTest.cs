@@ -47,8 +47,8 @@ namespace RobotGamepadTest
             lookHelper.Look(0.5f, 0.5f); // (только чтобы сбить начальные координаты, иначе следующая команда не выполнится)
             lookHelper.Look(0, 0);
             Assert.AreEqual(
-                "HH" + CommandHelper.IntToCommandValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) / 2),
-                lookHelper.LastHorizontalServoCommand);
+                "H" + MessageHelper.IntToMessageValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) / 2),
+                lookHelper.HorizontalServoCommand);
         }
         
         /// <summary>
@@ -61,13 +61,13 @@ namespace RobotGamepadTest
 
             lookHelper.Look(-1f, 0);
             Assert.AreEqual(
-                "HH" + CommandHelper.IntToCommandValue(Settings.HorizontalMaximumDegree),
-                lookHelper.LastHorizontalServoCommand);
+                "H" + MessageHelper.IntToMessageValue(Settings.HorizontalMaximumDegree),
+                lookHelper.HorizontalServoCommand);
 
             lookHelper.Look(-0.5f, 0);
             Assert.AreEqual(
-                "HH" + CommandHelper.IntToCommandValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) * 3 / 4),
-                lookHelper.LastHorizontalServoCommand);
+                "H" + MessageHelper.IntToMessageValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) * 3 / 4),
+                lookHelper.HorizontalServoCommand);
         }
 
         /// <summary>
@@ -80,13 +80,13 @@ namespace RobotGamepadTest
 
             lookHelper.Look(1f, 0);
             Assert.AreEqual(
-                "HH" + CommandHelper.IntToCommandValue(Settings.HorizontalMinimumDegree),
-                lookHelper.LastHorizontalServoCommand);
+                "H" + MessageHelper.IntToMessageValue(Settings.HorizontalMinimumDegree),
+                lookHelper.HorizontalServoCommand);
 
             lookHelper.Look(0.5f, 0);
             Assert.AreEqual(
-                "HH" + CommandHelper.IntToCommandValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) * 1 / 4),
-                lookHelper.LastHorizontalServoCommand);
+                "H" + MessageHelper.IntToMessageValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) * 1 / 4),
+                lookHelper.HorizontalServoCommand);
         }
 
         /// <summary>

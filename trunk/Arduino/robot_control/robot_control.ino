@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------------------
-// file = "robot_control.pde"
+// file = "robot_control.ino"
 // company = "Dzakhov's jag"
 // Copyright © Dmitry Dzakhov 2011
 //   Скетч, предназначенный для исполнения роботом команд, полученных с уровня
@@ -27,8 +27,8 @@
 // Режим отладки.
 boolean debugMode = true;
 
-// Длина команды:
-const int COMMANDLENGTH = 5;
+// Длина сообщения:
+const int MESSAGELENGTH = 5;
 // Неуместившаяся команда из буфера, прочитанного на предыдущей итерации чтения:
 String previousBufferRest = "";
 
@@ -86,7 +86,7 @@ void setup()
   digitalWrite(gunPin, LOW);
 
   // Инициализация двигателей (установка нулевой скорости):
-  moveMotor('D', 'F', 0);
+  moveMotor("D", 0);
 
   // Установка горизонтального сервопривода в положение для установки телефона:
   pinMode(servoHorizontalPin, OUTPUT);
@@ -121,11 +121,18 @@ void loop()
     
     indicate();
     serialPrintln("Hit ");
-    // Шлю сообщение Android-приложению об ИК-попадании в нас: 'HT000' (hit - попадание):
-    message[0] = (uint8_t)'H';
-    message[1] = (uint8_t)'T';
+    // Шлю сообщения Android-приложению об ИК-попадании в нас:
+    // один раз 'h0001' и один раз 'h0000' (hit - попадание).
+    // 'h0000' нужно чтобы сбросить значение в хэш-таблице 
+    // сообщений Android-приложения. Там используется хэш-таблица
+    // сообщений для исключения из обработки повторяющихся команд
+    // с одинаковыми значениями.
+    message[0] = (uint8_t)'h';
+    message[1] = (uint8_t)'0';
     message[2] = (uint8_t)'0';
     message[3] = (uint8_t)'0';
+    message[4] = (uint8_t)'1';
+    adk.SndData(messageLength, message);
     message[4] = (uint8_t)'0';
     adk.SndData(messageLength, message);
   }
@@ -138,7 +145,7 @@ void loop()
   adk.RcvData(&bufferLength, buffer);
   
   // Извлечение и обработка команд из входного буфера:
-  processCommandBuffer(bufferLength, buffer);
+  processMessageBuffer(bufferLength, buffer);
 }
 
 // Проверка ИК-попадания в робота:
@@ -160,7 +167,7 @@ boolean checkIrHit()
 }
 
 // Извлечение и обработка команд из входного буфера:
-void processCommandBuffer(uint16_t bufferSize, uint8_t *buffer)
+void processMessageBuffer(uint16_t bufferSize, uint8_t *buffer)
 {
   // Перевожу буфер в строку:
   String bufferText = "";
@@ -173,7 +180,7 @@ void processCommandBuffer(uint16_t bufferSize, uint8_t *buffer)
   bufferText = previousBufferRest + bufferText;
   previousBufferRest = "";
   
-  // Последовательно извлекаю из полученной строки команды длиной COMMANDLENGTH символов.
+  // Последовательно извлекаю из полученной строки команды длиной MESSAGELENGTH символов.
   // Что не уместилось пойдёт в "довесок" (previousBufferRest) к следующей итереции.
   int i = 0;
   int bufferLength = bufferText.length();
@@ -181,16 +188,16 @@ void processCommandBuffer(uint16_t bufferSize, uint8_t *buffer)
   {
     int currentBufferLength = bufferLength - i;
     
-    if (currentBufferLength >= COMMANDLENGTH)
+    if (currentBufferLength >= MESSAGELENGTH)
     {
-      String command = "";
-      for (int j = 0; j < COMMANDLENGTH; j++)
+      String message = "";
+      for (int j = 0; j < MESSAGELENGTH; j++)
       {
-        command += bufferText[i + j];
+        message += bufferText[i + j];
       }
 
       // Обработка команды:      
-      processCommand(command);
+      processMessage(message);
     }
     else
     {
@@ -202,50 +209,72 @@ void processCommandBuffer(uint16_t bufferSize, uint8_t *buffer)
       }
     }
 
-    i += COMMANDLENGTH;
+    i += MESSAGELENGTH;
   }
 }
 
-// Процедура обработки команды:
-void processCommand(String command)
+boolean parseMessage(String message, String &command, int &value)
+{
+  if (message.length() != 5)
+  {
+    command = "";
+    value = 0;
+    return false;
+  }
+    
+  command = (String)message[0];
+  value = 
+    4096 * hexCharToInt(message[1]) +
+    256 * hexCharToInt(message[2]) +
+    16 * hexCharToInt(message[3]) +
+    hexCharToInt(message[4]);
+  
+  return true;
+}
+
+int hexCharToInt(char ch)
+{
+  if ((ch >= '0') && (ch <= '9'))
+    return ch - '0';
+  else if ((ch >= 'A') && (ch <= 'F'))
+    return 10 + ch - 'A';
+  else if ((ch >= 'a') && (ch <= 'f'))
+    return 10 + ch - 'a';
+  else
+    return 0;
+}
+
+// Процедура обработки сообщения:
+void processMessage(String message)
 {
   // Парсер команды:
-  String operation;
-  int paramValue;
-  operation = (String)command[0];
-  operation += (String)command[1];
-  int digit100 = command[2] - '0';
-  int digit10 = command[3] - '0';
-  int digit1 = command[4] - '0';
-  paramValue = 100 * digit100 + 10 * digit10 + digit1;
-  serialPrintln(operation + (char)(digit100 + '0') + (char)(digit10 + '0') + (char)(digit1 + '0'));
+  String command;
+  int value;
+  if (! parseMessage(message, command, value))
+  {
+    indicate();
+    serialFlush();
+    serialPrintln("Wrong message.");
+  }
   
-  if ((operation == "LF") || (operation == "RF")
-   || (operation == "LB") || (operation == "RB")
-   || (operation == "DF") || (operation == "DB")) 
+  if ((command == "L") || (command == "R") || (command == "D")) 
   {
     // Команда двигателям:
-    moveMotor(operation[0], operation[1], paramValue);
+    moveMotor(command, value);
     serialPrintln("MOVE: OK");
   }
-  else if ((operation == "HH") || (operation == "HV"))
+  else if ((command == "H") || (command == "V"))
   {
     // Команда голове:
-    moveHead(operation[1], paramValue);
+    moveHead(command, value);
     serialPrintln("HEAD: OK");
   }
-  else if (operation == "FR")
+  else if (command == "f")
   {
     // Команда выстрела пушке:
     irsend.sendSony(0xABC0, 16);
     irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
     serialPrintln("GUN: OK");
-  }
-  else if (operation == "TE")
-  {
-    // Команда выполнения теста робота:
-    testRobot(paramValue);
-    serialPrintln("TE: OK");
   }
   else
   {
@@ -256,59 +285,43 @@ void processCommand(String command)
 }
 
 // Поворот головы.
-void moveHead(char plane, int degree)
+void moveHead(String plane, int degree)
 {
-  if (plane == 'H') // (горизонтальная плоскость)
+  if (plane == "H") // (горизонтальная плоскость)
   {
     servoHorizontal.write(degree);
   }
-  else if (plane == 'V') // (вертикальная плоскость)
+  else if (plane == "V") // (вертикальная плоскость)
   {
     servoVertical.write(degree);
   }
 }
 
 // Управление двигателями.
-void moveMotor(char side, char direction, int speed)
+void moveMotor(String side, int speed)
 {
-  bool directionPinValue = direction == 'F' ? LOW : HIGH;
+  bool directionPinValue = speed > 0 ? LOW : HIGH;
+  
+  if (speed < 0) {
+    speed = - speed;
+  }
+ 
+  if (speed > 255) {
+    speed = 255;
+  }
+  
   if (speed == 0) {
     directionPinValue = LOW; // это для режима отключения мотора
   }
-  if ((side == 'L') || (side == 'D')) {
+  
+  if ((side == "L") || (side == "D")) {
     digitalWrite(motorLeftDirectionPin, directionPinValue);
     analogWrite(motorLeftSpeedPin, speed);
   }
-  if ((side == 'R') || (side == 'D')) {
+  
+  if ((side == "R") || (side == "D")) {
     digitalWrite(motorRightDirectionPin, directionPinValue);
     analogWrite(motorRightSpeedPin, speed);
-  }
-}
-
-// Выполнение тестовой программы робота:
-void testRobot(int testNumber)
-{
-  if (testNumber == 0)
-  {
-    moveMotor('D', 'F', 128);
-    delay(1000);
-    moveMotor('D', 'F', 192);
-    delay(1000);
-    moveMotor('D', 'F', 255);
-    delay(1000);
-    moveMotor('D', 'F', 192);
-    moveMotor('R', 'B', 192);
-    delay(1500);
-    moveMotor('L', 'F', 128);
-    delay(500);
-    moveMotor('D', 'B', 128);
-    delay(1500);
-    moveMotor('D', 'F', 0);
-    moveHead('H', 45);
-    delay(1000);
-    moveHead('H', 135);
-    delay(1000);
-    moveHead('H', 90);
   }
 }
 
@@ -346,22 +359,4 @@ void indicate() {
     digitalWrite(gunPin, LOW);
   }
 }
-
-// Система каманд:
-//   XX###
-//   XX - двухсимвольный идентификатор команды, ### - трёхзначный параметр команды.
-//   Длина команды обязательно 5 символов: 2 буквенных и 3 цифровых.
-// Команды:
-//   LF### - режим левого двигателя (left forward). ### - скорость (значение от 000 до 255).
-//   LB### - режим левого двигателя (left backward). ### - скорость (значение от 000 до 255).
-//   RF### - режим правого двигателя (right forward). ### - скорость (значение от 000 до 255).
-//   RB### - режим правого двигателя (right backward). ### - скорость (значение от 000 до 255).
-//   DF### - режим левого и правого двигателей (drive forward). ### - скорость (значение от 000 до 255).
-//   DB### - режим левого и правого двигателей (drive backward). ### - скорость (значение от 000 до 255).
-//   HH### - поворот головы по горизонтали на указанный угол. ### - абсолютное значение угла в градусах (от 000 до 360).
-//   HV### - поворот головы по вертикали на указанный угол. ### - абсолютное значение угла в градусах (от 000 до 180).
-//   FR000 - выстрелить из ИК-пушки.
-//   HT000 - попадание (команда, отправляемая на уровень Android-приложения).
-// Пример:
-//   LF010
 

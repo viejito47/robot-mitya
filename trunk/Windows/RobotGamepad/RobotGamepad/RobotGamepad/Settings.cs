@@ -30,8 +30,6 @@ namespace RobotGamepad
         {
             SinAlphaBound = 0.06;
 
-            RepeatCommandsFlag = true;
-
             HorizontalMinimumDegree = 0;
             HorizontalForwardDegree = 90;
             HorizontalMaximumDegree = 180;
@@ -75,12 +73,6 @@ namespace RobotGamepad
         /// </summary>
         public static double SinAlphaBound { get; private set; }
 
-        /// <summary>
-        /// Gets a value indicating whether разрешено ли повторять одинаковые команды. Если установлен в false, 
-        /// подряд идущие обинаковые команда не повторяются.
-        /// </summary>
-        public static bool RepeatCommandsFlag { get; private set; }
-        
         /// <summary>
         /// Gets Минимальный угол поворота сервопривода, управляющего горизонтальным поворотом головы.
         /// </summary>

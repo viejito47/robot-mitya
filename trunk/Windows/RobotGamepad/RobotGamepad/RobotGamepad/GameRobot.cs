@@ -482,12 +482,12 @@ namespace RobotGamepad
             Color color;
             string motorCommand;
 
-            motorCommand = this.driveHelper.LastLeftMotorCommand;
-            color = (motorCommand.Length > 1) && (motorCommand[1] == 'F') ? Color.White : Color.Orange;
+            motorCommand = this.driveHelper.LeftMotorCommand;
+            color = Color.White;
             this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition1, color);
 
-            motorCommand = this.driveHelper.LastRightMotorCommand;
-            color = (motorCommand.Length > 1) && (motorCommand[1] == 'F') ? Color.White : Color.Orange;
+            motorCommand = this.driveHelper.RightMotorCommand;
+            color = Color.White;
             this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition2, color);
 
             if (this.driveHelper.TurboModeOn)
@@ -510,11 +510,11 @@ namespace RobotGamepad
                 this.spriteBatch.DrawString(this.debugFont, "Боевой настрой", debugStringPosition4c1, Color.Orange);
             }
 
-            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.LastHorizontalServoCommand, debugStringPosition3, Color.White);
-            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.LastVerticalServoCommand, debugStringPosition4, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.HorizontalServoCommand, debugStringPosition3, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.VerticalServoCommand, debugStringPosition4, Color.White);
 
             color = this.flashlightHelper.FlashlightTurnedOn ? Color.Yellow : Color.White;
-            this.spriteBatch.DrawString(this.debugFont, this.flashlightHelper.LastFlashlightCommand, debugStringPosition5, color);
+            this.spriteBatch.DrawString(this.debugFont, this.flashlightHelper.FlashlightCommand, debugStringPosition5, color);
 
             string moodText = "Настроение: ";
             switch (this.moodHelper.Mood)
