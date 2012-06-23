@@ -73,7 +73,13 @@ namespace RobotGamepad
             this.CheckRobotHelper();
             this.GenerateFlashlightTurnOnCommand();
             this.flashlightTurnedOn = true;
-            this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+            }
         }
 
         /// <summary>
@@ -84,7 +90,13 @@ namespace RobotGamepad
             this.CheckRobotHelper();
             this.GenerateFlashlightTurnOffCommand();
             this.flashlightTurnedOn = false;
-            this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+            }
         }
 
         /// <summary>
@@ -95,7 +107,13 @@ namespace RobotGamepad
             this.CheckRobotHelper();
             this.GenerateSwitchFlashlightCommand();
             this.flashlightTurnedOn = !this.flashlightTurnedOn;
-            this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+            }
         }
 
         /// <summary>

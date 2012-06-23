@@ -65,6 +65,8 @@ namespace RobotGamepad
             DriveModeTurboCoef = 255;
 
             GunChargeTime = new TimeSpan(0, 0, 5);
+
+            SingleMessageRepetitionsCount = 3;
         }
 
         /// <summary>
@@ -192,5 +194,7 @@ namespace RobotGamepad
         /// Gets Время "заряда" пушки - минимальный временной интервал между выстрелами.
         /// </summary>
         public static TimeSpan GunChargeTime { get; private set; }
+
+        public static byte SingleMessageRepetitionsCount { get; private set; }
     }
 }

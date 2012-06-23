@@ -74,13 +74,19 @@ namespace RobotGamepad
             // Сброс нужен из-за алгоритма приёма сообщений в голове робота. Там есть хэш-таблица команд роботу,
             // и одинаковые команды с повторяющимися значениями игнорируются. Поэтому чтобы выстрел обрабатывался
             // в следующий раз, значение "0001" для команды "h" надо сменить на "0000" в этой хэш-таблице.
-            this.robotHelper.SendMessageToRobot("f0001");
-            this.robotHelper.SendMessageToRobot("f0001");
-            this.robotHelper.SendMessageToRobot("f0001");
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot("f0001");
+                this.robotHelper.SendMessageToRobot("f0001");
+                this.robotHelper.SendMessageToRobot("f0001");
+            }
 
-            this.robotHelper.SendMessageToRobot("f0000");
-            this.robotHelper.SendMessageToRobot("f0000");
-            this.robotHelper.SendMessageToRobot("f0000");
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot("f0000");
+                this.robotHelper.SendMessageToRobot("f0000");
+                this.robotHelper.SendMessageToRobot("f0000");
+            }
             
             this.chargeStartTime = DateTime.Now;
         }
