@@ -4,18 +4,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.app.AlertDialog;
-import android.content.Context;
+// import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
+// import android.hardware.Sensor;
+// import android.hardware.SensorManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.Toast;
+// import android.widget.Toast;
 
 /**
  * Главная активити приложения.
@@ -39,7 +39,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 */
 	private Handler mHandler;
 
-	private OrientationHelper mOrientationHelper;
+	// private OrientationHelper mOrientationHelper;
 	
 	/**
 	 * Установка картинки с мордочкой робота.
@@ -115,7 +115,7 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 
     	startUdpReceiver(mHandler);
     	
-		mOrientationHelper = new OrientationHelper(this);
+		// mOrientationHelper = new OrientationHelper(this);
 	}
 	
 	@Override
@@ -126,13 +126,13 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	
 	@Override
 	protected final void afterOnResume() {
-		mOrientationHelper.registerListner();
+		// mOrientationHelper.registerListner();
 	}
 
 	@Override
 	protected final void afterOnPause() {
 		sendBroadcast(new Intent("com.pas.webcam.CONTROL").putExtra("action", "stop"));
-		mOrientationHelper.unregisterListner();
+		// mOrientationHelper.unregisterListner();
 	}
 
 	/**
@@ -176,10 +176,12 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 * Проверка записи и передачи видео.
 	 */
 	private void recordVideo() {
+/*
 		String s = mOrientationHelper.getAzimuthAngle() + "  "
 				+ mOrientationHelper.getPitchAngle() + "  "
 				+ mOrientationHelper.getRollAngle();
 		Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+*/
 	}
 	
 	/**
