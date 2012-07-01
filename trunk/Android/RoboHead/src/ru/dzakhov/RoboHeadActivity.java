@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
@@ -36,6 +39,8 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 */
 	private Handler mHandler;
 
+	private OrientationHelper mOrientationHelper;
+	
 	/**
 	 * Установка картинки с мордочкой робота.
 	 * @param faceResouceId идентификатор ресурса-картинки.
@@ -109,7 +114,9 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 		getOpenAccessory().setListener(mReceiver);
 
     	startUdpReceiver(mHandler);
-    }
+    	
+		mOrientationHelper = new OrientationHelper(this);
+	}
 	
 	@Override
 	protected final void afterOnDestroy() {
@@ -119,11 +126,13 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	
 	@Override
 	protected final void afterOnResume() {
+		mOrientationHelper.registerListner();
 	}
 
 	@Override
 	protected final void afterOnPause() {
 		sendBroadcast(new Intent("com.pas.webcam.CONTROL").putExtra("action", "stop"));
+		mOrientationHelper.unregisterListner();
 	}
 
 	/**
@@ -167,24 +176,10 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 * Проверка записи и передачи видео.
 	 */
 	private void recordVideo() {
-		Toast.makeText(this, "Проверка записи и передачи видео", Toast.LENGTH_SHORT).show();
-
-		Intent launcher = new Intent().setAction(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
-		Intent ipWebcam = 
-			new Intent()
-			.setClassName("com.pas.webcam", "com.pas.webcam.Rolling")
-			.putExtra("cheats", new String[] { 
-					//"set(Photo,1024,768)",         // set photo resolution to 1024x768
-					"set(DisableVideo,false)",      // Disable video streaming (only photo and immediate photo)
-					"reset(Port)",                 // Use default port 8080
-					"set(HtmlPath,/sdcard/html/)", // Override server pages with ones in this directory 
-					})
-			.putExtra("hidebtn1", true)                // Hide help button
-			.putExtra("caption2", "Run in background") // Change caption on "Actions..."
-			.putExtra("intent2", launcher)             // And give button another purpose
-		    .putExtra("returnto", new Intent().setClassName(
-		    		RoboHeadActivity.this, RoboHeadActivity.class.getName())); // Set activity to return to
-		startActivity(ipWebcam);
+		String s = mOrientationHelper.getAzimuthAngle() + "  "
+				+ mOrientationHelper.getPitchAngle() + "  "
+				+ mOrientationHelper.getRollAngle();
+		Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
 	}
 	
 	/**
