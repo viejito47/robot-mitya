@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="D:\robot-mitya\Windows\RobotGamepad\RobotGamepadTest\bin\Debug\RobotGamepadTest.exe" total="15" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2012-02-17" time="19:09:53">
+  <environment nunit-version="2.5.10.11092" clr-version="2.0.50727.5448" os-version="Microsoft Windows NT 6.1.7601 Service Pack 1" platform="Win32NT" cwd="d:\robot-mitya\Windows\RobotGamepad\RobotGamepadTest\bin\Debug" machine-name="DMITRY-HP" user="Дмитрий" user-domain="Dmitry-HP" />
+  <culture-info current-culture="ru-RU" current-uiculture="ru-RU" />
+  <test-suite type="Assembly" name="D:\robot-mitya\Windows\RobotGamepad\RobotGamepadTest\bin\Debug\RobotGamepadTest.exe" executed="True" result="Success" success="True" time="0.430" asserts="0">
+    <results>
+      <test-suite type="Namespace" name="RobotGamepadTest" executed="True" result="Success" success="True" time="0.413" asserts="0">
+        <results>
+          <test-suite type="TestFixture" name="DriveHelperTest" executed="True" result="Success" success="True" time="0.314" asserts="0">
+            <results>
+              <test-case name="RobotGamepadTest.DriveHelperTest.BackwardTest" executed="True" result="Success" success="True" time="0.147" asserts="4" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.DriveTest" executed="True" result="Success" success="True" time="0.001" asserts="8" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.ForwardTest" executed="True" result="Success" success="True" time="0.001" asserts="4" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.HalfLeftBackward" executed="True" result="Success" success="True" time="0.001" asserts="4" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.HalfLeftForward" executed="True" result="Success" success="True" time="0.001" asserts="4" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.HalfRightBackward" executed="True" result="Success" success="True" time="0.001" asserts="4" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.HalfRightForward" executed="True" result="Success" success="True" time="0.001" asserts="4" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.RotationTest1" executed="True" result="Success" success="True" time="0.001" asserts="8" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.RotationTest2" executed="True" result="Success" success="True" time="0.002" asserts="8" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.StopTest" executed="True" result="Success" success="True" time="0.001" asserts="2" />
+              <test-case name="RobotGamepadTest.DriveHelperTest.TurboDriveTest" executed="True" result="Success" success="True" time="0.001" asserts="8" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="LookHelperTest" executed="True" result="Success" success="True" time="0.076" asserts="0">
+            <results>
+              <test-case name="RobotGamepadTest.LookHelperTest.CorrectCoordinatesFromCyrcleToSquareAreaTest" executed="True" result="Success" success="True" time="0.024" asserts="20" />
+              <test-case name="RobotGamepadTest.LookHelperTest.LookForwardTest" executed="True" result="Success" success="True" time="0.008" asserts="1" />
+              <test-case name="RobotGamepadTest.LookHelperTest.LookLeftTest" executed="True" result="Success" success="True" time="0.001" asserts="2" />
+              <test-case name="RobotGamepadTest.LookHelperTest.LookRightTest" executed="True" result="Success" success="True" time="0.001" asserts="2" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
