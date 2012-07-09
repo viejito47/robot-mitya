@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------------------
-// file = "robot_control.ino"
+// file = "robot_body.ino"
 // company = "Dzakhov's jag"
 // Copyright © Dmitry Dzakhov 2011
 //   Скетч, предназначенный для исполнения роботом команд, полученных с уровня
@@ -8,24 +8,7 @@
 // -------------------------------------------------------------------------------------
 
 #include <Servo.h>
-
-#include <avrpins.h>
-#include <max3421e.h>
-#include <usbhost.h>
-#include <usb_ch9.h>
-#include <Usb.h>
-#include <usbhub.h>
-#include <avr/pgmspace.h>
-#include <address.h>
-#include <adk.h>
-#include <printhex.h>
-#include <message.h>
-#include <hexdump.h>
-#include <parsetools.h>
 #include <IRremote.h>
-
-// Режим отладки.
-boolean debugMode = true;
 
 // Длина сообщения:
 const int MESSAGELENGTH = 5;
@@ -43,24 +26,16 @@ int motorLeftDirectionPin = 7;
 int motorRightSpeedPin = 5;
 int motorRightDirectionPin = 4;
 
-// Пины контроллера для управления сервоприводами робота (цифровые выходы)
+// Пины контроллера для управления сервоприводами робота (цифровые выходы).
 int servoHorizontalPin = 2;
 int servoVerticalPin = 9;
+
+// Пин управления фарами.
+int lightPin = 13;
 
 // Объекты для управления сервоприводами.
 Servo servoHorizontal;
 Servo servoVertical;
-
-// Объекты управления USB-хостом.
-USB Usb;
-USBHub hub0(&Usb);
-USBHub hub1(&Usb);
-ADK adk(&Usb,"Dzakhov Dmitry",
-            "RoboHead",
-            "RoboHead Arduino Project",
-            "1.0",
-            "http://www.android.com",
-            "0000000012345678");
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
 IRrecv irrecv(targetPin);
@@ -71,14 +46,7 @@ IRsend irsend;
 void setup()
 {
   // Установка скорости последовательного порта (для отладочной информации):
-  serialBegin(115200);
-  serialPrintln("Start...");
-
-  // Инициализация USB:
-  if (Usb.Init() == -1) {
-    serialPrintln("OSCOKIRQ failed to assert");
-  while(1);
-  }
+  Serial.begin(9600);
 
   // Инициализация ИК-приёмника:
   irrecv.enableIRIn(); // Start the receiver
@@ -98,54 +66,34 @@ void setup()
   servoVertical.attach(servoVerticalPin);
   servoVertical.write(90);
   
-  // Индикация режима отладки:
-  indicate();
+  pinMode(lightPin, OUTPUT);
+  digitalWrite(lightPin, LOW);
 }
 
 // Функция главного цикла:
 void loop()
 {
-  Usb.Task();
-
-  // Установка соединения с Andriod-приложением:
-  if (adk.isReady() == false) {
-    return;
-  }
-
   // Проверка ИК-попадания в робота:
   if (checkIrHit())
   {
-    // Инициализация структуры для передачи данных в Android-приложение:
-    uint8_t message[5] = { 0x00 };
-    uint16_t messageLength = sizeof(message);
-    
-    indicate();
-    serialPrintln("Hit ");
     // Шлю сообщения Android-приложению об ИК-попадании в нас:
     // один раз 'h0001' и один раз 'h0000' (hit - попадание).
     // 'h0000' нужно чтобы сбросить значение в хэш-таблице 
     // сообщений Android-приложения. Там используется хэш-таблица
     // сообщений для исключения из обработки повторяющихся команд
     // с одинаковыми значениями.
-    message[0] = (uint8_t)'h';
-    message[1] = (uint8_t)'0';
-    message[2] = (uint8_t)'0';
-    message[3] = (uint8_t)'0';
-    message[4] = (uint8_t)'1';
-    adk.SndData(messageLength, message);
-    message[4] = (uint8_t)'0';
-    adk.SndData(messageLength, message);
+    Serial.print("h0001");
+    Serial.print("h0000");
   }
   
-  // Инициализация структуры для приёма данных от Android-приложения:
-  uint8_t buffer[5] = { 0x00 };
-  uint16_t bufferLength = sizeof(buffer);
-
-  // Чтение команд из входной очереди:
-  adk.RcvData(&bufferLength, buffer);
+  String bufferText = "";
+  while (Serial.available() > 0)
+  {
+    char ch = Serial.read();
+    bufferText += ch;
+  }
   
-  // Извлечение и обработка команд из входного буфера:
-  processMessageBuffer(bufferLength, buffer);
+  processMessageBuffer(bufferText);
 }
 
 // Проверка ИК-попадания в робота:
@@ -154,12 +102,13 @@ boolean checkIrHit()
   boolean result = false;
   if (irrecv.decode(&results)) {
     unsigned long hitValue;
-    if (debugMode) {
+/*    if (debugMode) {
       hitValue = 0xA90;
     }
     else {
       hitValue = 0xABC1;
-    }
+    }*/
+    hitValue = 0xA90;
     result = (results.decode_type == SONY) && (results.value == hitValue);
     irrecv.resume();
   }
@@ -167,17 +116,15 @@ boolean checkIrHit()
 }
 
 // Извлечение и обработка команд из входного буфера:
-void processMessageBuffer(uint16_t bufferSize, uint8_t *buffer)
+void processMessageBuffer(String bufferText)
 {
-  // Перевожу буфер в строку:
-  String bufferText = "";
-  for (int i = 0; i < bufferSize; i++)
-  {
-    bufferText += (char) buffer[i];
-  }
-  
   // Если от предыдущей итерации остался кусок команды, прибавляю его слева:
   bufferText = previousBufferRest + bufferText;
+  if (bufferText.length() < MESSAGELENGTH)
+  {
+    previousBufferRest = bufferText;
+    return;
+  }
   previousBufferRest = "";
   
   // Последовательно извлекаю из полученной строки команды длиной MESSAGELENGTH символов.
@@ -223,25 +170,36 @@ boolean parseMessage(String message, String &command, int &value)
   }
     
   command = (String)message[0];
-  value = 
-    4096 * hexCharToInt(message[1]) +
-    256 * hexCharToInt(message[2]) +
-    16 * hexCharToInt(message[3]) +
-    hexCharToInt(message[4]);
-  
-  return true;
+  int digit1, digit2, digit3, digit4;
+  if (hexCharToInt(message[1], digit1) && hexCharToInt(message[2], digit2) &&
+    hexCharToInt(message[3], digit3) && hexCharToInt(message[4], digit4))
+  {
+    value = 4096 * digit1 + 256 * digit2 + 16 * digit3 + digit4;
+    return true;
+  }
+  else
+  {
+    command = "";
+    value = 0;
+    return false;
+  }
 }
 
-int hexCharToInt(char ch)
+boolean hexCharToInt(char ch, int &value)
 {
   if ((ch >= '0') && (ch <= '9'))
-    return ch - '0';
+    value = ch - '0';
   else if ((ch >= 'A') && (ch <= 'F'))
-    return 10 + ch - 'A';
+    value = 10 + ch - 'A';
   else if ((ch >= 'a') && (ch <= 'f'))
-    return 10 + ch - 'a';
+    value = 10 + ch - 'a';
   else
-    return 0;
+  {
+    value = 0;
+    return false;
+  }
+  
+  return true;
 }
 
 // Процедура обработки сообщения:
@@ -252,35 +210,36 @@ void processMessage(String message)
   int value;
   if (! parseMessage(message, command, value))
   {
-    indicate();
-    serialFlush();
-    serialPrintln("Wrong message.");
+    //Serial.flush();
+    Serial.print("E0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
+    return;
   }
   
   if ((command == "L") || (command == "R") || (command == "D")) 
   {
     // Команда двигателям:
     moveMotor(command, value);
-    serialPrintln("MOVE: OK");
   }
   else if ((command == "H") || (command == "V"))
   {
     // Команда голове:
     moveHead(command, value);
-    serialPrintln("HEAD: OK");
+  }
+  else if (command == "I")
+  {
+    setHeadlightState(value);
   }
   else if (command == "f")
   {
     // Команда выстрела пушке:
     irsend.sendSony(0xABC0, 16);
     irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
-    serialPrintln("GUN: OK");
   }
   else
   {
-    indicate();
-    serialFlush();
-    serialPrintln("Unknown command.");
+    //Serial.flush();
+    Serial.print("E0002"); // неизвестная команда
+    return;
   }
 }
 
@@ -325,38 +284,15 @@ void moveMotor(String side, int speed)
   }
 }
 
-// Инициализация последовательного порта.
-void serialBegin(int serialSpeed) {
-  if (debugMode) {
-    Serial.begin(115200);
+// Управление фарами.
+void setHeadlightState(int value)
+{
+  if (value == 0)
+  {
+    digitalWrite(lightPin, LOW);
+  }
+  else if (value == 1)
+  {
+    digitalWrite(lightPin, HIGH);
   }
 }
-
-// Вывод строки в последовательный порт.
-void serialPrintln(String outputText) {
-  if (debugMode) {
-    Serial.println(outputText);
-  }
-}
-
-// Очистка входного буфера последовательного порта.
-void serialFlush() {
-  if (debugMode) {
-    Serial.flush();
-  }
-}
-
-// Функция для отладки. Индикация какого-либо события светодиодом,
-// подключенным вместо ИК-пушки.
-void indicate() {
-  if (debugMode) {
-    digitalWrite(gunPin, HIGH);
-    delay(30);
-    digitalWrite(gunPin, HIGH);
-    delay(30);
-    digitalWrite(gunPin, HIGH);
-    delay(30);
-    digitalWrite(gunPin, LOW);
-  }
-}
-

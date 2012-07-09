@@ -53,8 +53,8 @@ namespace RobotGamepad
 
             MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
-            // byte[] roboHeadAddress = { 192, 168, 1, 1 };
-            byte[] roboHeadAddress = { 192, 168, 1, 40 };
+            byte[] roboHeadAddress = { 192, 168, 1, 1 };
+            //byte[] roboHeadAddress = { 192, 168, 1, 40 };
             RoboHeadAddress = new IPAddress(roboHeadAddress);
 
             IpWebcamPort = 8080;
