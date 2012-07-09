@@ -85,7 +85,7 @@ public final class BluetoothHelper {
 	 */
 	private BluetoothHelper() {		
 	}
-	
+
 	/**
 	 * Начальная инициализация bluetooth-адаптера телефона. Должно вызываться только один раз, например, в onCreate главной активити.
 	 * @param parentActivity родительское активити.
