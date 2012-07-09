@@ -132,6 +132,7 @@ namespace RobotGamepad
         /// </summary>
         private void GenerateFlashlightTurnOnCommand()
         {
+            // this.flashlightCommand = "Z0001"; (проверка вывода сообщения о ошибке - неизвестная команды)
             this.flashlightCommand = "I0001";
         }
 
@@ -140,6 +141,7 @@ namespace RobotGamepad
         /// </summary>
         private void GenerateFlashlightTurnOffCommand()
         {
+            // this.flashlightCommand = "Z0000"; (проверка вывода сообщения о ошибке - неизвестная команды)
             this.flashlightCommand = "I0000";
         }
 

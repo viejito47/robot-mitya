@@ -5,7 +5,7 @@ import android.preference.PreferenceActivity;
 
 /**
  * јктивити настроек приложени€.
- * @author ƒмитрий
+ * @author ƒмитрий ƒзахов
  *
  */
 public class Settings extends PreferenceActivity {
@@ -38,6 +38,11 @@ public class Settings extends PreferenceActivity {
 	 * ƒлина значени€ в сообщении.
 	 */
 	public static final int MESSAGE_VALUE_LENGTH = 4;
+
+	/**
+	 * MAC-адрес Bluetooth-адаптера контроллера робота.
+	 */
+	public static final String ROBOBODY_MAC = "00:12:03:31:01:22";
 	
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {

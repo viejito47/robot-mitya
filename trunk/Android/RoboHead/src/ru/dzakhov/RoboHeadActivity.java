@@ -3,31 +3,22 @@ package ru.dzakhov;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.app.Activity;
 import android.app.AlertDialog;
-// import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-// import android.hardware.Sensor;
-// import android.hardware.SensorManager;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
-// import android.widget.Toast;
+import android.widget.Toast;
 
 /**
  * Главная активити приложения.
- * @author Дмитрий
+ * @author Дмитрий Дзахов
  *
  */
-public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickListener {
-	/**
-	 * Объект-прослушиватель сообщений от устройства Open Accessory (USB Host Shield + Arduino).
-	 */
-	private MessageAccessoryReceiver mReceiver;
-	
+public class RoboHeadActivity extends Activity {
 	/**
 	 * Runnable объект, для нити, взаимодействующей с уровнем Windows-приложения.
 	 */
@@ -51,11 +42,13 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	}
 	
 	/**
-	 * Вызывается в конце onCreate.
+	 * Метод, вызывающийся при создании активити.
 	 * @param savedInstanceState ранее сохранённое состояние экземпляра.
 	 */
 	@Override
-	protected final void afterOnCreate(final Bundle savedInstanceState) {
+	public final void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
         setContentView(R.layout.face);
 
         SoundManager.getInstance();
@@ -93,6 +86,14 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 					}
 					// Осознано ничего не делаем для значения 0000. Это сообщение используется для
 					// фиксации в хэш-таблице последних принятых сообщений значения, отличного от 0001.
+				} else if (command.equals("E")) {
+					String errorMessage = "Ошибка: ";
+					if (value.equals("0001")) {
+						errorMessage += "неверное сообщение";
+					} else if (value.equals("0002")) {
+						errorMessage += "неизвестная команда";
+					}
+					Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
 				} else {
 					if (command.equals("f")) { // f [fire] – выстрел
 						if (value.equals("0001")) {
@@ -110,36 +111,45 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 			}
   		};
 
-		mReceiver = new MessageAccessoryReceiver(mHandler);
-		getOpenAccessory().setListener(mReceiver);
-
+  		BluetoothHelper.initialize(this, mHandler);
+  		
     	startUdpReceiver(mHandler);
     	
 		// mOrientationHelper = new OrientationHelper(this);
 	}
 	
+	/**
+	 * Метод вызывается при закрытии активити.
+	 */
 	@Override
-	protected final void afterOnDestroy() {
+	protected final void onDestroy() {
+		super.onDestroy();
+		
 		stopUdpReceiver();
 		SoundManager.cleanup();
 	}
-	
-	@Override
-	protected final void afterOnResume() {
-		// mOrientationHelper.registerListner();
-	}
 
+	/**
+	 * Метод вызывается при восстановлении активити.
+	 */
 	@Override
-	protected final void afterOnPause() {
-		sendBroadcast(new Intent("com.pas.webcam.CONTROL").putExtra("action", "stop"));
-		// mOrientationHelper.unregisterListner();
+	protected final void onResume() {
+		super.onResume();
+
+		// mOrientationHelper.registerListner();
+		BluetoothHelper.connect();
 	}
 
 	/**
-	 * Реализация интерфейса OnClickListner.
-	 * @param view где произведён клик.
+	 * Метод вызывается при переходе активити в состояние паузы.
 	 */
-	public void onClick(final View view) {
+	@Override
+	protected final void onPause() {
+		super.onPause();
+		
+		sendBroadcast(new Intent("com.pas.webcam.CONTROL").putExtra("action", "stop"));
+		// mOrientationHelper.unregisterListner();
+		BluetoothHelper.disconnect();
 	}
 
 	@Override
@@ -284,12 +294,13 @@ public class RoboHeadActivity extends AccessoryBaseActivity implements OnClickLi
 	 * @param message текст сообщения.
 	 */
 	private void sendMessageToRobot(final String message) {
-		byte[] buffer = new byte[message.length()];
-		for (int i = 0; i < message.length(); i++) {
-			buffer[i] = (byte) message.charAt(i);
-		}		
-		getOpenAccessory().write(buffer);
+//		byte[] buffer = new byte[message.length()];
+//		for (int i = 0; i < message.length(); i++) {
+//			buffer[i] = (byte) message.charAt(i);
+//		}		
+//		getOpenAccessory().write(buffer);
 		Logger.d("RoboHeadActivity: Sent to Robot: " + message);
+		BluetoothHelper.send(message);
 	}
 	
 	/**
