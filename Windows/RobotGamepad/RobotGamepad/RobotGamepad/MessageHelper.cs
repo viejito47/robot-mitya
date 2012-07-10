@@ -31,16 +31,8 @@ namespace RobotGamepad
                 throw new ArgumentException("Параметр сообщения должен находиться в интервале от -32 768 до 32 767.");
             }
 
-            Int16 shortValue = Convert.ToInt16(value);
+            short shortValue = Convert.ToInt16(value);
             return shortValue.ToString("X4");
-
-            //string result = value.ToString();
-            //while (result.Length < 3)
-            //{
-            //    result = "0" + result;
-            //}
-
-            //return result;
         }
     }
 }

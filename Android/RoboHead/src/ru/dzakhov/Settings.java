@@ -1,14 +1,20 @@
 package ru.dzakhov;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
 /**
  * Активити настроек приложения.
  * @author Дмитрий Дзахов
  *
  */
-public class Settings extends PreferenceActivity {
+public final class Settings extends PreferenceActivity implements OnPreferenceChangeListener {
 	/**
 	 * Адрес сервера.
 	 */
@@ -17,12 +23,38 @@ public class Settings extends PreferenceActivity {
 	/**
 	 * Порт сокета для приёма сообщений от ПК.
 	 */
-	public static final int MESSAGESOCKETPORT = 51974;
+	private static int mMessageSocketPort;
 	
 	/**
-	 * Порт сокета для передачи видео в Windows-приложение.
+	 * MAC-адрес Bluetooth-адаптера контроллера робота.
 	 */
-	public static final int MEDIASOCKETPORT = 51973;
+	private static String mRoboBodyMac; // "00:12:03:31:01:22"
+	
+	/**
+	 * Поле ввода опции.
+	 */
+	private EditTextPreference mEditTextPreferenceMessageSocketPort;
+	
+	/**
+	 * Поле ввода опции.
+	 */
+	private EditTextPreference mEditTextPreferenceRoboBodyMac;
+	
+	/**
+	 * Аксессор поля mMessageSocketPort.
+	 * @return порт для обмена сообщениями с ПК.
+	 */
+	public static int getMessageSocketPort() {
+		return mMessageSocketPort;
+	}
+	
+	/**
+	 * Аксессор поля mRoboBodyMac.
+	 * @return MAC-адрес Bluetooth-адаптера контроллера робота.
+	 */
+	public static String getRoboBodyMac() {
+		return mRoboBodyMac;
+	}
 	
 	/**
 	 * Длина сообщений, между уровнями ПК, телефон, контроллер.
@@ -39,14 +71,62 @@ public class Settings extends PreferenceActivity {
 	 */
 	public static final int MESSAGE_VALUE_LENGTH = 4;
 
-	/**
-	 * MAC-адрес Bluetooth-адаптера контроллера робота.
-	 */
-	public static final String ROBOBODY_MAC = "00:12:03:31:01:22";
-	
 	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
+	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.settings);
+		
+		String key;
+		
+		key = getString(R.string.option_message_socket_port_key);		
+		mEditTextPreferenceMessageSocketPort = (EditTextPreference) this.findPreference(key);
+		mEditTextPreferenceMessageSocketPort.setOnPreferenceChangeListener(this);
+		
+		key = getString(R.string.option_robobody_mac_key);
+		mEditTextPreferenceRoboBodyMac = (EditTextPreference) this.findPreference(key);
+		mEditTextPreferenceRoboBodyMac.setOnPreferenceChangeListener(this);
+	}
+	
+	/**
+	 * Инициализация некоторых установок.
+	 * @param context контекст приложения.
+	 */
+	public static void initialize(final Context context) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		String key;
+		
+		key = context.getString(R.string.option_message_socket_port_key);		
+		mMessageSocketPort = Integer.parseInt(settings.getString(key, ""));
+		//Logger.d("Settings: " + mMessageSocketPort);
+		
+		key = context.getString(R.string.option_robobody_mac_key);
+		mRoboBodyMac = settings.getString(key, "");
+		//Logger.d("Settings: " + mRoboBodyMac);
+	}
+
+	/**
+	 * Обработчик листнера изенений настроек.
+	 * @param preference изменившаяся опция.
+	 * @param newValue новое значение.
+	 * @return принять ли изменения.
+	 */
+	public boolean onPreferenceChange(final Preference preference, final Object newValue) {
+		if (preference == null) {
+			return false;
+		}
+		
+		if (preference == mEditTextPreferenceMessageSocketPort) {
+			String value = (String) newValue;
+			mMessageSocketPort = Integer.parseInt(value);
+			//Logger.d("Settings2: " + mMessageSocketPort);
+			return true;
+		} else if (preference == mEditTextPreferenceRoboBodyMac) {
+			mRoboBodyMac = (String) newValue;
+			//Logger.d("Settings2: " + mRoboBodyMac);
+			return true;
+		}
+
+		return false;
 	}
 }

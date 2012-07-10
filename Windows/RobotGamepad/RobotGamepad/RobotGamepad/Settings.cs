@@ -11,6 +11,7 @@ namespace RobotGamepad
 {
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Linq;
     using System.Net;
     using System.Text;
@@ -54,15 +55,16 @@ namespace RobotGamepad
             MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
             byte[] roboHeadAddress = { 192, 168, 1, 1 };
-            //byte[] roboHeadAddress = { 192, 168, 1, 40 };
-            RoboHeadAddress = new IPAddress(roboHeadAddress);
+            
+            // byte[] roboHeadAddress = { 192, 168, 1, 40 };
+            RoboHeadAddress = IPAddress.Parse(Properties.Settings.Default.RoboHeadAddress);
 
-            IpWebcamPort = 8080;
+            IpWebcamPort = Properties.Settings.Default.IpWebcamPort;
 
-            CommandPort = 51974;
+            MessagePort = Properties.Settings.Default.MessagePort;
 
-            DriveModeNormalCoef = 190;
-            DriveModeTurboCoef = 255;
+            DriveModeNormalCoef = Properties.Settings.Default.DriveModeNormalCoef;
+            DriveModeTurboCoef = Properties.Settings.Default.DriveModeTurboCoef;
 
             GunChargeTime = new TimeSpan(0, 0, 5);
 
@@ -176,7 +178,7 @@ namespace RobotGamepad
         /// <summary>
         /// Gets Порт для передачи команд голове робота.
         /// </summary>
-        public static int CommandPort { get; private set; }
+        public static int MessagePort { get; private set; }
 
         /// <summary>
         /// Gets Определяет скорость в нормальном (не турбо) режиме движения. 
@@ -195,6 +197,9 @@ namespace RobotGamepad
         /// </summary>
         public static TimeSpan GunChargeTime { get; private set; }
 
+        /// <summary>
+        /// Gets Количество повторений для одиночных команд. Например, когда по UDP передаётся команда включить фары, она дублируется несколько раз. Для автоматически повторяющихся команд, это не делается.
+        /// </summary>
         public static byte SingleMessageRepetitionsCount { get; private set; }
     }
 }

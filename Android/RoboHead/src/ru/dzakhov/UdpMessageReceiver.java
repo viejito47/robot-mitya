@@ -47,7 +47,7 @@ public class UdpMessageReceiver implements Runnable {
 			DatagramSocket datagramSocket = null;
 			try {
 				Logger.d("UdpMessageReceiver: Waiting for client to connect...");
-				datagramSocket = new DatagramSocket(Settings.MESSAGESOCKETPORT);
+				datagramSocket = new DatagramSocket(Settings.getMessageSocketPort());
 				Logger.d("UdpMessageReceiver: Connected.");
 				
 				// Хэш-таблица для исключения из обработки повторяющихся сообщений.

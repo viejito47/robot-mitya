@@ -31,7 +31,7 @@ public final class BluetoothHelper {
 	/**
 	 * MAC-адрес bluetooth-модуля, подключаемого к контроллеру робота.
 	 */
-	private static final String ROBOBODY_MAC = "00:12:03:31:01:22";
+	// private static final String ROBOBODY_MAC = "00:12:03:31:01:22";
 	
 	/**
 	 * Handler обрабатывающий все сообщения в Android-приложении робота. Передаётся классу в методе Initialize.
@@ -128,7 +128,7 @@ public final class BluetoothHelper {
 	    			    // Это - единственный метод подключиться напрямую, не используя поиска всех устройств в округе.
 	    				// createRfcommSocketToServiceRecord(), к сожалению, не работает
 	    				try {
-	    					mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(ROBOBODY_MAC);
+	    					mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(Settings.getRoboBodyMac());
 	    					Method m = mBluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
 	    					mBluetoothSocket = (BluetoothSocket) m.invoke(mBluetoothDevice, Integer.valueOf(1));
 	    					mBluetoothSocket.connect();
