@@ -97,6 +97,7 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.configuration" />
     <Reference Include="System.Xml">
       <Private>False</Private>
     </Reference>
@@ -114,6 +115,11 @@
     <Compile Include="AudioHelper.cs" />
     <Compile Include="GunHelper.cs" />
     <Compile Include="MoodHelper.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="RobotHelper.cs" />
     <Compile Include="MessageHelper.cs" />
     <Compile Include="DriveHelper.cs" />
@@ -164,6 +170,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="AXVLC">

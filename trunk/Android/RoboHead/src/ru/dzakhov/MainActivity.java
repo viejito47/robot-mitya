@@ -31,6 +31,8 @@ public final class MainActivity extends Activity {
         setTestClickHandler();
         setSettingsClickHandler();
         setAboutClickHandler();
+        
+        Settings.initialize(this);
 	}
 	
 	/**

@@ -60,7 +60,7 @@ namespace RobotGamepad
                 byte[] messageBytes = Encoding.ASCII.GetBytes(message + (char)13 + (char)10);
 
                 UdpClient udpClient = new UdpClient();
-                IPEndPoint endPoint = new IPEndPoint(Settings.RoboHeadAddress, Settings.CommandPort);
+                IPEndPoint endPoint = new IPEndPoint(Settings.RoboHeadAddress, Settings.MessagePort);
                 int bytesSent = udpClient.Send(messageBytes, messageBytes.Length, endPoint);
                 if (bytesSent != messageBytes.Length)
                 {
