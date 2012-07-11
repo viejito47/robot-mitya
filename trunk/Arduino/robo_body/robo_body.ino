@@ -27,15 +27,17 @@ int motorRightSpeedPin = 5;
 int motorRightDirectionPin = 4;
 
 // Пины контроллера для управления сервоприводами робота (цифровые выходы).
-int servoHorizontalPin = 2;
-int servoVerticalPin = 9;
+int servoHeadHorizontalPin = 9;
+int servoHeadVerticalPin = 10;
+int servoTailPin = 11;
 
 // Пин управления фарами.
 int lightPin = 13;
 
 // Объекты для управления сервоприводами.
-Servo servoHorizontal;
-Servo servoVertical;
+Servo servoHeadHorizontal;
+Servo servoHeadVertical;
+Servo servoTail;
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
 IRrecv irrecv(targetPin);
@@ -57,14 +59,14 @@ void setup()
   moveMotor("D", 0);
 
   // Установка горизонтального сервопривода в положение для установки телефона:
-  pinMode(servoHorizontalPin, OUTPUT);
-  servoHorizontal.attach(servoHorizontalPin);
-  servoHorizontal.write(90);
+  pinMode(servoHeadHorizontalPin, OUTPUT);
+  servoHeadHorizontal.attach(servoHeadHorizontalPin);
+  servoHeadHorizontal.write(90);
 
   // Установка вертикального сервопривода в положение для установки телефона:
-  pinMode(servoVerticalPin, OUTPUT);
-  servoVertical.attach(servoVerticalPin);
-  servoVertical.write(90);
+  pinMode(servoHeadVerticalPin, OUTPUT);
+  servoHeadVertical.attach(servoHeadVerticalPin);
+  servoHeadVertical.write(90);
   
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
@@ -225,6 +227,10 @@ void processMessage(String message)
     // Команда голове:
     moveHead(command, value);
   }
+  else if (command == "T")
+  {
+    moveTail(value);
+  }
   else if (command == "I")
   {
     setHeadlightState(value);
@@ -248,12 +254,18 @@ void moveHead(String plane, int degree)
 {
   if (plane == "H") // (горизонтальная плоскость)
   {
-    servoHorizontal.write(degree);
+    servoHeadHorizontal.write(degree);
   }
   else if (plane == "V") // (вертикальная плоскость)
   {
-    servoVertical.write(degree);
+    servoHeadVertical.write(degree);
   }
+}
+
+// Поворот хвоста.
+void moveTail(int degree)
+{
+  servoTail.write(degree);
 }
 
 // Управление двигателями.
