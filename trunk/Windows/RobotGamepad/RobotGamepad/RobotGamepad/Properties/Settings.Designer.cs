@@ -53,18 +53,63 @@ namespace RobotGamepad.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("255")]
-        public byte DriveModeNormalCoef {
+        public byte DriveModeNormalMaxSpeed {
             get {
-                return ((byte)(this["DriveModeNormalCoef"]));
+                return ((byte)(this["DriveModeNormalMaxSpeed"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("255")]
-        public byte DriveModeTurboCoef {
+        public byte DriveModeTurboMaxSpeed {
             get {
-                return ((byte)(this["DriveModeTurboCoef"]));
+                return ((byte)(this["DriveModeTurboMaxSpeed"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("51")]
+        public byte Speed1 {
+            get {
+                return ((byte)(this["Speed1"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("102")]
+        public byte Speed2 {
+            get {
+                return ((byte)(this["Speed2"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("153")]
+        public byte Speed3 {
+            get {
+                return ((byte)(this["Speed3"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("204")]
+        public byte Speed4 {
+            get {
+                return ((byte)(this["Speed4"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255")]
+        public byte Speed5 {
+            get {
+                return ((byte)(this["Speed5"]));
             }
         }
     }
