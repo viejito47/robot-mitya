@@ -35,6 +35,11 @@ namespace RobotGamepad
         private bool turboModeOn = false;
 
         /// <summary>
+        /// Текущая установленная скорость при управлении роботом от клавиатуры.
+        /// </summary>
+        private byte speedForKeyboardControl = Settings.Speed3;
+
+        /// <summary>
         /// Признак режима разворота.
         /// </summary>
         /// <remarks>
@@ -70,7 +75,23 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether режим разворота включен.
+        /// Gets or sets текущую установленную скорость при управлении роботом от клавиатуры.
+        /// </summary>
+        public byte SpeedForKeyboardControl
+        {
+            get
+            {
+                return this.speedForKeyboardControl;
+            }
+
+            set
+            {
+                this.speedForKeyboardControl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether режим разворота включен. Только для управления джойстиком.
         /// </summary>
         public bool RotationModeOn
         {
@@ -130,6 +151,179 @@ namespace RobotGamepad
         }
 
         /// <summary>
+        /// Расчёт скоростей двигателей, исходя из значений координат джойстика движения.
+        /// </summary>
+        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
+        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
+        /// <param name="leftSpeed">Возвращаемая скорость левого двигателя.</param>
+        /// <param name="rightSpeed">Возвращаемая скорость правого двигателя.</param>
+        public void CalculateMotorsSpeed(double x, double y, out int leftSpeed, out int rightSpeed)
+        {
+            double vectorLength = Math.Sqrt((x * x) + (y * y));
+            vectorLength = vectorLength < 0 ? 0 : vectorLength;
+            vectorLength = vectorLength > 1 ? 1 : vectorLength;
+
+            double sinAlpha = vectorLength == 0 ? 0 : (y >= 0 ? y / vectorLength : -y / vectorLength);
+
+            // Аж два раза корректирую синус. Дошёл до этого эмпирически. Только так чувствуется эффект.
+            sinAlpha = 1 - Math.Sqrt(1 - (sinAlpha * sinAlpha)); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
+            sinAlpha = 1 - Math.Sqrt(1 - (sinAlpha * sinAlpha)); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
+            sinAlpha = sinAlpha < 0 ? 0 : sinAlpha;
+            sinAlpha = sinAlpha > 1 ? 1 : sinAlpha;
+
+            bool smallAlpha = sinAlpha < Settings.SinAlphaBound;
+            bool rotationModeOn = this.rotationModeOn && smallAlpha;
+
+            if ((x >= 0) && (y >= 0))
+            {
+                leftSpeed = this.Map(vectorLength, 0, 255);
+                rightSpeed = this.rotationModeOn ? -leftSpeed : this.Map(sinAlpha * vectorLength, 0, 255);
+            }
+            else if ((x < 0) && (y >= 0))
+            {
+                rightSpeed = this.Map(vectorLength, 0, 255);
+                leftSpeed = this.rotationModeOn ? -rightSpeed : this.Map(sinAlpha * vectorLength, 0, 255);
+            }
+            else if ((x < 0) && (y < 0))
+            {
+                rightSpeed = this.Map(vectorLength, 0, -255);
+                leftSpeed = this.rotationModeOn ? -rightSpeed : this.Map(sinAlpha * vectorLength, 0, -255);
+            }
+            else
+            { // (x >= 0) && (y < 0)
+                leftSpeed = this.Map(vectorLength, 0, -255);
+                rightSpeed = this.rotationModeOn ? -leftSpeed : this.Map(sinAlpha * vectorLength, 0, -255);
+            }
+
+            // Делаю нелинейный прирост скорости. Функция - дуга окружности. f(x) = sqrt(2x - x^2)
+            leftSpeed = NonlinearSpeedCorrection(leftSpeed);
+            rightSpeed = NonlinearSpeedCorrection(rightSpeed);
+
+            this.CorrectMotorsSpeedForTurboMode(ref leftSpeed, ref rightSpeed);
+        }
+
+        /// <summary>
+        /// Расчёт скоростей двигателей, исходя из состояний клавиш управления движением.
+        /// </summary>
+        /// <param name="forwardPressed">Нажата клавиша "Вперёд".</param>
+        /// <param name="backwardPressed">Нажата клавиша "Назад".</param>
+        /// <param name="leftPressed">Нажата клавиша "Влево".</param>
+        /// <param name="rightPressed">Нажата клавиша "Вправо".</param>
+        /// <param name="leftSpeed">Возвращаемая скорость левого двигателя.</param>
+        /// <param name="rightSpeed">Возвращаемая скорость правого двигателя.</param>
+        public void CalculateMotorsSpeed(
+            bool forwardPressed, 
+            bool backwardPressed, 
+            bool leftPressed, 
+            bool rightPressed,
+            out int leftSpeed, 
+            out int rightSpeed)
+        {
+            const int speedRetarding = 3;
+
+            leftSpeed = 0;
+            rightSpeed = 0;
+            if (forwardPressed)
+            {
+                if (leftPressed && rightPressed)
+                {
+                    // Движение вперёд
+                    leftSpeed = this.speedForKeyboardControl;
+                    rightSpeed = this.speedForKeyboardControl;
+                }
+                else if (leftPressed)
+                {
+                    // Поворот налево в движении
+                    leftSpeed = this.speedForKeyboardControl / speedRetarding;
+                    rightSpeed = this.speedForKeyboardControl;
+                }
+                else if (rightPressed)
+                {
+                    // Поворот направо в движении
+                    leftSpeed = this.speedForKeyboardControl;
+                    rightSpeed = this.speedForKeyboardControl / speedRetarding;
+                }
+                else if (backwardPressed)
+                {
+                    // Остановка
+                    leftSpeed = 0;
+                    rightSpeed = 0;
+                }
+                else
+                {
+                    // Движение вперёд
+                    leftSpeed = this.speedForKeyboardControl;
+                    rightSpeed = this.speedForKeyboardControl;
+                }
+            }
+            else if (backwardPressed)
+            {
+                if (leftPressed && rightPressed)
+                {
+                    // Движение назад
+                    leftSpeed = -this.speedForKeyboardControl;
+                    rightSpeed = -this.speedForKeyboardControl;
+                }
+                else if (leftPressed)
+                {
+                    // Поворот направо в движении
+                    leftSpeed = -this.speedForKeyboardControl / speedRetarding;
+                    rightSpeed = -this.speedForKeyboardControl;
+                }
+                else if (rightPressed)
+                {
+                    // Поворот налево в движении
+                    leftSpeed = -this.speedForKeyboardControl;
+                    rightSpeed = -this.speedForKeyboardControl / speedRetarding;
+                }
+                else if (forwardPressed)
+                {
+                    // Остановка
+                    leftSpeed = 0;
+                    rightSpeed = 0;
+                }
+                else
+                {
+                    // Движение назад
+                    leftSpeed = -this.speedForKeyboardControl;
+                    rightSpeed = -this.speedForKeyboardControl;
+                }
+            }
+            else if (leftPressed)
+            {
+                if (rightPressed)
+                {
+                    // Остановка
+                    leftSpeed = 0;
+                    rightSpeed = 0;
+                }
+                else
+                {
+                    // Поворот налево на месте
+                    leftSpeed = -this.speedForKeyboardControl;
+                    rightSpeed = this.speedForKeyboardControl;
+                }
+            }
+            else if (rightPressed)
+            {
+                if (leftPressed)
+                {
+                    // Остановка
+                    leftSpeed = 0;
+                    rightSpeed = 0;
+                }
+                else
+                {
+                    // Поворот направо на месте
+                    leftSpeed = this.speedForKeyboardControl;
+                    rightSpeed = -this.speedForKeyboardControl;
+                }
+            }
+
+            this.CorrectMotorsSpeedForTurboMode(ref leftSpeed, ref rightSpeed);
+        }
+
+        /// <summary>
         /// Формирование команд остановки двигателей.
         /// </summary>
         /// <param name="leftMotorCommand">Команда остановки левых двигателей.</param>
@@ -142,15 +336,12 @@ namespace RobotGamepad
         /// <summary>
         /// Формирование команд на двигатели исходя из координат джойстика движения.
         /// </summary>
-        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
-        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
+        /// <param name="leftSpeed">Скорость левого мотора в интервале [-255, 255].</param>
+        /// <param name="rightSpeed">Скорость правого мотора в интервале [-255, 255].</param>
         /// <param name="leftMotorCommand">Команда на левые двигатели.</param>
         /// <param name="rightMotorCommand">Команда на правые двигатели.</param>
-        public void GenerateMotorCommands(double x, double y, out string leftMotorCommand, out string rightMotorCommand)
+        public void GenerateMotorCommands(int leftSpeed, int rightSpeed, out string leftMotorCommand, out string rightMotorCommand)
         {
-            int leftSpeed;
-            int rightSpeed;
-            this.CalculateMotorsSpeed(x, y, out leftSpeed, out rightSpeed);
             leftMotorCommand = this.SpeedToMotorCommand('L', leftSpeed);
             rightMotorCommand = this.SpeedToMotorCommand('R', rightSpeed);
         }
@@ -173,7 +364,29 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
-            this.GenerateMotorCommands(x, y, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+            this.CalculateMotorsSpeed(x, y, out leftSpeed, out rightSpeed);
+            this.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
+            this.robotHelper.SendMessageToRobot(this.leftMotorCommand);
+            this.robotHelper.SendMessageToRobot(this.rightMotorCommand);
+        }
+
+        /// <summary>
+        /// Организует движение робота в соответсятвии с состояниями клавиш клавиатуры.
+        /// </summary>
+        /// <param name="forwardPressed">Нажата клавиша "Вперёд".</param>
+        /// <param name="backwardPressed">Нажата клавиша "Назад".</param>
+        /// <param name="leftPressed">Нажата клавиша "Влево".</param>
+        /// <param name="rightPressed">Нажата клавиша "Вправо".</param>
+        public void Drive(bool forwardPressed, bool backwardPressed, bool leftPressed, bool rightPressed)
+        {
+            this.CheckRobotHelper();
+
+            int leftSpeed;
+            int rightSpeed;
+            this.CalculateMotorsSpeed(forwardPressed, backwardPressed, leftPressed, rightPressed, out leftSpeed, out rightSpeed);
+            this.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             this.robotHelper.SendMessageToRobot(this.leftMotorCommand);
             this.robotHelper.SendMessageToRobot(this.rightMotorCommand);
         }
@@ -225,64 +438,12 @@ namespace RobotGamepad
         /// </summary>
         /// <param name="leftSpeed">Скорость левых двигателей.</param>
         /// <param name="rightSpeed">Скорость правых двигателей.</param>
-        private void CorrectMotorsSpeed(ref int leftSpeed, ref int rightSpeed)
+        private void CorrectMotorsSpeedForTurboMode(ref int leftSpeed, ref int rightSpeed)
         {
-            // Делаю нелинейный прирост скорости. Функция - дуга окружности. f(x) = sqrt(2x - x^2)
-            leftSpeed = NonlinearSpeedCorrection(leftSpeed);
-            rightSpeed = NonlinearSpeedCorrection(rightSpeed);
-
             // Линейное снижение скорости (если не включен режим Турбо) - берегу двигатели.
-            int coef = this.turboModeOn ? Settings.DriveModeTurboCoef : Settings.DriveModeNormalCoef;
+            int coef = this.turboModeOn ? Settings.DriveModeTurboMaxSpeed : Settings.DriveModeNormalMaxSpeed;
             leftSpeed = leftSpeed * coef / 255;
             rightSpeed = rightSpeed * coef / 255;
-        }
-
-        /// <summary>
-        /// Расчёт скоростей двигателей, исходя из значений координат джойстика движения.
-        /// </summary>
-        /// <param name="x">Координата x джойстика в интервале [-1, 1].</param>
-        /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
-        /// <param name="leftSpeed">Возвращаемая скорость левого двигателя.</param>
-        /// <param name="rightSpeed">Возвращаемая скорость правого двигателя.</param>
-        private void CalculateMotorsSpeed(double x, double y, out int leftSpeed, out int rightSpeed)
-        {
-            double vectorLength = Math.Sqrt((x * x) + (y * y));
-            vectorLength = vectorLength < 0 ? 0 : vectorLength;
-            vectorLength = vectorLength > 1 ? 1 : vectorLength;
-
-            double sinAlpha = vectorLength == 0 ? 0 : (y >= 0 ? y / vectorLength : -y / vectorLength);
-
-            // Аж два раза корректирую синус. Дошёл до этого эмпирически. Только так чувствуется эффект.
-            sinAlpha = 1 - Math.Sqrt(1 - (sinAlpha * sinAlpha)); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
-            sinAlpha = 1 - Math.Sqrt(1 - (sinAlpha * sinAlpha)); // (нелинейная корректировка синуса) f(x) = 1 - sqrt(1 - x^2)
-            sinAlpha = sinAlpha < 0 ? 0 : sinAlpha;
-            sinAlpha = sinAlpha > 1 ? 1 : sinAlpha;
-
-            bool smallAlpha = sinAlpha < Settings.SinAlphaBound;
-            bool rotationModeOn = this.rotationModeOn && smallAlpha;
-
-            if ((x >= 0) && (y >= 0))
-            {
-                leftSpeed = this.Map(vectorLength, 0, 255);
-                rightSpeed = this.rotationModeOn ? -leftSpeed : this.Map(sinAlpha * vectorLength, 0, 255);
-            }
-            else if ((x < 0) && (y >= 0))
-            {
-                rightSpeed = this.Map(vectorLength, 0, 255);
-                leftSpeed = this.rotationModeOn ? -rightSpeed : this.Map(sinAlpha * vectorLength, 0, 255);
-            }
-            else if ((x < 0) && (y < 0))
-            {
-                rightSpeed = this.Map(vectorLength, 0, -255);
-                leftSpeed = this.rotationModeOn ? -rightSpeed : this.Map(sinAlpha * vectorLength, 0, -255);
-            }
-            else
-            { // (x >= 0) && (y < 0)
-                leftSpeed = this.Map(vectorLength, 0, -255);
-                rightSpeed = this.rotationModeOn ? -leftSpeed : this.Map(sinAlpha * vectorLength, 0, -255);
-            }
-
-            this.CorrectMotorsSpeed(ref leftSpeed, ref rightSpeed);
         }
 
         /// <summary>

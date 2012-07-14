@@ -35,6 +35,16 @@ namespace RobotGamepadTest
         private string rightMotorCommand;
 
         /// <summary>
+        /// Конструктор класса.
+        /// </summary>
+        public DriveHelperTest()
+        {
+            // Специально для тестов переопределяю максимальные скорости нормального и турбо режимов моторов.
+            Settings.DriveModeNormalMaxSpeed = 190;
+            Settings.DriveModeTurboMaxSpeed = 255;
+        }
+
+        /// <summary>
         /// Тест движения вперёд и назад в турбо-режиме.
         /// </summary>
         [Test]
@@ -43,19 +53,26 @@ namespace RobotGamepadTest
             var driveHelper = new DriveHelper();
             driveHelper.TurboModeOn = true;
 
-            driveHelper.GenerateMotorCommands(0, 1, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(0, 1, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00FF", leftMotorCommand);
             Assert.AreEqual("R00FF", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0, 0.5, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, 0.5, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00DD", leftMotorCommand);
             Assert.AreEqual("R00DD", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0, -1, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, -1, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF01", leftMotorCommand);
             Assert.AreEqual("RFF01", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0, -0.5, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, -0.5, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF23", leftMotorCommand);
             Assert.AreEqual("RFF23", rightMotorCommand);
         }
@@ -69,19 +86,26 @@ namespace RobotGamepadTest
             var driveHelper = new DriveHelper();
             driveHelper.TurboModeOn = false;
 
-            driveHelper.GenerateMotorCommands(0, 1, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(0, 1, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00BE", leftMotorCommand);
             Assert.AreEqual("R00BE", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0, 0.5, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, 0.5, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00A4", leftMotorCommand);
             Assert.AreEqual("R00A4", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0, -1, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, -1, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF42", leftMotorCommand);
             Assert.AreEqual("RFF42", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0, -0.5, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, -0.5, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF5C", leftMotorCommand);
             Assert.AreEqual("RFF5C", rightMotorCommand);
         }
@@ -107,14 +131,19 @@ namespace RobotGamepadTest
             var driveHelper = new DriveHelper();
             driveHelper.TurboModeOn = false;
 
-            driveHelper.GenerateMotorCommands(0, 1, out this.leftMotorCommand, out this.rightMotorCommand);
-            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(Settings.DriveModeNormalCoef), leftMotorCommand);
-            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(Settings.DriveModeNormalCoef), rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
 
-            driveHelper.GenerateMotorCommands(0, 0.5, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, 1, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
+            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(Settings.DriveModeNormalMaxSpeed), leftMotorCommand);
+            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(Settings.DriveModeNormalMaxSpeed), rightMotorCommand);
+
+            driveHelper.CalculateMotorsSpeed(0, 0.5, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             int speed = Convert.ToInt32(255.0 * 0.5);
             speed = DriveHelper.NonlinearSpeedCorrection(speed);
-            speed = driveHelper.TurboModeOn ? speed : speed * Settings.DriveModeNormalCoef / 255;
+            speed = driveHelper.TurboModeOn ? speed : speed * Settings.DriveModeNormalMaxSpeed / 255;
             Assert.AreEqual("L" + MessageHelper.IntToMessageValue(speed), leftMotorCommand);
             Assert.AreEqual("R" + MessageHelper.IntToMessageValue(speed), rightMotorCommand);
         }
@@ -128,18 +157,23 @@ namespace RobotGamepadTest
             var driveHelper = new DriveHelper();
             driveHelper.TurboModeOn = false;
 
-            driveHelper.GenerateMotorCommands(0, -1, out this.leftMotorCommand, out this.rightMotorCommand);
-            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(- Settings.DriveModeNormalCoef), leftMotorCommand);
-            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(- Settings.DriveModeNormalCoef), rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
 
-            driveHelper.GenerateMotorCommands(0, -0.5, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0, -1, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
+            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(-Settings.DriveModeNormalMaxSpeed), leftMotorCommand);
+            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(-Settings.DriveModeNormalMaxSpeed), rightMotorCommand);
+
+            driveHelper.CalculateMotorsSpeed(0, -0.5, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             int speed = Convert.ToInt32(255.0 * 0.5);
             speed = DriveHelper.NonlinearSpeedCorrection(speed);
-            speed = driveHelper.TurboModeOn ? speed : speed * Settings.DriveModeNormalCoef / 255;
-            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(- speed), leftMotorCommand);
-            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(- speed), rightMotorCommand);
+            speed = driveHelper.TurboModeOn ? speed : speed * Settings.DriveModeNormalMaxSpeed / 255;
+            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(-speed), leftMotorCommand);
+            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(-speed), rightMotorCommand);
         }
-            
+
         /// <summary>
         /// Тест разворота.
         /// </summary>
@@ -150,19 +184,26 @@ namespace RobotGamepadTest
 
             driveHelper.TurboModeOn = true;
 
-            driveHelper.GenerateMotorCommands(1, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(1, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00FF", leftMotorCommand);
             Assert.AreEqual("R0000", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0.5, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0.5, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00DD", leftMotorCommand);
             Assert.AreEqual("R0000", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(-1, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(-1, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L0000", leftMotorCommand);
             Assert.AreEqual("R00FF", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(-0.5, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(-0.5, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L0000", leftMotorCommand);
             Assert.AreEqual("R00DD", rightMotorCommand);
         }
@@ -178,19 +219,26 @@ namespace RobotGamepadTest
             driveHelper.TurboModeOn = true;
             driveHelper.RotationModeOn = true;
 
-            driveHelper.GenerateMotorCommands(1, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(1, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00FF", leftMotorCommand);
             Assert.AreEqual("RFF01", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0.5, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0.5, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00DD", leftMotorCommand);
             Assert.AreEqual("RFF23", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(-1, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(-1, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF01", leftMotorCommand);
             Assert.AreEqual("R00FF", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(-0.5, 0, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(-0.5, 0, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF23", leftMotorCommand);
             Assert.AreEqual("R00DD", rightMotorCommand);
         }
@@ -205,11 +253,16 @@ namespace RobotGamepadTest
 
             driveHelper.TurboModeOn = true;
 
-            driveHelper.GenerateMotorCommands(-0.7071, 0.7071, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(-0.7071, 0.7071, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L004A", leftMotorCommand);
             Assert.AreEqual("R00FF", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(-0.3536, 0.3536, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(-0.3536, 0.3536, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L0037", leftMotorCommand);
             Assert.AreEqual("R00DD", rightMotorCommand);
         }
@@ -224,11 +277,16 @@ namespace RobotGamepadTest
 
             driveHelper.TurboModeOn = true;
 
-            driveHelper.GenerateMotorCommands(0.7071, 0.7071, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(0.7071, 0.7071, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00FF", leftMotorCommand);
             Assert.AreEqual("R004A", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0.3536, 0.3536, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0.3536, 0.3536, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L00DD", leftMotorCommand);
             Assert.AreEqual("R0037", rightMotorCommand);
         }
@@ -243,11 +301,16 @@ namespace RobotGamepadTest
 
             driveHelper.TurboModeOn = true;
 
-            driveHelper.GenerateMotorCommands(-0.7071, -0.7071, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(-0.7071, -0.7071, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFFB6", leftMotorCommand);
             Assert.AreEqual("RFF01", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(-0.3536, -0.3536, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(-0.3536, -0.3536, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFFC9", leftMotorCommand);
             Assert.AreEqual("RFF23", rightMotorCommand);
         }
@@ -262,11 +325,16 @@ namespace RobotGamepadTest
 
             driveHelper.TurboModeOn = true;
 
-            driveHelper.GenerateMotorCommands(0.7071, -0.7071, out this.leftMotorCommand, out this.rightMotorCommand);
+            int leftSpeed;
+            int rightSpeed;
+
+            driveHelper.CalculateMotorsSpeed(0.7071, -0.7071, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF01", leftMotorCommand);
             Assert.AreEqual("RFFB6", rightMotorCommand);
 
-            driveHelper.GenerateMotorCommands(0.3536, -0.3536, out this.leftMotorCommand, out this.rightMotorCommand);
+            driveHelper.CalculateMotorsSpeed(0.3536, -0.3536, out leftSpeed, out rightSpeed);
+            driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("LFF23", leftMotorCommand);
             Assert.AreEqual("RFFC9", rightMotorCommand);
         }

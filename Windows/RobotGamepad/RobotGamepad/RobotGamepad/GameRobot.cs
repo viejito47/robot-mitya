@@ -37,6 +37,22 @@ namespace RobotGamepad
         /// </summary>
         gsRobotControl 
     }
+
+    /// <summary>
+    /// Способ управления роботом.
+    /// </summary>
+    internal enum ControlType
+    {
+        /// <summary>
+        /// Управление клавиатурой.
+        /// </summary>
+        ctKeyboard,
+
+        /// <summary>
+        /// Управление геймпэдом.
+        /// </summary>
+        ctGamepad
+    }
     
     /// <summary>
     /// This is the main type for your game
@@ -51,7 +67,7 @@ namespace RobotGamepad
         /// <summary>
         /// Ширина строк на экране.
         /// </summary>
-        private static int debugStringColumnWidth = 100;
+        private static int debugStringColumnWidth = 130;
 
         /// <summary>
         /// Координаты первой ячейки 1-й строки.
@@ -194,6 +210,11 @@ namespace RobotGamepad
         private KeyboardState previousKeyboardState;
 
         /// <summary>
+        /// Способ управления роботом: клавиатура или геймпэд.
+        /// </summary>
+        private ControlType controlType;
+
+        /// <summary>
         /// Initializes a new instance of the GameRobot class.
         /// </summary>
         public GameRobot()
@@ -269,24 +290,42 @@ namespace RobotGamepad
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState(PlayerIndex.One);
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+
+            // Запуск режима управления роботом клавиатурой.
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Space))
+            {
+                this.controlType = ControlType.ctKeyboard;
+                this.gameState = GameState.gsRobotControl;
+                this.InitializeRobot();
+            }
+
+            // Запуск режима управления роботом геймпэдом.
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.Start))
+            {
+                this.controlType = ControlType.ctGamepad;
+                this.gameState = GameState.gsRobotControl;
+                this.InitializeRobot();
+            }
 
             if (this.IsButtonPressed(gamePadState, gamePadState.Buttons.Back))
             {
                 this.Exit();
             }
 
-            // Запуск режима управления роботом.
-            if (this.IsButtonChangedToDown(gamePadState, Buttons.Start) || this.IsKeyChangedToDown(keyboardState, Keys.Space))
-            {
-                this.gameState = GameState.gsRobotControl;
-                this.InitializeRobot();
-            }
-
             if (this.gameState == GameState.gsRobotControl)
             {
-                this.UpdateInRobotControlState(gameTime, gamePadState);
+                switch (this.controlType)
+                {
+                    case ControlType.ctKeyboard:
+                        this.KeyboardUpdateInRobotControlState(gameTime, keyboardState);
+                        break;
+                    case ControlType.ctGamepad:
+                        this.GamepadUpdateInRobotControlState(gameTime, gamePadState);
+                        break;
+                }
+                
                 this.videoTexture = this.videoHelper.GetVideoTexture(this.GraphicsDevice);
             }
 
@@ -358,11 +397,152 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Update в режиме управления роботом.
+        /// Проверка зажата ли кнопка клавиатуры.
+        /// </summary>
+        /// <param name="keyboardState">Текущее состояние клавиатуры.</param>
+        /// <param name="key">Отслеживаемая кнопка.</param>
+        /// <returns>true, если кнопка зажата.</returns>
+        private bool IsKeyPressed(KeyboardState keyboardState, Keys key)
+        {
+            return keyboardState.IsKeyDown(key);
+        }
+
+        /// <summary>
+        /// Update в режиме управления роботом посредством клавиатуры.
+        /// </summary>
+        /// <param name="gameTime">Игровое время.</param>
+        /// <param name="keyboardState">Состояние клавиатуры.</param>
+        private void KeyboardUpdateInRobotControlState(GameTime gameTime, KeyboardState keyboardState)
+        {
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F1))
+            {
+                this.moodHelper.SetMood(Mood.Normal);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F2))
+            {
+                this.moodHelper.SetMood(Mood.Happy);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F3))
+            {
+                this.moodHelper.SetMood(Mood.Blue);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F4))
+            {
+                this.moodHelper.SetMood(Mood.Disaster);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F5))
+            {
+                this.moodHelper.SetMood(Mood.Angry);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.L))
+            {
+                this.flashlightHelper.Switch();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl))
+            {
+                this.gunHelper.Fire();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Scroll))
+            {
+                this.driveHelper.SwitchTurboMode();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.CapsLock))
+            {
+                // В боевом режиме центральное направление взгляда по вертикали - строго горизонтально.
+                // Так проще целиться и стрелять. В обычном режиме - чуть вверх.
+                this.lookHelper.WarModeOn = !this.lookHelper.WarModeOn;
+                this.lookHelper.LookForward();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Home))
+            {
+                // Установка головы в положение "смотреть вперёд".
+                this.lookHelper.LookForward();
+            }
+
+            // Установка признака плавного фиксированного обзора (при отпускании кнопок управления
+            // голова остаётся в установленном положении). При плавном фиксированном обзоре 
+            // голова поворачивается с меньшей скоростью.
+            this.lookHelper.SlowModeOn =
+                this.IsKeyPressed(keyboardState, Keys.LeftShift) || this.IsKeyPressed(keyboardState, Keys.RightShift);
+
+            if (this.IsKeyPressed(keyboardState, Keys.Left))
+            {
+                // Поворот головы влево с фиксацией. Угол поворота определяется значением gameTime.
+                this.lookHelper.FixedLookLeft(gameTime);
+            }
+
+            if (this.IsKeyPressed(keyboardState, Keys.Right))
+            {
+                // Поворот головы вправо с фиксацией. Угол поворота определяется значением gameTime.
+                this.lookHelper.FixedLookRight(gameTime);
+            }
+
+            if (this.IsKeyPressed(keyboardState, Keys.Up))
+            {
+                // Поворот головы вверх с фиксацией. Угол поворота определяется значением gameTime.
+                this.lookHelper.FixedLookUp(gameTime);
+            }
+
+            if (this.IsKeyPressed(keyboardState, Keys.Down))
+            {
+                // Поворот головы вниз с фиксацией. Угол поворота определяется значением gameTime.
+                this.lookHelper.FixedLookDown(gameTime);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D1))
+            {
+                this.driveHelper.SpeedForKeyboardControl = Settings.Speed1;
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D2))
+            {
+                this.driveHelper.SpeedForKeyboardControl = Settings.Speed2;
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D3))
+            {
+                this.driveHelper.SpeedForKeyboardControl = Settings.Speed3;
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D4))
+            {
+                this.driveHelper.SpeedForKeyboardControl = Settings.Speed4;
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D5))
+            {
+                this.driveHelper.SpeedForKeyboardControl = Settings.Speed5;
+            }
+
+            DateTime nowTime = DateTime.Now;
+            TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
+            if (timePassed >= Settings.MinCommandInterval)
+            {
+                this.driveHelper.Drive(
+                    this.IsKeyPressed(keyboardState, Keys.W), 
+                    this.IsKeyPressed(keyboardState, Keys.S),
+                    this.IsKeyPressed(keyboardState, Keys.A), 
+                    this.IsKeyPressed(keyboardState, Keys.D));
+
+                this.lastTimeCommandSent = nowTime;
+            }
+        }
+
+        /// <summary>
+        /// Update в режиме управления роботом посредством геймпэда.
         /// </summary>
         /// <param name="gameTime">Игровое время.</param>
         /// <param name="gamePadState">Состояние геймпэда.</param>
-        private void UpdateInRobotControlState(GameTime gameTime, GamePadState gamePadState)
+        private void GamepadUpdateInRobotControlState(GameTime gameTime, GamePadState gamePadState)
         {
             if (this.IsButtonChangedToDown(gamePadState, Buttons.A))
             {
@@ -384,6 +564,7 @@ namespace RobotGamepad
                 this.moodHelper.SetMood(Mood.Angry);
             }
 
+            // if (this.IsButtonChangedToDown(gamePadState, Buttons.LeftTrigger) || this.IsKeyChangedToDown(Keyboard.GetState(PlayerIndex.One), Keys.L))
             if (this.IsButtonChangedToDown(gamePadState, Buttons.LeftTrigger))
             {
                 this.flashlightHelper.Switch();
@@ -481,12 +662,13 @@ namespace RobotGamepad
 
             Color color;
             string motorCommand;
+            string speedText = " (" + Math.Round((double)this.driveHelper.SpeedForKeyboardControl * 100 / 255).ToString() + "%)";
 
-            motorCommand = this.driveHelper.LeftMotorCommand;
+            motorCommand = this.driveHelper.LeftMotorCommand + speedText;
             color = Color.White;
             this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition1, color);
 
-            motorCommand = this.driveHelper.RightMotorCommand;
+            motorCommand = this.driveHelper.RightMotorCommand + speedText;
             color = Color.White;
             this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition2, color);
 

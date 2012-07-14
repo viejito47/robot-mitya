@@ -95,13 +95,16 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		String key;
+		String defaultValue;
 		
-		key = context.getString(R.string.option_message_socket_port_key);		
-		mMessageSocketPort = Integer.parseInt(settings.getString(key, ""));
+		key = context.getString(R.string.option_message_socket_port_key);
+		defaultValue = context.getString(R.string.option_message_socket_port_default_value);
+		mMessageSocketPort = Integer.parseInt(settings.getString(key, defaultValue));
 		//Logger.d("Settings: " + mMessageSocketPort);
 		
 		key = context.getString(R.string.option_robobody_mac_key);
-		mRoboBodyMac = settings.getString(key, "");
+		defaultValue = context.getString(R.string.option_robobody_mac_default_value);
+		mRoboBodyMac = settings.getString(key, defaultValue);
 		//Logger.d("Settings: " + mRoboBodyMac);
 	}
 

@@ -54,21 +54,24 @@ namespace RobotGamepad
 
             MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
-            byte[] roboHeadAddress = { 192, 168, 1, 1 };
-            
-            // byte[] roboHeadAddress = { 192, 168, 1, 40 };
             RoboHeadAddress = IPAddress.Parse(Properties.Settings.Default.RoboHeadAddress);
 
             IpWebcamPort = Properties.Settings.Default.IpWebcamPort;
 
             MessagePort = Properties.Settings.Default.MessagePort;
 
-            DriveModeNormalCoef = Properties.Settings.Default.DriveModeNormalCoef;
-            DriveModeTurboCoef = Properties.Settings.Default.DriveModeTurboCoef;
+            DriveModeNormalMaxSpeed = Properties.Settings.Default.DriveModeNormalMaxSpeed;
+            DriveModeTurboMaxSpeed = Properties.Settings.Default.DriveModeTurboMaxSpeed;
 
             GunChargeTime = new TimeSpan(0, 0, 5);
 
             SingleMessageRepetitionsCount = 3;
+
+            Speed1 = Properties.Settings.Default.Speed1;
+            Speed2 = Properties.Settings.Default.Speed2;
+            Speed3 = Properties.Settings.Default.Speed3;
+            Speed4 = Properties.Settings.Default.Speed4;
+            Speed5 = Properties.Settings.Default.Speed5;
         }
 
         /// <summary>
@@ -181,16 +184,16 @@ namespace RobotGamepad
         public static int MessagePort { get; private set; }
 
         /// <summary>
-        /// Gets Определяет скорость в нормальном (не турбо) режиме движения. 
-        /// Окончательная скорость определяется умножением на коэффициент, равный DriveModeNormalCoef / 255.
+        /// Gets or sets Определяет скорость в нормальном (не турбо) режиме движения. 
+        /// Окончательная скорость определяется умножением на коэффициент, равный DriveModeNormalMaxSpeed / 255.
         /// </summary>
-        public static byte DriveModeNormalCoef { get; private set; }
+        public static byte DriveModeNormalMaxSpeed { get; set; }
 
         /// <summary>
-        /// Gets Определяет скорость в турбо-режиме движения. 
-        /// Окончательная скорость определяется умножением на коэффициент, равный DriveModeTurboCoef / 255.
+        /// Gets or sets Определяет скорость в турбо-режиме движения. 
+        /// Окончательная скорость определяется умножением на коэффициент, равный DriveModeTurboMaxSpeed / 255.
         /// </summary>
-        public static byte DriveModeTurboCoef { get; private set; }
+        public static byte DriveModeTurboMaxSpeed { get; set; }
 
         /// <summary>
         /// Gets Время "заряда" пушки - минимальный временной интервал между выстрелами.
@@ -201,5 +204,30 @@ namespace RobotGamepad
         /// Gets Количество повторений для одиночных команд. Например, когда по UDP передаётся команда включить фары, она дублируется несколько раз. Для автоматически повторяющихся команд, это не делается.
         /// </summary>
         public static byte SingleMessageRepetitionsCount { get; private set; }
+
+        /// <summary>
+        /// Gets 1-ая скорость при управлении от клавиатуры.
+        /// </summary>
+        public static byte Speed1 { get; private set; }
+
+        /// <summary>
+        /// Gets 2-ая скорость при управлении от клавиатуры.
+        /// </summary>
+        public static byte Speed2 { get; private set; }
+
+        /// <summary>
+        /// Gets 3-ья скорость при управлении от клавиатуры.
+        /// </summary>
+        public static byte Speed3 { get; private set; }
+
+        /// <summary>
+        /// Gets 4-ая скорость при управлении от клавиатуры.
+        /// </summary>
+        public static byte Speed4 { get; private set; }
+
+        /// <summary>
+        /// Gets 5-ая скорость при управлении от клавиатуры.
+        /// </summary>
+        public static byte Speed5 { get; private set; }
     }
 }
