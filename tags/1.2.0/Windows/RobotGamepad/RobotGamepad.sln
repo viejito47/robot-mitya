@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotGamepad", "RobotGamepad\RobotGamepad\RobotGamepad.csproj", "{71C60388-011C-4E62-B8DB-5E3BE046330D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotGamepadContent", "RobotGamepad\RobotGamepadContent\RobotGamepadContent.contentproj", "{5CD36A25-55CE-4DBE-8864-AE4177A678EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotGamepadTest", "RobotGamepadTest\RobotGamepadTest.csproj", "{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Debug|x86.ActiveCfg = Debug|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Debug|x86.Build.0 = Debug|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Release|Any CPU.ActiveCfg = Release|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Release|x86.ActiveCfg = Release|x86
+		{71C60388-011C-4E62-B8DB-5E3BE046330D}.Release|x86.Build.0 = Release|x86
+		{5CD36A25-55CE-4DBE-8864-AE4177A678EB}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5CD36A25-55CE-4DBE-8864-AE4177A678EB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5CD36A25-55CE-4DBE-8864-AE4177A678EB}.Debug|x86.ActiveCfg = Debug|x86
+		{5CD36A25-55CE-4DBE-8864-AE4177A678EB}.Release|Any CPU.ActiveCfg = Release|x86
+		{5CD36A25-55CE-4DBE-8864-AE4177A678EB}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5CD36A25-55CE-4DBE-8864-AE4177A678EB}.Release|x86.ActiveCfg = Release|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Debug|x86.ActiveCfg = Debug|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Debug|x86.Build.0 = Debug|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Release|Any CPU.ActiveCfg = Release|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Release|Mixed Platforms.Build.0 = Release|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Release|x86.ActiveCfg = Release|x86
+		{AE99CB26-EFD6-46C6-BF5E-C68892FE1AEC}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
