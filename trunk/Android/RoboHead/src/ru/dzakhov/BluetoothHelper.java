@@ -74,6 +74,12 @@ public final class BluetoothHelper {
 	private static boolean mConnected = false;
 	
 	/**
+	 * ѕризнак того, что контроллер робота выключен. ”станавливаетс€ при неудачной попытке установлени€ соединени€ с 
+	 * удалЄнным bluetooth-модулем робота.
+	 */
+	private static boolean mControllerIsTurnedOff = false;
+	
+	/**
 	 * ѕри чтении сообщений, поступающих от контроллера робота последнее сообщение может быть получео ещЄ не полностью.
 	 * “огда прин€тый неполный кусок последней команды запоминаем в это поле. ѕри обработке следующей партии сообщений
 	 * мы вспомним его и прибавим справа.
@@ -123,6 +129,8 @@ public final class BluetoothHelper {
 		
 	    new Thread(new Runnable() {
 	        public void run() {
+	        	//mBluetoothAdapter.cancelDiscovery();
+	        	
 				while (true) {
 	    			if (!mConnected) { 
 	    			    // Ёто - единственный метод подключитьс€ напр€мую, не использу€ поиска всех устройств в округе.
@@ -131,12 +139,25 @@ public final class BluetoothHelper {
 	    					mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(Settings.getRoboBodyMac());
 	    					Method m = mBluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
 	    					mBluetoothSocket = (BluetoothSocket) m.invoke(mBluetoothDevice, Integer.valueOf(1));
+	    					
+	    					// ≈сли контроллер робота недоступен, connect() вызывает исключение и тормозит работу 
+	    					// приложени€, несмотр€ на отдельный поток!
 	    					mBluetoothSocket.connect();
+	    					
 	    					mInputStream = mBluetoothSocket.getInputStream();
 	    					mOutputStream = mBluetoothSocket.getOutputStream();
 	    					mConnected = true;
 	    				} catch (Exception e) {
-	    					continue;
+	    					Logger.e("Bluetooth connection error: " + e.getMessage());
+//	    					try {
+//								Thread.sleep(10000);
+//							} catch (InterruptedException e1) {
+//								e1.printStackTrace();
+//							}
+	    					mControllerIsTurnedOff = true;
+	    					
+	    					//continue;
+	    					break;
 	    				}
 	    			}
 	    			

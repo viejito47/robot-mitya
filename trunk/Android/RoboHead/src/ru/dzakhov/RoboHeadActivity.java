@@ -32,14 +32,18 @@ public class RoboHeadActivity extends Activity {
 
 	// private OrientationHelper mOrientationHelper;
 	
-	/**
-	 * Установка картинки с мордочкой робота.
-	 * @param faceResouceId идентификатор ресурса-картинки.
-	 */
-	private void setFace(final int faceResouceId) {
-        ImageView face = (ImageView) this.findViewById(R.id.imageViewFace);
-        face.setImageResource(faceResouceId);
-	}
+//	/**
+//	 * Установка картинки с мордочкой робота.
+//	 * @param faceResouceId идентификатор ресурса-картинки.
+//	 */
+//	private void setFace(final int faceResouceId) {
+//        ImageView face = (ImageView) this.findViewById(R.id.imageViewFace);
+//        face.setImageResource(faceResouceId);
+//	}
+
+	private FaceType testFace = FaceType.ftOk;
+	
+	private ImageView mFaceImageView;
 	
 	/**
 	 * Метод, вызывающийся при создании активити.
@@ -55,7 +59,9 @@ public class RoboHeadActivity extends Activity {
         SoundManager.initSounds(this);
         SoundManager.loadSounds();
         
-        setFace(R.drawable.mitya_is_ok);
+        mFaceImageView = (ImageView) this.findViewById(R.id.imageViewFace);
+        //setFace(R.drawable.mitya_is_ok);
+        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftOk);
         
     	mHandler = new Handler() {
 			@Override
@@ -66,15 +72,15 @@ public class RoboHeadActivity extends Activity {
 				
 				if (command.equals("F")) { // F [face] – смена мордочки
 					if (value.equals("0000")) {
-						setFace(R.drawable.mitya_is_ok);
+				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftOk);
 					} else if (value.equals("0001")) {
-						setFace(R.drawable.mitya_is_happy);
+				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftHappy);
 					} else if (value.equals("0002")) {
-						setFace(R.drawable.mitya_is_blue);
+				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftBlue);
 					} else if (value.equals("0003")) {
-						setFace(R.drawable.mitya_is_angry);
+				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftAngry);
 					} else if (value.equals("0004")) {
-						setFace(R.drawable.mitya_is_ill);
+				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftIll);
 					}
 				} else if (command.equals("h")) { // h [hit] – попадание
 					if (value.equals("0001")) {
@@ -170,7 +176,14 @@ public class RoboHeadActivity extends Activity {
 			selectCommand();
 			return true;
 		case R.id.test_record:
-			recordVideo();
+	        if (testFace == FaceType.ftOk) {
+	        	testFace = FaceType.ftBlue;
+	        } else if (testFace == FaceType.ftBlue) {
+	        	testFace = FaceType.ftIll;
+	        } else if (testFace == FaceType.ftIll) {
+	        	testFace = FaceType.ftBlue;
+	        }
+			// dsd FaceHelper.setFace(mFaceImageView, testFace);
 			return true;
 		case R.id.about:
 			startActivity(new Intent(this, About.class));
@@ -180,18 +193,6 @@ public class RoboHeadActivity extends Activity {
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * Проверка записи и передачи видео.
-	 */
-	private void recordVideo() {
-/*
-		String s = mOrientationHelper.getAzimuthAngle() + "  "
-				+ mOrientationHelper.getPitchAngle() + "  "
-				+ mOrientationHelper.getRollAngle();
-		Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
-*/
 	}
 	
 	/**
@@ -260,19 +261,19 @@ public class RoboHeadActivity extends Activity {
 		    		sendMessageToRobot("D0000");
 		    		break;
 		    	case cFaceOK:
-		    		setFace(R.drawable.mitya_is_ok);
+		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftOk);
 		    		break;
 		    	case cFaceHappy:
-		    		setFace(R.drawable.mitya_is_happy);
+		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftHappy);
 		    		break;
 		    	case cFaceBlue:
-		    		setFace(R.drawable.mitya_is_blue);
+		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftBlue);
 		    		break;
 		    	case cFaceAngry:
-		    		setFace(R.drawable.mitya_is_angry);
+		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftAngry);
 		    		break;
 		    	case cFaceIll:
-		    		setFace(R.drawable.mitya_is_ill);
+		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftIll);
 		    		break;
 		    	case cFire:
 					Message message = new Message();

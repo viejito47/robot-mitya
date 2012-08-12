@@ -444,6 +444,11 @@ namespace RobotGamepad
                 this.flashlightHelper.Switch();
             }
 
+            if (this.IsKeyChangedToDown(keyboardState, Keys.T))
+            {
+                this.moodHelper.WagTail();
+            }
+
             if (this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl))
             {
                 this.gunHelper.Fire();

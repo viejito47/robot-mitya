@@ -28,7 +28,6 @@ public final class MainActivity extends Activity {
         setContentView(R.layout.main);
 
         setRunClickHandler();
-        setTestClickHandler();
         setSettingsClickHandler();
         setAboutClickHandler();
         
@@ -64,19 +63,6 @@ public final class MainActivity extends Activity {
         });
 	}
 
-	/**
-	 * Установка обработчика кнопки "Тест".
-	 */
-    private void setTestClickHandler() {
-		final Button button = (Button) findViewById(R.id.buttonTest);
-        button.setOnClickListener(new OnClickListener() {
-   		
-    		public void onClick(final View v) {
-
-    		}
-        });
-    }
-    
 	/**
 	 * Установка обработчика кнопки "Настройки". 
 	 */

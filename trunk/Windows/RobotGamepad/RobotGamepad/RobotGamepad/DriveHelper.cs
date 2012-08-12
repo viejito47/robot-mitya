@@ -219,7 +219,7 @@ namespace RobotGamepad
             out int leftSpeed, 
             out int rightSpeed)
         {
-            const int speedRetarding = 3;
+            const int SpeedRetarding = 3;
 
             leftSpeed = 0;
             rightSpeed = 0;
@@ -234,14 +234,14 @@ namespace RobotGamepad
                 else if (leftPressed)
                 {
                     // Поворот налево в движении
-                    leftSpeed = this.speedForKeyboardControl / speedRetarding;
+                    leftSpeed = this.speedForKeyboardControl / SpeedRetarding;
                     rightSpeed = this.speedForKeyboardControl;
                 }
                 else if (rightPressed)
                 {
                     // Поворот направо в движении
                     leftSpeed = this.speedForKeyboardControl;
-                    rightSpeed = this.speedForKeyboardControl / speedRetarding;
+                    rightSpeed = this.speedForKeyboardControl / SpeedRetarding;
                 }
                 else if (backwardPressed)
                 {
@@ -267,14 +267,14 @@ namespace RobotGamepad
                 else if (leftPressed)
                 {
                     // Поворот направо в движении
-                    leftSpeed = -this.speedForKeyboardControl / speedRetarding;
+                    leftSpeed = -this.speedForKeyboardControl / SpeedRetarding;
                     rightSpeed = -this.speedForKeyboardControl;
                 }
                 else if (rightPressed)
                 {
                     // Поворот налево в движении
                     leftSpeed = -this.speedForKeyboardControl;
-                    rightSpeed = -this.speedForKeyboardControl / speedRetarding;
+                    rightSpeed = -this.speedForKeyboardControl / SpeedRetarding;
                 }
                 else if (forwardPressed)
                 {
