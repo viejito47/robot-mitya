@@ -21,10 +21,10 @@ int gunPin = 3;
 int targetPin = A0;
 
 // Пины контроллера для управления двигателями робота (цифровые выходы).
-int motorLeftSpeedPin = 6;
-int motorLeftDirectionPin = 7;
-int motorRightSpeedPin = 5;
-int motorRightDirectionPin = 4;
+int motorLeftSpeedPin = 5;
+int motorLeftDirectionPin = 4;
+int motorRightSpeedPin = 6;
+int motorRightDirectionPin = 7;
 
 // Пины контроллера для управления сервоприводами робота (цифровые выходы).
 int servoHeadHorizontalPin = 9;
@@ -38,6 +38,15 @@ int lightPin = 13;
 Servo servoHeadHorizontal;
 Servo servoHeadVertical;
 Servo servoTail;
+
+// Переменные виляния хвостом. Центральная точка это 90 градусов.
+signed long waggingStartMillis; // момент начала виляния хвостом
+bool waggingTail = false; // признак виляния хвостом
+int waggingMode; // режим виляния хвостом (1 - угол меняется по синусу от времени, 2 - линейно от времени)
+signed long waggingPeriod = 250; // период виляния в милисекундах
+int waggingIterations = 6; // количество тактов виляния хвостом
+signed long waggingAmplitude = 70; // амплитуда колебаний хвостом
+// (для амплитуды в 70 градусов колебания происходят вокруг 90 градусов - от 55 до 125 градусов)
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
 IRrecv irrecv(targetPin);
@@ -67,6 +76,11 @@ void setup()
   pinMode(servoHeadVerticalPin, OUTPUT);
   servoHeadVertical.attach(servoHeadVerticalPin);
   servoHeadVertical.write(90);
+
+  // Установка хвоста пистолетом:
+  pinMode(servoTailPin, OUTPUT);
+  servoTail.attach(servoTailPin);
+  moveTail(90);
   
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
@@ -96,6 +110,8 @@ void loop()
   }
   
   processMessageBuffer(bufferText);
+  
+  wagTail();
 }
 
 // Проверка ИК-попадания в робота:
@@ -231,6 +247,15 @@ void processMessage(String message)
   {
     moveTail(value);
   }
+  else if (command == "t")
+  {
+    if ((value != 0) && (! waggingTail))
+    {
+      waggingMode = value;
+      waggingTail = true;
+      waggingStartMillis = millis();
+    }
+  }
   else if (command == "I")
   {
     setHeadlightState(value);
@@ -308,3 +333,52 @@ void setHeadlightState(int value)
     digitalWrite(lightPin, HIGH);
   }
 }
+
+// Виляние хвостом.
+void wagTail()
+{
+  if (! waggingTail)
+  {
+    return;
+  }
+ 
+  signed long waggingTime = millis() - waggingStartMillis;
+  signed long tailDegree;
+ 
+  if (waggingTime > waggingPeriod * waggingIterations)
+  {
+    waggingTail = false;
+    tailDegree = 90;
+  }
+
+  if (waggingMode == 1)
+  {
+    signed long t = waggingTime % waggingPeriod;
+    if ((t >= 0) && (t < waggingPeriod / 4))
+    {
+      tailDegree = 90 + 2 * waggingAmplitude * t / waggingPeriod;
+    }
+    else if ((t >= waggingPeriod / 4) && (t < 3 * waggingPeriod / 4))
+    {
+      tailDegree = 90 - 2 * waggingAmplitude * t / waggingPeriod + waggingAmplitude;
+    }
+    else
+    {
+      tailDegree = 90 + 2 * waggingAmplitude * t / waggingPeriod - 2 * waggingAmplitude;
+    }
+  }
+  else
+  {
+    tailDegree = 90 + waggingAmplitude / 2 * sin(2 * 3.1415 * waggingTime / waggingPeriod);
+  }
+  
+  moveTail(tailDegree);
+}
+
+signed long sign(double value)
+{
+  if (value > 0) return 1;
+  if (value < 0) return -1;
+  return 0;
+}
+

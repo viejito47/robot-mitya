@@ -70,6 +70,11 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	 * Длина значения в сообщении.
 	 */
 	public static final int MESSAGE_VALUE_LENGTH = 4;
+	
+	/**
+	 * Длительность задержки при смене кадров при изменении выражения лица.
+	 */
+	public static final int FACE_FRAME_DELAY = 80;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {

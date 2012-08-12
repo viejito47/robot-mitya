@@ -23,12 +23,6 @@
         android:text="@string/menu_run_label" />
 
     <Button
-        android:id="@+id/buttonTest"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/menu_test_label" />
-
-    <Button
         android:id="@+id/buttonSettings"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

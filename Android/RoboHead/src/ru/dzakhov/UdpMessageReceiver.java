@@ -73,6 +73,11 @@ public class UdpMessageReceiver implements Runnable {
 				} // read while cycle
 			} catch (Exception e) {
 				Logger.d("UdpMessageReceiver error (1): " + e.getLocalizedMessage());
+//				try {
+//					Thread.sleep(3000);
+//				} catch (InterruptedException e1) {
+//					e1.printStackTrace();
+//				}
 			}
 	
 			if ((datagramSocket != null) && (!datagramSocket.isClosed())) {

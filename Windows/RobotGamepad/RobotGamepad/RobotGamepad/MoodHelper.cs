@@ -95,9 +95,25 @@ namespace RobotGamepad
                 mood = Mood.Normal;
             }
 
-            string command = this.GenerateCommand(mood);
+            string command = this.GenerateMoodCommand(mood);
             this.robotHelper.SendMessageToRobot(command);
             this.mood = mood;
+        }
+
+        /// <summary>
+        /// Генерация и передача команды виляния хвостом.
+        /// </summary>
+        public void WagTail()
+        {
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot("t0001");
+            }
+
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                this.robotHelper.SendMessageToRobot("t0000");
+            }
         }
 
         /// <summary>
@@ -116,7 +132,7 @@ namespace RobotGamepad
         /// </summary>
         /// <param name="mood">Новое настроение.</param>
         /// <returns>Текст команды.</returns>
-        private string GenerateCommand(Mood mood)
+        private string GenerateMoodCommand(Mood mood)
         {   
             switch (mood)
             {
