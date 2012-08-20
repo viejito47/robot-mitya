@@ -39,14 +39,47 @@ Servo servoHeadHorizontal;
 Servo servoHeadVertical;
 Servo servoTail;
 
+int servoHeadHorizontalMinDegree = 0;
+int servoHeadHorizontalMaxDegree = 180;
+int servoHeadVerticalMinDegree = 0;
+int servoHeadVerticalMaxDegree = 90;
+int servoTailMinDegree = 10;
+int servoTailMaxDegree = 170;
+
+int servoHeadCurrentHorizontalDegree;
+int servoHeadCurrentVerticalDegree;
+int servoTailCurrentDegree;
+
 // Переменные виляния хвостом. Центральная точка это 90 градусов.
-signed long waggingStartMillis; // момент начала виляния хвостом
-bool waggingTail = false; // признак виляния хвостом
-int waggingMode; // режим виляния хвостом (1 - угол меняется по синусу от времени, 2 - линейно от времени)
-signed long waggingPeriod = 250; // период виляния в милисекундах
-int waggingIterations = 6; // количество тактов виляния хвостом
-signed long waggingAmplitude = 70; // амплитуда колебаний хвостом
+signed long waggingTailStartMillis; // момент начала виляния хвостом
+int waggingTailStartDegree; // угол с которого начинается виляние
+boolean waggingTail = false; // признак виляния хвостом
+int waggingTailMode; // режим виляния хвостом (1 - угол меняется по синусу от времени, 2 - линейно от времени)
+signed long waggingTailPeriod = 250; // период виляния в милисекундах
+double waggingTailIterations = 6; // количество тактов виляния хвостом
+signed long waggingTailAmplitude = 70; // амплитуда колебаний хвостом
 // (для амплитуды в 70 градусов колебания происходят вокруг 90 градусов - от 55 до 125 градусов)
+double waggingTailAmplitudeCoefficient = 0.9; // во сколько раз снизится амплитуда за период
+
+// Переменные мотания головой. Центральная точка это 90 градусов.
+signed long waggingNoStartMillis; // момент начала мотания головой
+int waggingNoStartDegree; // угол с которого начинается мотание головой
+boolean waggingNo = false; // признак мотания головой
+int waggingNoMode; // режим мотания головой (1 - угол меняется по синусу от времени, 2 - линейно от времени)
+signed long waggingNoPeriod = 400; // период мотания головой в милисекундах
+double waggingNoIterations = 2.5; // количество тактов мотания головой
+signed long waggingNoAmplitude = 60; // амплитуда мотания головой
+double waggingNoAmplitudeCoefficient = 0.75; // во сколько раз снизится амплитуда за период
+
+// Переменные кивания головой. Центральная точка это 90 градусов.
+signed long waggingYesStartMillis; // момент начала кивания головой
+int waggingYesStartDegree; // угол с которого начинается кивание головой
+boolean waggingYes = false; // признак кивания головой
+int waggingYesMode; // режим кивания головой (1 - угол меняется по синусу от времени, 2 - линейно от времени)
+signed long waggingYesPeriod = 400; // период кивания головой в милисекундах
+double waggingYesIterations = 2.5; // количество тактов кивания головой
+signed long waggingYesAmplitude = 30; // амплитуда кивания головой
+double waggingYesAmplitudeCoefficient = 0.8; // во сколько раз снизится амплитуда за период
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
 IRrecv irrecv(targetPin);
@@ -70,12 +103,12 @@ void setup()
   // Установка горизонтального сервопривода в положение для установки телефона:
   pinMode(servoHeadHorizontalPin, OUTPUT);
   servoHeadHorizontal.attach(servoHeadHorizontalPin);
-  servoHeadHorizontal.write(90);
+  moveHead("H", 90);
 
   // Установка вертикального сервопривода в положение для установки телефона:
   pinMode(servoHeadVerticalPin, OUTPUT);
   servoHeadVertical.attach(servoHeadVerticalPin);
-  servoHeadVertical.write(90);
+  moveHead("V", 90);
 
   // Установка хвоста пистолетом:
   pinMode(servoTailPin, OUTPUT);
@@ -112,6 +145,8 @@ void loop()
   processMessageBuffer(bufferText);
   
   wagTail();
+  wagNo();
+  wagYes();
 }
 
 // Проверка ИК-попадания в робота:
@@ -251,9 +286,30 @@ void processMessage(String message)
   {
     if ((value != 0) && (! waggingTail))
     {
-      waggingMode = value;
+      waggingTailMode = value;
       waggingTail = true;
-      waggingStartMillis = millis();
+      waggingTailStartMillis = millis();
+      waggingTailStartDegree = servoTailCurrentDegree;
+    }
+  }
+  else if (command == "n")
+  {
+    if ((value != 0) && (! waggingNo))
+    {
+      waggingNoMode = value;
+      waggingNo = true;
+      waggingNoStartMillis = millis();
+      waggingNoStartDegree = servoHeadCurrentHorizontalDegree;
+    }
+  }
+  else if (command == "y")
+  {
+    if ((value != 0) && (! waggingYes))
+    {
+      waggingYesMode = value;
+      waggingYes = true;
+      waggingYesStartMillis = millis();
+      waggingYesStartDegree = servoHeadCurrentVerticalDegree;
     }
   }
   else if (command == "I")
@@ -274,22 +330,40 @@ void processMessage(String message)
   }
 }
 
+int correctDegree(int degree, int minValue, int maxValue)
+{
+  if (degree < minValue)
+  {
+    return minValue;
+  }
+  
+  if (degree > maxValue)
+  {
+    return maxValue;
+  }
+  
+  return degree;
+}
+
 // Поворот головы.
 void moveHead(String plane, int degree)
 {
   if (plane == "H") // (горизонтальная плоскость)
   {
-    servoHeadHorizontal.write(degree);
+    servoHeadCurrentHorizontalDegree = correctDegree(degree, servoHeadHorizontalMinDegree, servoHeadHorizontalMaxDegree);
+    servoHeadHorizontal.write(servoHeadCurrentHorizontalDegree);
   }
   else if (plane == "V") // (вертикальная плоскость)
   {
-    servoHeadVertical.write(degree);
+    servoHeadCurrentVerticalDegree = correctDegree(degree, servoHeadVerticalMinDegree, servoHeadVerticalMaxDegree);
+    servoHeadVertical.write(servoHeadCurrentVerticalDegree);
   }
 }
 
 // Поворот хвоста.
 void moveTail(int degree)
 {
+  servoTailCurrentDegree = correctDegree(degree, servoTailMinDegree, servoTailMaxDegree);
   servoTail.write(degree);
 }
 
@@ -334,6 +408,66 @@ void setHeadlightState(int value)
   }
 }
 
+signed long wagSomething(
+  signed long waggingStartMillis, 
+  int waggingStartDegree, 
+  int waggingMode, 
+  signed long waggingPeriod, 
+  double waggingIterations, 
+  signed long waggingAmplitude,
+  double waggingAmplitudeCoefficient,
+  boolean &wagging)
+{
+  signed long waggingTime = millis() - waggingStartMillis;
+  signed long degree;
+ 
+  // Если времени прошло больше, чем положено на все колебания, определяем угол на последний момент колебаний:
+  if (waggingTime > waggingPeriod * waggingIterations)
+  {
+    wagging = false;
+    waggingTime = (signed long)(waggingPeriod * waggingIterations);
+  }
+
+  // Пока считаем, что колебания происходят вокруг оси t (y = 0):
+  if (waggingMode == 1)
+  {
+    signed long t = waggingTime % waggingPeriod;
+    if ((t >= 0) && (t < waggingPeriod / 4))
+    {
+      degree = 2 * waggingAmplitude * t / waggingPeriod;
+    }
+    else if ((t >= waggingPeriod / 4) && (t < 3 * waggingPeriod / 4))
+    {
+      degree = - 2 * waggingAmplitude * t / waggingPeriod + waggingAmplitude;
+    }
+    else
+    {
+      degree = 2 * waggingAmplitude * t / waggingPeriod - 2 * waggingAmplitude;
+    }
+  }
+  else
+  {
+    degree = waggingAmplitude / 2 * sin(2 * 3.1415 * waggingTime / waggingPeriod);
+  }
+  
+  // Если амплитуда, например, затухает (amplitudeCoefficient < 1), пропорционально уменьшаем угол:
+  degree = (signed long)degree + degree * (waggingAmplitudeCoefficient - 1) * waggingTime / waggingPeriod;
+  if (waggingAmplitudeCoefficient < 1)
+  {
+    if ((double)waggingTime > (double)waggingPeriod / (1 - waggingAmplitudeCoefficient))
+    {
+      // Если коэффициент меньше 1 (затухания амплитуды), то начиная с этого момента прямая изменения
+      // амплитуды пересекает y = 0 и амплитуда начинает расти по модулю в отрицательном направлении.
+      degree = 0;
+    }
+  }
+  
+  // Учитываем, что колебания происходят не вокруг оси t, а относительно waggingStartDegree:
+  degree += waggingStartDegree;
+  
+  return degree;
+}
+
 // Виляние хвостом.
 void wagTail()
 {
@@ -342,37 +476,54 @@ void wagTail()
     return;
   }
  
-  signed long waggingTime = millis() - waggingStartMillis;
-  signed long tailDegree;
- 
-  if (waggingTime > waggingPeriod * waggingIterations)
-  {
-    waggingTail = false;
-    tailDegree = 90;
-  }
+  signed long degree = wagSomething(
+    waggingTailStartMillis, 
+    waggingTailStartDegree, 
+    waggingTailMode, 
+    waggingTailPeriod, 
+    waggingTailIterations, 
+    waggingTailAmplitude, 
+    waggingTailAmplitudeCoefficient, 
+    waggingTail);
+  moveTail(degree);
+}
 
-  if (waggingMode == 1)
+void wagNo()
+{
+  if (! waggingNo)
   {
-    signed long t = waggingTime % waggingPeriod;
-    if ((t >= 0) && (t < waggingPeriod / 4))
-    {
-      tailDegree = 90 + 2 * waggingAmplitude * t / waggingPeriod;
-    }
-    else if ((t >= waggingPeriod / 4) && (t < 3 * waggingPeriod / 4))
-    {
-      tailDegree = 90 - 2 * waggingAmplitude * t / waggingPeriod + waggingAmplitude;
-    }
-    else
-    {
-      tailDegree = 90 + 2 * waggingAmplitude * t / waggingPeriod - 2 * waggingAmplitude;
-    }
+    return;
   }
-  else
+ 
+  signed long degree = wagSomething(
+    waggingNoStartMillis, 
+    waggingNoStartDegree, 
+    waggingNoMode, 
+    waggingNoPeriod, 
+    waggingNoIterations, 
+    waggingNoAmplitude,
+    waggingNoAmplitudeCoefficient, 
+    waggingNo);
+  moveHead("H", degree);
+}
+
+void wagYes()
+{
+  if (! waggingYes)
   {
-    tailDegree = 90 + waggingAmplitude / 2 * sin(2 * 3.1415 * waggingTime / waggingPeriod);
+    return;
   }
-  
-  moveTail(tailDegree);
+ 
+  signed long degree = wagSomething(
+    waggingYesStartMillis, 
+    waggingYesStartDegree, 
+    waggingYesMode, 
+    waggingYesPeriod, 
+    waggingYesIterations, 
+    waggingYesAmplitude, 
+    waggingYesAmplitudeCoefficient, 
+    waggingYes);
+  moveHead("V", degree);
 }
 
 signed long sign(double value)
