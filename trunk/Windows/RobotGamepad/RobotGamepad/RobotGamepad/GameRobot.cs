@@ -449,6 +449,16 @@ namespace RobotGamepad
                 this.moodHelper.WagTail();
             }
 
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Y))
+            {
+                this.moodHelper.WagYes();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.N))
+            {
+                this.moodHelper.WagNo();
+            }
+
             if (this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl))
             {
                 this.gunHelper.Fire();

@@ -77,5 +77,45 @@ namespace RobotGamepad
             this.lastErrorMessage = string.Empty;
             return true;
         }
+
+        /// <summary>
+        /// Передать роботу неповторяющееся сообщение.
+        /// </summary>
+        /// <param name="message">
+        /// Сообщение, передаваемое роботу.
+        /// </param>
+        /// <param name="voidMessage">
+        /// Сообщение с этим же идентификатором, но с "пустым" значением.</param>
+        /// <returns>
+        /// true, если нет ошибок.
+        /// </returns>
+        /// <remarks>
+        /// Сообщения для управления моторами, например, повторяются постоянно, каждые несколько милисекунд.
+        /// Потеря одного такого сообщения несущественно. А сообщения, например, смены настроения (мордочки)
+        /// передаются по команде оператора. Потеря - пропуск команды. Поэтому сообщения повторяются 
+        /// несколько раз. Особенность обработки сообщений на приёмной стороне (хэш таблица для исключения
+        /// обработки абсолютно идентичных поступивших друг за другом сообщений) требует после команды смены
+        /// настроения дать аналогичную команду с "пустым" значением.
+        /// </remarks>
+        public bool SendNonrecurrentMessageToRobot(string message, string voidMessage)
+        {
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                if (!this.SendMessageToRobot(message))
+                {
+                    return false;
+                }
+            }
+
+            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            {
+                if (!this.SendMessageToRobot(voidMessage))
+                {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
     } // class
 } // namespace

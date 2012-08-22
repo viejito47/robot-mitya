@@ -96,7 +96,7 @@ namespace RobotGamepad
             }
 
             string command = this.GenerateMoodCommand(mood);
-            this.robotHelper.SendMessageToRobot(command);
+            this.robotHelper.SendNonrecurrentMessageToRobot(command, "F0000");
             this.mood = mood;
         }
 
@@ -105,15 +105,23 @@ namespace RobotGamepad
         /// </summary>
         public void WagTail()
         {
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
-            {
-                this.robotHelper.SendMessageToRobot("t0001");
-            }
+            this.robotHelper.SendNonrecurrentMessageToRobot("t0002", "t0000");
+        }
 
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
-            {
-                this.robotHelper.SendMessageToRobot("t0000");
-            }
+        /// <summary>
+        /// Генерация и передача команды кивания головой (ответ "да").
+        /// </summary>
+        public void WagYes()
+        {
+            this.robotHelper.SendNonrecurrentMessageToRobot("y0002", "y0000");
+        }
+
+        /// <summary>
+        /// Генерация и передача команды кивания головой (ответ "нет").
+        /// </summary>
+        public void WagNo()
+        {
+            this.robotHelper.SendNonrecurrentMessageToRobot("n0002", "n0000");
         }
 
         /// <summary>
