@@ -219,7 +219,7 @@ namespace RobotGamepad
             out int leftSpeed, 
             out int rightSpeed)
         {
-            const int SpeedRetarding = 3;
+            const int SpeedRetarding = 1000;
 
             leftSpeed = 0;
             rightSpeed = 0;
