@@ -90,10 +90,10 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
-            if (mood == this.mood)
-            {
-                mood = Mood.Normal;
-            }
+            //if (mood == this.mood)
+            //{
+            //    mood = Mood.Normal;
+            //}
 
             string command = this.GenerateMoodCommand(mood);
             this.robotHelper.SendNonrecurrentMessageToRobot(command, "F0000");
@@ -144,14 +144,16 @@ namespace RobotGamepad
         {   
             switch (mood)
             {
-                case Mood.Happy:
+                case Mood.Normal:
                     return "F0001";
-                case Mood.Blue:
+                case Mood.Happy:
                     return "F0002";
-                case Mood.Angry:
+                case Mood.Blue:
                     return "F0003";
-                case Mood.Disaster:
+                case Mood.Angry:
                     return "F0004";
+                case Mood.Disaster:
+                    return "F0005";
                 default:
                     return "F0000";
             }

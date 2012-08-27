@@ -20,18 +20,18 @@
         android:id="@+id/buttonRun"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/menu_run_label" />
+        android:text="@string/button_run_label" />
 
     <Button
         android:id="@+id/buttonSettings"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/menu_settings_label" />
+        android:text="@string/button_settings_label" />
 
     <Button
         android:id="@+id/buttonAbout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/menu_about_label" />
+        android:text="@string/button_about_label" />
 	
 </LinearLayout>

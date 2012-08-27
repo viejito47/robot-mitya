@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/imageViewFace"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:contentDescription="@string/app_name"
+    />
+	
+<!-- Оригинал:
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
        android:id="@+id/imageViewFace"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:contentDescription="@string/app_name"
-       android:src="@drawable/mitya_is_ok"
        />
-
+-->
 <!--
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
