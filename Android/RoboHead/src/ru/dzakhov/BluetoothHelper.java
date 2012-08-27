@@ -77,7 +77,7 @@ public final class BluetoothHelper {
 	 * ѕризнак того, что контроллер робота выключен. ”станавливаетс€ при неудачной попытке установлени€ соединени€ с 
 	 * удалЄнным bluetooth-модулем робота.
 	 */
-	private static boolean mControllerIsTurnedOff = false;
+	//private static boolean mControllerIsTurnedOff = false;
 	
 	/**
 	 * ѕри чтении сообщений, поступающих от контроллера робота последнее сообщение может быть получео ещЄ не полностью.
@@ -154,7 +154,7 @@ public final class BluetoothHelper {
 //							} catch (InterruptedException e1) {
 //								e1.printStackTrace();
 //							}
-	    					mControllerIsTurnedOff = true;
+	    					//mControllerIsTurnedOff = true;
 	    					
 	    					//continue;
 	    					break;

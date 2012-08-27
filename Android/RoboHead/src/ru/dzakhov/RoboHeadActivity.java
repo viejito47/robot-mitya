@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -29,21 +30,23 @@ public class RoboHeadActivity extends Activity {
 	 * и сообщения от уровня Arduino-скетча.
 	 */
 	private Handler mHandler;
-
+	
 	// private OrientationHelper mOrientationHelper;
 	
-//	/**
-//	 * Установка картинки с мордочкой робота.
-//	 * @param faceResouceId идентификатор ресурса-картинки.
-//	 */
-//	private void setFace(final int faceResouceId) {
-//        ImageView face = (ImageView) this.findViewById(R.id.imageViewFace);
-//        face.setImageResource(faceResouceId);
-//	}
+	/**
+	 * Класс-контроллер для управления лицом робота.
+	 */
+	private FaceHelper mFaceHelper;
 
-	private FaceType testFace = FaceType.ftOk;
-	
+	/**
+	 * Главный ImageView - лицо.
+	 */
 	private ImageView mFaceImageView;
+	
+	/**
+	 * Текущая мордочка для тестирования.
+	 */
+	private FaceType testFace = FaceType.ftOk;
 	
 	/**
 	 * Метод, вызывающийся при создании активити.
@@ -53,15 +56,17 @@ public class RoboHeadActivity extends Activity {
 	public final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.face);
-
+		setContentView(R.layout.face);
+		getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN, LayoutParams.FLAG_FULLSCREEN);
+		getWindow().setLayout(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+		
         SoundManager.getInstance();
         SoundManager.initSounds(this);
         SoundManager.loadSounds();
         
         mFaceImageView = (ImageView) this.findViewById(R.id.imageViewFace);
-        //setFace(R.drawable.mitya_is_ok);
-        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftOk);
+        mFaceHelper = new FaceHelper(mFaceImageView);        
+        mFaceHelper.setFace(FaceType.ftOk);
         
     	mHandler = new Handler() {
 			@Override
@@ -71,16 +76,16 @@ public class RoboHeadActivity extends Activity {
 				String value = MessageHelper.getMessageValue(message);
 				
 				if (command.equals("F")) { // F [face] – смена мордочки
-					if (value.equals("0000")) {
-				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftOk);
-					} else if (value.equals("0001")) {
-				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftHappy);
+					if (value.equals("0001")) {
+				        mFaceHelper.setFace(FaceType.ftOk);
 					} else if (value.equals("0002")) {
-				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftBlue);
+				        mFaceHelper.setFace(FaceType.ftHappy);
 					} else if (value.equals("0003")) {
-				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftAngry);
+				        mFaceHelper.setFace(FaceType.ftBlue);
 					} else if (value.equals("0004")) {
-				        // dsd FaceHelper.setFace(mFaceImageView, FaceType.ftIll);
+				        mFaceHelper.setFace(FaceType.ftAngry);
+					} else if (value.equals("0005")) {
+				        mFaceHelper.setFace(FaceType.ftIll);
 					}
 				} else if (command.equals("h")) { // h [hit] – попадание
 					if (value.equals("0001")) {
@@ -169,24 +174,22 @@ public class RoboHeadActivity extends Activity {
 	@Override
 	public final boolean onOptionsItemSelected(final MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
-		case R.id.settings:
-			startActivity(new Intent(this, Settings.class));
-			return true;
-		case R.id.test:
+		case R.id.test_control:
 			selectCommand();
 			return true;
-		case R.id.test_record:
+		case R.id.test_animation:
 	        if (testFace == FaceType.ftOk) {
+	        	testFace = FaceType.ftAngry;
+	        } else if (testFace == FaceType.ftAngry) {
 	        	testFace = FaceType.ftBlue;
 	        } else if (testFace == FaceType.ftBlue) {
+	        	testFace = FaceType.ftHappy;
+	        } else if (testFace == FaceType.ftHappy) {
 	        	testFace = FaceType.ftIll;
 	        } else if (testFace == FaceType.ftIll) {
-	        	testFace = FaceType.ftBlue;
+	        	testFace = FaceType.ftOk;
 	        }
-			// dsd FaceHelper.setFace(mFaceImageView, testFace);
-			return true;
-		case R.id.about:
-			startActivity(new Intent(this, About.class));
+			mFaceHelper.setFace(testFace);
 			return true;
 		default:
 			break;
@@ -200,41 +203,49 @@ public class RoboHeadActivity extends Activity {
 	 */
 	private void selectCommand() {
 		final CharSequence[] items = {
+				"Стоп моторы",
+				"Фары вкл.",
+				"Фары выкл.",
+				"Выстрел",
 				"Левый и правый моторы вперёд 100%", 
 				"Левый и правый моторы назад 40%", 
 				"Левый и правый моторы в разные стороны 50%", 
 				"Голова на 45 градусов влево", 
 				"Голова на 45 градусов вправо", 
 				"Голова на 30 градусов вверх", 
-				"Голова на 30 градусов вниз",
-				"Стоп моторы",
-				"Настроение нормальное",
-				"Настроение весёлое",
-				"Настроение грустное",
-				"Настроение злое",
-				"Заболел",
-				"Выстрел"};
+				"Голова на 30 градусов вниз"};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Действие:");
 		builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 		    public void onClick(final DialogInterface dialog, final int item) {
-		    	final int cDriveForward255 = 0;
-		    	final int cDriveBackward100 = 1;
-		    	final int cLeftForward127RightBackward127 = 2;
-		    	final int cHeadHorizontal135 = 3;
-		    	final int cHeadHorizontal045 = 4;
-		    	final int cHeadVertical120 = 5;
-		    	final int cHeadVertical060 = 6;
-		    	final int cStop = 7;
-		    	final int cFaceOK = 8;
-		    	final int cFaceHappy = 9;
-		    	final int cFaceBlue = 10;
-		    	final int cFaceAngry = 11;
-		    	final int cFaceIll = 12;
-		    	final int cFire = 13;
+		    	final int cStop = 0;
+		    	final int cLightsOn = 1;
+		    	final int cLightsOff = 2;
+		    	final int cFire = 3;
+		    	final int cDriveForward255 = 4;
+		    	final int cDriveBackward100 = 5;
+		    	final int cLeftForward127RightBackward127 = 6;
+		    	final int cHeadHorizontal135 = 7;
+		    	final int cHeadHorizontal045 = 8;
+		    	final int cHeadVertical120 = 9;
+		    	final int cHeadVertical060 = 10;
 
 		    	switch (item) {
+		    	case cStop:
+		    		sendMessageToRobot("D0000");
+		    		break;
+		    	case cLightsOn:
+		    		sendMessageToRobot("I0001");
+		    		break;
+		    	case cLightsOff:
+		    		sendMessageToRobot("I0000");
+		    		break;
+		    	case cFire:
+					Message message = new Message();
+					message.obj = "f0001";
+					mHandler.sendMessage(message);
+		    		break;
 		    	case cDriveForward255:
 		    		sendMessageToRobot("D00FF");
 		    		break;
@@ -256,29 +267,6 @@ public class RoboHeadActivity extends Activity {
 		    		break;
 		    	case cHeadVertical060:
 		    		sendMessageToRobot("V003C");
-		    		break;
-		    	case cStop:
-		    		sendMessageToRobot("D0000");
-		    		break;
-		    	case cFaceOK:
-		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftOk);
-		    		break;
-		    	case cFaceHappy:
-		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftHappy);
-		    		break;
-		    	case cFaceBlue:
-		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftBlue);
-		    		break;
-		    	case cFaceAngry:
-		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftAngry);
-		    		break;
-		    	case cFaceIll:
-		    		// dsd FaceHelper.setFace(mFaceImageView, FaceType.ftIll);
-		    		break;
-		    	case cFire:
-					Message message = new Message();
-					message.obj = "f0000";
-					mHandler.sendMessage(message);
 		    		break;
 		    	default: 
 		    		break;

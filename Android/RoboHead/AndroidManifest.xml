@@ -32,21 +32,21 @@
             android:label="@string/app_name"
             android:name=".RoboHeadActivity" 
             android:screenOrientation="landscape" 
-            android:theme="@android:style/Theme.Dialog" 
+            android:theme="@style/RoboHeadTheme" 
             android:launchMode="singleInstance" 
             android:excludeFromRecents="true">
         </activity>
         
         <activity
             android:name=".About"
-            android:label="@string/menu_about_title" 
+            android:label="@string/dialog_about_title" 
             android:theme="@android:style/Theme.Dialog" 
             android:screenOrientation="landscape">            
         </activity>
         
         <activity
             android:name=".Settings"
-            android:label="@string/menu_settings_title" 
+            android:label="@string/dialog_settings_title" 
             android:screenOrientation="landscape">            
         </activity>        
                 

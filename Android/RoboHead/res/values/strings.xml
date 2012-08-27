@@ -4,16 +4,16 @@
     
     <string name="main_title">- RoboHead -</string>
 
-    <string name="menu_run_label">Запуск</string>
+ 
+    <string name="menu_test_control_label">Тест управления</string>
+    <string name="menu_test_animation_label">Тест анимации</string>
     
-    <string name="menu_test_label">Тест</string>
-    
-    <string name="menu_test_record_label">Проверка записи</string><string name="menu_settings_label">Настройки</string>
-    <string name="menu_settings_title">Настройки приложения</string>
-    
-    <string name="menu_about_label">О приложении</string>
-    <string name="menu_about_title">О приложении RoboHead</string>
-    <string name="menu_about_text">Приложение <b>RoboHead</b> это мозг робота. Головной, естественно. Спинной мозг расположен в Arduino. А ещё есть голоса. Голоса в мозг приходят по каналу WiFi.</string>
+    <string name="button_run_label">Запуск</string>
+    <string name="button_settings_label">Настройки</string>
+    <string name="dialog_settings_title">Настройки приложения</string>
+    <string name="button_about_label">О приложении</string>
+    <string name="dialog_about_title">О приложении RoboHead</string>
+    <string name="dialog_about_text">Приложение <b>RoboHead</b> это мозг робота. Головной, естественно. Спинной мозг расположен в Arduino. А ещё есть голоса. Голоса в мозг приходят по каналу WiFi.</string>
     
     <string name="option_mycheckbox_title">Моя опция-галочка</string>
     <string name="option_mycheckbox_summary">Здесь будет описание опции-галочки</string>
