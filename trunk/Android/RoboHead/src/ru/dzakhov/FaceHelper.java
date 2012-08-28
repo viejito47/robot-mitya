@@ -1,6 +1,8 @@
 package ru.dzakhov;
 
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Handler;
+import android.os.Message;
 import android.widget.ImageView;
 
 /**
@@ -32,11 +34,61 @@ public final class FaceHelper {
 	private FaceType mCurrentFace = FaceType.ftOk;
 	
 	/**
+	 * Хэндлер, принимающий пустые сообщения, сигнализирующие о необходимости запустить автоматическую анимацию.
+	 * Автоматическую, потому что она запускается не по команде, а сама, при простое робота. 
+	 */
+	private Handler mHandlerIdleAction = new Handler() {
+		@Override
+		public void handleMessage(final Message msg) {
+			int resource;
+			
+			switch (mCurrentFace) {
+			case ftOk:
+				final int variansCount = 5;
+				int choise = (int) Math.round((variansCount - 1) * Math.random());
+				switch (choise) {
+				case 0: // вероятность 20%
+					resource = R.drawable.idle_action_ok_2;
+					break;
+				case 1: // вероятность 20%
+					resource = R.drawable.idle_action_ok_3;
+					break;
+				default: // вероятность 60%
+					resource = R.drawable.idle_action_ok_1;
+					break;
+				}				
+				break;
+			default:
+				return;
+			}
+			
+			startAnimation(resource);
+		}
+	};
+	
+	/**
 	 * Конструктор класса.
 	 * @param imageView контрол для вывода анимации.
 	 */
 	public FaceHelper(final ImageView imageView) {
 		mImageView = imageView;
+		
+		new Thread() {
+			public void run() {
+				try {
+					final int constDelay = 4000;
+					final int variantMaxDelay = 4000;
+					
+					while (true) {					
+						int variantDelay = (int) (variantMaxDelay * Math.random());
+						Thread.sleep(constDelay + variantDelay);
+						mHandlerIdleAction.sendEmptyMessage(0);
+					}
+				} catch (InterruptedException e) {
+						e.printStackTrace();
+				}
+			}
+		} .start();
 	}
 	
 	/**
@@ -45,12 +97,6 @@ public final class FaceHelper {
 	 * @return true если началась смена выражения лица, false если смена лица уже происходит.
 	 */
 	public boolean setFace(final FaceType face) {
-		if (mAnimation != null) {
-			mAnimation.stop();
-			mImageView.clearAnimation();
-			mAnimation = null;
-		}
-
 		int resource = 0;
 
 		switch (mCurrentFace) {
@@ -163,10 +209,23 @@ public final class FaceHelper {
 			return false;
 		}
 		
+		mCurrentFace = face;
+		startAnimation(resource);
+        return true;
+	}
+	
+	/**
+	 * Запуск анимации.
+	 * @param resource ресурс AnimationList.
+	 */
+	private void startAnimation(final int resource) {
+		if (mAnimation != null) {
+			mAnimation.stop();
+			mAnimation = null;
+		}
+
 		mImageView.setBackgroundResource(resource);
 		mAnimation = (AnimationDrawable) mImageView.getBackground();
 		mAnimation.start();
-		mCurrentFace = face;
-        return true;
 	}
 }
