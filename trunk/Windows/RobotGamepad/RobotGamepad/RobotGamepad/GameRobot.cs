@@ -316,6 +316,8 @@ namespace RobotGamepad
 
             if (this.gameState == GameState.gsRobotControl)
             {
+                this.CommonUpdateInRobotControlState(gameTime, keyboardState);
+
                 switch (this.controlType)
                 {
                     case ControlType.ctKeyboard:
@@ -408,11 +410,11 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Update в режиме управления роботом посредством клавиатуры.
+        /// Update в обоих режимах: управления роботом посредством клавиатуры и джойстика.
         /// </summary>
         /// <param name="gameTime">Игровое время.</param>
         /// <param name="keyboardState">Состояние клавиатуры.</param>
-        private void KeyboardUpdateInRobotControlState(GameTime gameTime, KeyboardState keyboardState)
+        private void CommonUpdateInRobotControlState(GameTime gameTime, KeyboardState keyboardState)
         {
             if (this.IsKeyChangedToDown(keyboardState, Keys.F1))
             {
@@ -439,11 +441,6 @@ namespace RobotGamepad
                 this.moodHelper.SetMood(Mood.Angry);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.L))
-            {
-                this.flashlightHelper.Switch();
-            }
-
             if (this.IsKeyChangedToDown(keyboardState, Keys.T))
             {
                 this.moodHelper.WagTail();
@@ -457,6 +454,19 @@ namespace RobotGamepad
             if (this.IsKeyChangedToDown(keyboardState, Keys.N))
             {
                 this.moodHelper.WagNo();
+            }
+        }
+
+        /// <summary>
+        /// Update в режиме управления роботом посредством клавиатуры.
+        /// </summary>
+        /// <param name="gameTime">Игровое время.</param>
+        /// <param name="keyboardState">Состояние клавиатуры.</param>
+        private void KeyboardUpdateInRobotControlState(GameTime gameTime, KeyboardState keyboardState)
+        {
+            if (this.IsKeyChangedToDown(keyboardState, Keys.L))
+            {
+                this.flashlightHelper.Switch();
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl))
@@ -559,28 +569,27 @@ namespace RobotGamepad
         /// <param name="gamePadState">Состояние геймпэда.</param>
         private void GamepadUpdateInRobotControlState(GameTime gameTime, GamePadState gamePadState)
         {
-            if (this.IsButtonChangedToDown(gamePadState, Buttons.A))
-            {
-                this.moodHelper.SetMood(Mood.Happy);
-            }
+            //if (this.IsButtonChangedToDown(gamePadState, Buttons.A))
+            //{
+            //    this.moodHelper.SetMood(Mood.Happy);
+            //}
 
-            if (this.IsButtonChangedToDown(gamePadState, Buttons.X))
-            {
-                this.moodHelper.SetMood(Mood.Blue);
-            }
+            //if (this.IsButtonChangedToDown(gamePadState, Buttons.X))
+            //{
+            //    this.moodHelper.SetMood(Mood.Blue);
+            //}
+
+            //if (this.IsButtonChangedToDown(gamePadState, Buttons.Y))
+            //{
+            //    this.moodHelper.SetMood(Mood.Disaster);
+            //}
+
+            //if (this.IsButtonChangedToDown(gamePadState, Buttons.B))
+            //{
+            //    this.moodHelper.SetMood(Mood.Angry);
+            //}
 
             if (this.IsButtonChangedToDown(gamePadState, Buttons.Y))
-            {
-                this.moodHelper.SetMood(Mood.Disaster);
-            }
-
-            if (this.IsButtonChangedToDown(gamePadState, Buttons.B))
-            {
-                this.moodHelper.SetMood(Mood.Angry);
-            }
-
-            // if (this.IsButtonChangedToDown(gamePadState, Buttons.LeftTrigger) || this.IsKeyChangedToDown(Keyboard.GetState(PlayerIndex.One), Keys.L))
-            if (this.IsButtonChangedToDown(gamePadState, Buttons.LeftTrigger))
             {
                 this.flashlightHelper.Switch();
             }

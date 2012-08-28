@@ -90,11 +90,6 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
-            //if (mood == this.mood)
-            //{
-            //    mood = Mood.Normal;
-            //}
-
             string command = this.GenerateMoodCommand(mood);
             this.robotHelper.SendNonrecurrentMessageToRobot(command, "F0000");
             this.mood = mood;
