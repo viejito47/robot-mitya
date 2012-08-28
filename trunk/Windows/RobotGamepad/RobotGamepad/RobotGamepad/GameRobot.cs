@@ -569,25 +569,20 @@ namespace RobotGamepad
         /// <param name="gamePadState">Состояние геймпэда.</param>
         private void GamepadUpdateInRobotControlState(GameTime gameTime, GamePadState gamePadState)
         {
-            //if (this.IsButtonChangedToDown(gamePadState, Buttons.A))
-            //{
-            //    this.moodHelper.SetMood(Mood.Happy);
-            //}
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.A))
+            {
+                this.moodHelper.WagYes();
+            }
 
-            //if (this.IsButtonChangedToDown(gamePadState, Buttons.X))
-            //{
-            //    this.moodHelper.SetMood(Mood.Blue);
-            //}
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.B))
+            {
+                this.moodHelper.WagNo();
+            }
 
-            //if (this.IsButtonChangedToDown(gamePadState, Buttons.Y))
-            //{
-            //    this.moodHelper.SetMood(Mood.Disaster);
-            //}
-
-            //if (this.IsButtonChangedToDown(gamePadState, Buttons.B))
-            //{
-            //    this.moodHelper.SetMood(Mood.Angry);
-            //}
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.X))
+            {
+                this.moodHelper.WagTail();
+            }
 
             if (this.IsButtonChangedToDown(gamePadState, Buttons.Y))
             {
