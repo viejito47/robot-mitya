@@ -31,7 +31,7 @@ namespace RobotGamepad
         /// <remarks>
         /// Используется только в режиме фиксированного обзора (джойстик DPAD).
         /// </remarks>
-        private bool slowModeOn;
+        private bool fastModeOn;
 
         /// <summary>
         /// Признак управления поворотами головы в режиме фиксации горизонтального угла.
@@ -96,21 +96,21 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether установлен режим медленного поворота головы.
+        /// Gets or sets a value indicating whether установлен режим быстрого поворота головы.
         /// </summary>
         /// <remarks>
-        /// Используется только в режиме фиксированного обзора (джойстик DPAD).
+        /// Используется только в режиме фиксированного обзора (джойстик DPAD или клавиатура).
         /// </remarks>
-        public bool SlowModeOn
+        public bool FastModeOn
         {
             get
             {
-                return this.slowModeOn;
+                return this.fastModeOn;
             }
 
             set
             {
-                this.slowModeOn = value;
+                this.fastModeOn = value;
             }
         }
 
@@ -483,7 +483,7 @@ namespace RobotGamepad
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void DecrementHorizontalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.slowModeOn ? Settings.HorizontalLowSpeed : Settings.HorizontalHighSpeed;
+            float speed = this.fastModeOn ? Settings.HorizontalHighSpeed : Settings.HorizontalLowSpeed;
             degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
             degree = (degree < Settings.HorizontalMinimumDegree) ? Settings.HorizontalMinimumDegree : degree;
         }
@@ -495,7 +495,7 @@ namespace RobotGamepad
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void IncrementHorizontalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.slowModeOn ? Settings.HorizontalLowSpeed : Settings.HorizontalHighSpeed;
+            float speed = this.fastModeOn ? Settings.HorizontalHighSpeed : Settings.HorizontalLowSpeed;
             degree += gameTime.ElapsedGameTime.Milliseconds * speed;
             degree = (degree > Settings.HorizontalMaximumDegree) ? Settings.HorizontalMaximumDegree : degree;
         }
@@ -507,7 +507,7 @@ namespace RobotGamepad
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void DecrementVerticalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.slowModeOn ? Settings.VerticalLowSpeed : Settings.VerticalHighSpeed;
+            float speed = this.fastModeOn ? Settings.VerticalHighSpeed : Settings.VerticalLowSpeed;
             degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
             degree = (degree < Settings.VerticalMinimumDegree) ? Settings.VerticalMinimumDegree : degree;
         }
@@ -519,7 +519,7 @@ namespace RobotGamepad
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void IncrementVerticalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.slowModeOn ? Settings.VerticalLowSpeed : Settings.VerticalHighSpeed;
+            float speed = this.fastModeOn ? Settings.VerticalHighSpeed : Settings.VerticalLowSpeed;
             degree += gameTime.ElapsedGameTime.Milliseconds * speed;
             degree = (degree > Settings.VerticalMaximumDegree) ? Settings.VerticalMaximumDegree : degree;
         }

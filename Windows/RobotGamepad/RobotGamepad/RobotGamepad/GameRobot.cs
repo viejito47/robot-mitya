@@ -493,10 +493,10 @@ namespace RobotGamepad
                 this.lookHelper.LookForward();
             }
 
-            // Установка признака плавного фиксированного обзора (при отпускании кнопок управления
-            // голова остаётся в установленном положении). При плавном фиксированном обзоре 
-            // голова поворачивается с меньшей скоростью.
-            this.lookHelper.SlowModeOn =
+            // Установка признака быстрого фиксированного обзора (при отпускании кнопок управления
+            // голова остаётся в установленном положении). При быстром фиксированном обзоре 
+            // голова поворачивается с большей скоростью.
+            this.lookHelper.FastModeOn =
                 this.IsKeyPressed(keyboardState, Keys.LeftShift) || this.IsKeyPressed(keyboardState, Keys.RightShift);
 
             if (this.IsKeyPressed(keyboardState, Keys.Left))
@@ -612,10 +612,10 @@ namespace RobotGamepad
                 this.lookHelper.LookForward();
             }
 
-            // Установка признака плавного фиксированного обзора (джойстик DPAD - при отпускании кнопок 
-            // джойстика голова остаётся в установленном положении). При плавном фиксированном обзоре 
-            // голова поворачивается с меньшей скоростью.
-            this.lookHelper.SlowModeOn = this.IsButtonPressed(gamePadState, gamePadState.Buttons.RightShoulder);
+            // Установка признака быстрого фиксированного обзора (при отпускании кнопок управления
+            // голова остаётся в установленном положении). При быстром фиксированном обзоре 
+            // голова поворачивается с большей скоростью.
+            this.lookHelper.FastModeOn = this.IsButtonPressed(gamePadState, gamePadState.Buttons.RightShoulder);
 
             if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Left))
             {
@@ -706,9 +706,9 @@ namespace RobotGamepad
                 this.spriteBatch.DrawString(this.debugFont, "Режим разворота", debugStringPosition2c1, Color.Orange);
             }
 
-            if (this.lookHelper.SlowModeOn)
+            if (this.lookHelper.FastModeOn)
             {
-                this.spriteBatch.DrawString(this.debugFont, "Плавный обзор", debugStringPosition3c1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Быстрый обзор", debugStringPosition3c1, Color.Orange);
             }
 
             if (this.lookHelper.WarModeOn)
