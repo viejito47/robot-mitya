@@ -36,12 +36,12 @@ namespace RobotGamepad
             HorizontalMaximumDegree = 180;
 
             VerticalMinimumDegree1 = 0;
-            VerticalForwardDegree1 = 45;
-            VerticalMaximumDegree1 = 90;
+            VerticalForwardDegree1 = 30;
+            VerticalMaximumDegree1 = 60;
 
             VerticalMinimumDegree2 = 0;
-            VerticalForwardDegree2 = 30;
-            VerticalMaximumDegree2 = 60;
+            VerticalForwardDegree2 = 45;
+            VerticalMaximumDegree2 = 90;
 
             VerticalMinimumDegree = VerticalMinimumDegree1;
             VerticalForwardDegree = VerticalForwardDegree1;
@@ -51,6 +51,8 @@ namespace RobotGamepad
             HorizontalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
             VerticalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
             VerticalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
+
+            ReverseHeadTangage = Properties.Settings.Default.ReverseHeadTangage;
 
             MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
@@ -112,18 +114,18 @@ namespace RobotGamepad
         public static int VerticalMaximumDegree1 { get; private set; }
 
         /// <summary>
-        /// Gets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (боевой режим).
+        /// Gets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
         /// </summary>        
         public static int VerticalMinimumDegree2 { get; private set; }
 
         /// <summary>
         /// Gets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
-        /// центральной позиции (боевой режим).
+        /// центральной позиции (прогулочный режим).
         /// </summary>
         public static int VerticalForwardDegree2 { get; private set; }
 
         /// <summary>
-        /// Gets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (боевой режим).
+        /// Gets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
         /// </summary>
         public static int VerticalMaximumDegree2 { get; private set; }
 
@@ -162,6 +164,11 @@ namespace RobotGamepad
         /// Gets Значение, соответствующее низкой скорости вертикального поворота головы.
         /// </summary>
         public static float VerticalLowSpeed { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether управление движением головы по Y-координате перевёрнуто.
+        /// </summary>
+        public static bool ReverseHeadTangage { get; private set; }
 
         /// <summary>
         /// Gets Период опроса джойстика движения и нефиксированного поворота головы.

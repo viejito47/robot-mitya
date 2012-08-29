@@ -112,5 +112,14 @@ namespace RobotGamepad.Properties {
                 return ((byte)(this["Speed5"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ReverseHeadTangage {
+            get {
+                return ((bool)(this["ReverseHeadTangage"]));
+            }
+        }
     }
 }

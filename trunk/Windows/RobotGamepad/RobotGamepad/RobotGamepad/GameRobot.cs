@@ -372,6 +372,22 @@ namespace RobotGamepad
         }
 
         /// <summary>
+        /// Обнаружение отпускания кнопки геймпэда.
+        /// </summary>
+        /// <param name="gamePadState">Текущее состояние геймпэда.</param>
+        /// <param name="button">Отслеживаемая кнопка.</param>
+        /// <returns>true, если кнопка была отпущена.</returns>
+        private bool IsButtonChangedToUp(GamePadState gamePadState, Buttons button)
+        {
+            if (gamePadState.IsConnected == false)
+            {
+                return false;
+            }
+
+            return (gamePadState.IsButtonDown(button) == false) && this.previousGamePadState.IsButtonDown(button);
+        }
+
+        /// <summary>
         /// Проверка зажата ли кнопка геймпэда.
         /// </summary>
         /// <param name="gamePadState">Текущее состояние геймпэда.</param>
@@ -481,9 +497,9 @@ namespace RobotGamepad
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.CapsLock))
             {
-                // В боевом режиме центральное направление взгляда по вертикали - строго горизонтально.
-                // Так проще целиться и стрелять. В обычном режиме - чуть вверх.
-                this.lookHelper.WarModeOn = !this.lookHelper.WarModeOn;
+                // В прогулочном режиме центральное направление взгляда по вертикали - строго горизонтально.
+                // Так проще целиться управлять движением. В режиме общения (не прогулочный) - чуть вверх.
+                this.lookHelper.WalkModeOn = !this.lookHelper.WalkModeOn;
                 this.lookHelper.LookForward();
             }
 
@@ -591,6 +607,16 @@ namespace RobotGamepad
 
             if (this.IsButtonChangedToDown(gamePadState, Buttons.RightTrigger))
             {
+                this.flashlightHelper.TurnOn();
+            }
+
+            if (this.IsButtonChangedToUp(gamePadState, Buttons.RightTrigger))
+            {
+                this.flashlightHelper.TurnOff();
+            }
+
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.LeftTrigger))
+            {
                 this.gunHelper.Fire();
             }
 
@@ -601,9 +627,9 @@ namespace RobotGamepad
 
             if (this.IsButtonChangedToDown(gamePadState, Buttons.RightStick))
             {
-                // В боевом режиме центральное направление взгляда по вертикали - строго горизонтально.
-                // Так проще целиться и стрелять. В обычном режиме - чуть вверх.
-                this.lookHelper.WarModeOn = !this.lookHelper.WarModeOn;
+                // В прогулочном режиме центральное направление взгляда по вертикали - строго горизонтально.
+                // Так проще целиться управлять движением. В режиме общения (не прогулочный) - чуть вверх.
+                this.lookHelper.WalkModeOn = !this.lookHelper.WalkModeOn;
                 this.lookHelper.LookForward();
             }
 
@@ -706,9 +732,9 @@ namespace RobotGamepad
                 this.spriteBatch.DrawString(this.debugFont, "Быстрый обзор", debugStringPosition3c1, Color.Orange);
             }
 
-            if (this.lookHelper.WarModeOn)
+            if (!this.lookHelper.WalkModeOn)
             {
-                this.spriteBatch.DrawString(this.debugFont, "Боевой настрой", debugStringPosition4c1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Режим обзора", debugStringPosition4c1, Color.Orange);
             }
 
             this.spriteBatch.DrawString(this.debugFont, this.lookHelper.HorizontalServoCommand, debugStringPosition3, Color.White);
