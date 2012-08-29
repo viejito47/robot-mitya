@@ -115,31 +115,31 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether установлен боевой режим. В этом режиме центральное положение 
+        /// Gets or sets a value indicating whether установлен "прогулочный" режим. В этом режиме центральное положение 
         /// ThumbStick-джойстика по вертикали соответствует направлению взгляда, параллельному плоскости поверхности 
-        /// пола. Режим введён для упрощения прицеливания. В небоевом режиме направление взгляда робота при 
-        /// центральном положении джойстика направлено чуть вверх.
+        /// пола. Режим введён для упрощения управления движением. В "не прогулочном" режиме направление взгляда робота
+        /// при центральном положении джойстика направлено чуть вверх. Это удобнее при общении с великанами.
         /// </summary>
-        public bool WarModeOn
+        public bool WalkModeOn
         {
             get
             {
-                return Settings.VerticalForwardDegree == Settings.VerticalForwardDegree2;
+                return Settings.VerticalForwardDegree == Settings.VerticalForwardDegree1;
             }
 
             set
             {
                 if (value)
                 {
-                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree2;
-                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree2;
-                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree2;
-                }
-                else
-                {
                     Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree1;
                     Settings.VerticalForwardDegree = Settings.VerticalForwardDegree1;
                     Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree1;
+                }
+                else
+                {
+                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree2;
+                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree2;
+                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree2;
                 }
             }
         }
@@ -211,6 +211,11 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
+            if (Settings.ReverseHeadTangage)
+            {
+                y = -y;
+            }
+
             LookHelper.CorrectCoordinatesFromCyrcleToSquareArea(ref x, ref y);
 
             if ((x != this.lookX) || (y != this.lookY))
@@ -243,7 +248,7 @@ namespace RobotGamepad
         }
 
         /// <summary>
-        /// Поворот головы в начальное положение (вперёд, для "небоевого" режима чуть вверх).
+        /// Поворот головы в начальное положение (вперёд, для режима общения (не прогулочного) чуть вверх).
         /// </summary>
         public void LookForward()
         {
@@ -324,7 +329,15 @@ namespace RobotGamepad
                 this.lookY = 0;
             }
 
-            this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
+            if (Settings.ReverseHeadTangage)
+            {
+                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
+            }
+            else
+            {
+                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
+            }
+
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
             this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
         }
@@ -347,7 +360,15 @@ namespace RobotGamepad
                 this.lookY = 0;
             }
 
-            this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
+            if (Settings.ReverseHeadTangage)
+            {
+                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
+            }
+            else
+            {
+                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
+            }
+
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
             this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
         }
