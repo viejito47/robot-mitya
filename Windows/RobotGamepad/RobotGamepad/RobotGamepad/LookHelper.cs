@@ -211,7 +211,7 @@ namespace RobotGamepad
         {
             this.CheckRobotHelper();
 
-            if (Settings.ReverseHeadTangage)
+            if (!Settings.ReverseHeadTangage)
             {
                 y = -y;
             }
@@ -331,11 +331,11 @@ namespace RobotGamepad
 
             if (Settings.ReverseHeadTangage)
             {
-                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
+                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
             }
             else
             {
-                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
+                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
             }
 
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
@@ -362,11 +362,11 @@ namespace RobotGamepad
 
             if (Settings.ReverseHeadTangage)
             {
-                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
+                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
             }
             else
             {
-                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
+                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
             }
 
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
