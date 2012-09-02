@@ -47,6 +47,8 @@ namespace RobotGamepad
             VerticalForwardDegree = VerticalForwardDegree1;
             VerticalMaximumDegree = VerticalMaximumDegree1;
 
+            VerticalReadyToPlayDegree = 50;
+
             HorizontalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
             HorizontalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
             VerticalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
@@ -144,6 +146,11 @@ namespace RobotGamepad
         /// Gets or sets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (текущий режим).
         /// </summary>
         public static int VerticalMaximumDegree { get; set; }
+
+        /// <summary>
+        /// Gets or sets Угол поворота сервопривода, управляющего вертикальным поворотом головы для игры.
+        /// </summary>
+        public static int VerticalReadyToPlayDegree { get; private set; }
 
         /// <summary>
         /// Gets Значение, соответствующее высокой скорости горизонтального поворота головы.

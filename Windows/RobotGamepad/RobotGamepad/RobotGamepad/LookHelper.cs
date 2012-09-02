@@ -145,6 +145,28 @@ namespace RobotGamepad
         }
 
         /// <summary>
+        /// Gets Последняя обработанная x-координата (горизонтальная) ThumbStick-джойстика для режима обзора с фиксацией.
+        /// </summary>
+        public float FixedLookX 
+        { 
+            get 
+            { 
+                return this.fixedLookX; 
+            } 
+        }
+
+        /// <summary>
+        /// Gets Последняя обработанная y-координата (вертикальная) ThumbStick-джойстика для режима обзора с фиксацией.
+        /// </summary>
+        public float FixedLookY 
+        { 
+            get 
+            { 
+                return this.fixedLookY; 
+            } 
+        }
+
+        /// <summary>
         /// Преобразование координат для поворота головы из пространства круга (область ThumbStick-джойстика)
         /// в пространсво квадрата (область поворота головы, доступная сервоприводам).
         /// </summary>
@@ -245,6 +267,29 @@ namespace RobotGamepad
                 this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
                 this.lookY = y;
             }
+        }
+
+        /// <summary>
+        /// Переход в режим фиксации углов и установка заданных углов.
+        /// </summary>
+        /// <param name="fixedX">Фиксированный угол по горизонтали.</param>
+        /// <param name="fixedY">Фиксированный угол по вертикали.</param>
+        public void FixedLook(float fixedX, float fixedY)
+        {
+            this.CheckRobotHelper();
+
+            this.horizontalFixedControl = true;
+            this.verticalFixedControl = true;
+            this.fixedLookX = fixedX;
+            this.fixedLookY = fixedY;
+            this.lookX = 0;
+            this.lookY = 0;
+
+            this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+
+            this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
+            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
         }
 
         /// <summary>
