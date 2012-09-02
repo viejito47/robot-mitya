@@ -432,44 +432,57 @@ namespace RobotGamepad
         /// <param name="keyboardState">Состояние клавиатуры.</param>
         private void CommonUpdateInRobotControlState(GameTime gameTime, KeyboardState keyboardState)
         {
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F1))
+            bool shiftIsPressed = this.IsShiftPressed(keyboardState);
+            bool shiftIsNotPressed = !shiftIsPressed;
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F1) && shiftIsNotPressed)
             {
                 this.moodHelper.SetMood(Mood.Normal);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F2))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && shiftIsNotPressed)
             {
                 this.moodHelper.SetMood(Mood.Happy);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F3))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && shiftIsPressed)
+            {
+                this.moodHelper.ShowReadyToPlay(this.lookHelper);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && shiftIsNotPressed)
             {
                 this.moodHelper.SetMood(Mood.Blue);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F4))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && shiftIsPressed)
+            {
+                this.moodHelper.ShowDepression(this.lookHelper);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F4) && shiftIsNotPressed)
             {
                 this.moodHelper.SetMood(Mood.Disaster);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F5))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F5) && shiftIsNotPressed)
             {
                 this.moodHelper.SetMood(Mood.Angry);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.T))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.T) && shiftIsNotPressed)
             {
                 this.moodHelper.WagTail();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.Y))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Y) && shiftIsNotPressed)
             {
-                this.moodHelper.WagYes();
+                this.moodHelper.ShowYes();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.N))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.N) && shiftIsNotPressed)
             {
-                this.moodHelper.WagNo();
+                this.moodHelper.ShowNo();
             }
         }
 
@@ -480,12 +493,15 @@ namespace RobotGamepad
         /// <param name="keyboardState">Состояние клавиатуры.</param>
         private void KeyboardUpdateInRobotControlState(GameTime gameTime, KeyboardState keyboardState)
         {
-            if (this.IsKeyChangedToDown(keyboardState, Keys.L))
+            bool shiftIsPressed = this.IsShiftPressed(keyboardState);
+            bool shiftIsNotPressed = !shiftIsPressed;
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.L) && shiftIsNotPressed)
             {
                 this.flashlightHelper.Switch();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl))
+            if ((this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl)) && shiftIsNotPressed)
             {
                 this.gunHelper.Fire();
             }
@@ -503,7 +519,7 @@ namespace RobotGamepad
                 this.lookHelper.LookForward();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.Home))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Home) && shiftIsNotPressed)
             {
                 // Установка головы в положение "смотреть вперёд".
                 this.lookHelper.LookForward();
@@ -512,8 +528,7 @@ namespace RobotGamepad
             // Установка признака быстрого фиксированного обзора (при отпускании кнопок управления
             // голова остаётся в установленном положении). При быстром фиксированном обзоре 
             // голова поворачивается с большей скоростью.
-            this.lookHelper.FastModeOn =
-                this.IsKeyPressed(keyboardState, Keys.LeftShift) || this.IsKeyPressed(keyboardState, Keys.RightShift);
+            this.lookHelper.FastModeOn = shiftIsPressed;
 
             if (this.IsKeyPressed(keyboardState, Keys.Left))
             {
@@ -539,27 +554,27 @@ namespace RobotGamepad
                 this.lookHelper.FixedLookDown(gameTime);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D1))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && shiftIsNotPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = Settings.Speed1;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D2))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && shiftIsNotPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = Settings.Speed2;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D3))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && shiftIsNotPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = Settings.Speed3;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D4))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && shiftIsNotPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = Settings.Speed4;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D5))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && shiftIsNotPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = Settings.Speed5;
             }
@@ -587,12 +602,12 @@ namespace RobotGamepad
         {
             if (this.IsButtonChangedToDown(gamePadState, Buttons.A))
             {
-                this.moodHelper.WagYes();
+                this.moodHelper.ShowYes();
             }
 
             if (this.IsButtonChangedToDown(gamePadState, Buttons.B))
             {
-                this.moodHelper.WagNo();
+                this.moodHelper.ShowNo();
             }
 
             if (this.IsButtonChangedToDown(gamePadState, Buttons.X))
@@ -827,6 +842,16 @@ namespace RobotGamepad
 
             this.videoHelper.FinalizeVideo();
             this.audioHelper.FinalizeAudio();
+        }
+
+        /// <summary>
+        /// Определяет нажата ли хоть одна клавиша Shift.
+        /// </summary>
+        /// <param name="keyboardState">Состояние клавиатуры.</param>
+        /// <returns>True, если нажата клавиша Shift.</returns>
+        private bool IsShiftPressed(KeyboardState keyboardState)
+        {
+            return this.IsKeyPressed(keyboardState, Keys.LeftShift) || this.IsKeyPressed(keyboardState, Keys.RightShift);
         }
     }
 }

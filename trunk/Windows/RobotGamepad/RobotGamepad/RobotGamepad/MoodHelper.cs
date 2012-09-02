@@ -17,7 +17,7 @@ namespace RobotGamepad
     /// <summary>
     /// Настроения робота.
     /// </summary>
-    public enum Mood 
+    public enum Mood
     { 
         /// <summary>
         /// Нормальное настроение.
@@ -106,7 +106,7 @@ namespace RobotGamepad
         /// <summary>
         /// Генерация и передача команды кивания головой (ответ "да").
         /// </summary>
-        public void WagYes()
+        public void ShowYes()
         {
             this.robotHelper.SendNonrecurrentMessageToRobot("y0002", "y0000");
         }
@@ -114,9 +114,37 @@ namespace RobotGamepad
         /// <summary>
         /// Генерация и передача команды кивания головой (ответ "нет").
         /// </summary>
-        public void WagNo()
+        public void ShowNo()
         {
             this.robotHelper.SendNonrecurrentMessageToRobot("n0002", "n0000");
+        }
+
+        /// <summary>
+        /// Генерация и передача команды очень-очень грустного настроения.
+        /// </summary>
+        /// <param name="lookHelper">
+        /// Экземпляр класса для управления обзором.
+        /// </param>
+        public void ShowReadyToPlay(LookHelper lookHelper)
+        {
+            this.robotHelper.SendNonrecurrentMessageToRobot("F0102", "F0000");
+            this.mood = Mood.Normal;
+
+            lookHelper.FixedLook(lookHelper.FixedLookX, Settings.VerticalReadyToPlayDegree);
+        }
+
+        /// <summary>
+        /// Генерация и передача команды очень-очень грустного настроения.
+        /// </summary>
+        /// <param name="lookHelper">
+        /// Экземпляр класса для управления обзором.
+        /// </param>
+        public void ShowDepression(LookHelper lookHelper)
+        {
+            this.robotHelper.SendNonrecurrentMessageToRobot("F0103", "F0000");
+            this.mood = Mood.Blue;
+
+            lookHelper.FixedLook(lookHelper.FixedLookX, Settings.VerticalMinimumDegree);
         }
 
         /// <summary>

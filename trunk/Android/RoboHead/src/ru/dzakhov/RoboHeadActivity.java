@@ -86,7 +86,14 @@ public class RoboHeadActivity extends Activity {
 				        mFaceHelper.setFace(FaceType.ftAngry);
 					} else if (value.equals("0005")) {
 				        mFaceHelper.setFace(FaceType.ftIll);
+					} else if (value.equals("0102")) {
+				        mFaceHelper.setFace(FaceType.ftReadyToPlay);
+						sendMessageToRobot(message);
+					} else if (value.equals("0103")) {
+				        mFaceHelper.setFace(FaceType.ftBlue);
+						sendMessageToRobot(message);
 					}
+					Logger.d(message);
 				} else if (command.equals("h")) { // h [hit] Ц попадание
 					if (value.equals("0001")) {
 		                new Thread() {
@@ -179,6 +186,8 @@ public class RoboHeadActivity extends Activity {
 			return true;
 		case R.id.test_animation:
 	        if (testFace == FaceType.ftOk) {
+	        	testFace = FaceType.ftReadyToPlay;
+	        } else if (testFace == FaceType.ftReadyToPlay) {
 	        	testFace = FaceType.ftAngry;
 	        } else if (testFace == FaceType.ftAngry) {
 	        	testFace = FaceType.ftBlue;

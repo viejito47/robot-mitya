@@ -10,7 +10,7 @@ import android.widget.ImageView;
  * @author Дмитрий Дзахов
  *
  */
-enum FaceType { ftOk, ftHappy, ftBlue, ftAngry, ftIll }; 
+enum FaceType { ftOk, ftHappy, ftBlue, ftAngry, ftIll, ftReadyToPlay }; 
 
 /**
  * Класс для управления лицом робота.
@@ -67,6 +67,22 @@ public final class FaceHelper {
 	};
 	
 	/**
+	 * Хэндлер, принимающий сообщения, сигнализирующие о необходимости что-sто сделать. 
+	 */
+	private Handler mHandlerDelayedAction = new Handler() {
+		@Override
+		public void handleMessage(final Message msg) {
+			switch (mCurrentFace) {
+			case ftReadyToPlay:
+				setFace(FaceType.ftOk);
+				break;
+			default:
+				return;
+			}
+		}
+	};
+
+	/**
 	 * Конструктор класса.
 	 * @param imageView контрол для вывода анимации.
 	 */
@@ -101,107 +117,104 @@ public final class FaceHelper {
 
 		switch (mCurrentFace) {
 		case ftAngry:
-			switch (face) {
-			case ftAngry:
+			if (face == FaceType.ftAngry) {
 				resource = R.drawable.face_angry_to_angry;
-				break;
-			case ftBlue:
+			} else if (face == FaceType.ftBlue) {
 				resource = R.drawable.face_angry_to_blue;
-				break;
-			case ftHappy:
+			} else if (face == FaceType.ftHappy) {
 				resource = R.drawable.face_angry_to_happy;
-				break;
-			case ftIll:
+			} else if (face == FaceType.ftIll) {
 				resource = R.drawable.face_angry_to_ill;
-				break;
-			case ftOk:
+			} else if (face == FaceType.ftOk) {
 				resource = R.drawable.face_angry_to_ok;
-				break;
-			default:
+			} else if (face == FaceType.ftReadyToPlay) {
+				resource = R.drawable.face_angry_to_ready_to_play;
+			} else {
 				return false;
 			}
 			break;
 		case ftBlue:
-			switch (face) {
-			case ftAngry:
+			if (face == FaceType.ftAngry) {
 				resource = R.drawable.face_blue_to_angry;
-				break;
-			case ftBlue:
+			} else if (face == FaceType.ftBlue) {
 				resource = R.drawable.face_blue_to_blue;
-				break;
-			case ftHappy:
+			} else if (face == FaceType.ftHappy) {
 				resource = R.drawable.face_blue_to_happy;
-				break;
-			case ftIll:
+			} else if (face == FaceType.ftIll) {
 				resource = R.drawable.face_blue_to_ill;
-				break;
-			case ftOk:
+			} else if (face == FaceType.ftOk) {
 				resource = R.drawable.face_blue_to_ok;
-				break;
-			default:
+			} else if (face == FaceType.ftReadyToPlay) {
+				resource = R.drawable.face_blue_to_ready_to_play;
+			} else {
 				return false;
 			}
 			break;
 		case ftHappy:
-			switch (face) {
-			case ftAngry:
+			if (face == FaceType.ftAngry) {
 				resource = R.drawable.face_happy_to_angry;
-				break;
-			case ftBlue:
+			} else if (face == FaceType.ftBlue) {
 				resource = R.drawable.face_happy_to_blue;
-				break;
-			case ftHappy:
+			} else if (face == FaceType.ftHappy) {
 				resource = R.drawable.face_happy_to_happy;
-				break;
-			case ftIll:
+			} else if (face == FaceType.ftIll) {
 				resource = R.drawable.face_happy_to_ill;
-				break;
-			case ftOk:
+			} else if (face == FaceType.ftOk) {
 				resource = R.drawable.face_happy_to_ok;
-				break;
-			default:
+			} else if (face == FaceType.ftReadyToPlay) {
+				resource = R.drawable.face_happy_to_ready_to_play;
+			} else {
 				return false;
 			}
 			break;
 		case ftIll:
-			switch (face) {
-			case ftAngry:
+			if (face == FaceType.ftAngry) {
 				resource = R.drawable.face_ill_to_angry;
-				break;
-			case ftBlue:
+			} else if (face == FaceType.ftBlue) {
 				resource = R.drawable.face_ill_to_blue;
-				break;
-			case ftHappy:
+			} else if (face == FaceType.ftHappy) {
 				resource = R.drawable.face_ill_to_happy;
-				break;
-			case ftIll:
+			} else if (face == FaceType.ftIll) {
 				resource = R.drawable.face_ill_to_ill;
-				break;
-			case ftOk:
+			} else if (face == FaceType.ftOk) {
 				resource = R.drawable.face_ill_to_ok;
-				break;
-			default:
+			} else if (face == FaceType.ftReadyToPlay) {
+				resource = R.drawable.face_ill_to_ready_to_play;
+			} else {
+				return false;
+			}
+			break;
+		case ftReadyToPlay:
+			if (face == FaceType.ftAngry) {
+				resource = R.drawable.face_ready_to_play_to_angry;
+			} else if (face == FaceType.ftBlue) {
+				resource = R.drawable.face_ready_to_play_to_blue;
+			} else if (face == FaceType.ftHappy) {
+				resource = R.drawable.face_ready_to_play_to_happy;
+			} else if (face == FaceType.ftIll) {
+				resource = R.drawable.face_ready_to_play_to_ill;
+			} else if (face == FaceType.ftOk) {
+				resource = R.drawable.face_ready_to_play_to_ok;
+			} else if (face == FaceType.ftReadyToPlay) {
+				resource = R.drawable.face_ready_to_play_to_ready_to_play;
+			} else {
 				return false;
 			}
 			break;
 		case ftOk:
-			switch (face) {
-			case ftAngry:
+			if (face == FaceType.ftAngry) {
 				resource = R.drawable.face_ok_to_angry;
-				break;
-			case ftBlue:
+			} else if (face == FaceType.ftBlue) {
 				resource = R.drawable.face_ok_to_blue;
-				break;
-			case ftHappy:
+			} else if (face == FaceType.ftHappy) {
 				resource = R.drawable.face_ok_to_happy;
-				break;
-			case ftIll:
+			} else if (face == FaceType.ftIll) {
 				resource = R.drawable.face_ok_to_ill;
-				break;
-			case ftOk:
+			} else if (face == FaceType.ftOk) {
 				resource = R.drawable.face_ok_to_ok;
-				break;
-			default:
+			} else if (face == FaceType.ftReadyToPlay) {
+				resource = R.drawable.face_ok_to_ready_to_play;
+			} else {
 				return false;
 			}
 			break;
@@ -211,6 +224,12 @@ public final class FaceHelper {
 		
 		mCurrentFace = face;
 		startAnimation(resource);
+		
+		if (face == FaceType.ftReadyToPlay) {
+			final int readyToPlayPause = 5000;
+			mHandlerDelayedAction.sendEmptyMessageDelayed(0, readyToPlayPause);
+		}
+		
         return true;
 	}
 	
