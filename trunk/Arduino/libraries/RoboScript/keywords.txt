@@ -1,0 +1,39 @@
+#######################################
+# Syntax Coloring Map For RoboScript
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+RoboScript	KEYWORD1
+RoboAction	KEYWORD1
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+initialize			KEYWORD2
+finalize			KEYWORD2
+addAction			KEYWORD2
+getActionsCount		KEYWORD2
+getActionAt			KEYWORD2
+clear				KEYWORD2
+startExecution		KEYWORD2
+stopExecution		KEYWORD2
+hasActionToExecute	KEYWORD2
+
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+ROBOSCRIPT_OK							LITERAL1
+ROBOSCRIPT_ERROR_CANNOT_ALLOC_MEMORY	LITERAL1
+ROBOSCRIPT_ERROR_NOT_INITIALIZED		LITERAL1
+ROBOSCRIPT_ERROR_ARRAY_IS_OVERLOADED	LITERAL1
+ROBOSCRIPT_ERROR_OUT_OF_BOUNDS			LITERAL1
+ROBOSCRIPT_ERROR_OTHER					LITERAL1
