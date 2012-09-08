@@ -10,6 +10,7 @@
 #include <Servo.h>
 #include <IRremote.h>
 #include <Swinger.h>
+#include <RoboScript.h>
 
 // Длина сообщения:
 const int MESSAGELENGTH = 5;
@@ -64,6 +65,10 @@ IRrecv irrecv(targetPin);
 decode_results results;
 IRsend irsend;
 
+
+// Программа для робота: РобоСкрипт.
+RoboScript readyToPlayReflex;
+
 // Функция инициализации скетча:
 void setup()
 {
@@ -95,6 +100,8 @@ void setup()
   
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
+  
+  readyToPlayInitialize();
 }
 
 // Функция главного цикла:
@@ -127,6 +134,7 @@ void loop()
   showYes();
   showBlue();
   showReadyToPlay();
+  readyToPlayRun();
 }
 
 // Проверка ИК-попадания в робота:
@@ -248,6 +256,11 @@ void processMessage(String message)
     return;
   }
   
+  executeAction(command, value);
+}
+
+void executeAction(String command, unsigned int value)
+{
   if ((command == "L") || (command == "R") || (command == "D")) 
   {
     // Команда двигателям:
@@ -285,12 +298,13 @@ void processMessage(String message)
   }
   else if ((command == "F") && (value == 0x0102))
   {
-    const int ReadyToPlayVerticalDegree = 50;
+    const int ReadyToPlayVerticalDegree = 70;
     int verticalAmplitude = abs((ReadyToPlayVerticalDegree - servoHeadCurrentVerticalDegree) * 2);
     boolean swingDirection = ReadyToPlayVerticalDegree > servoHeadCurrentVerticalDegree;
     readyToPlayVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
     readyToPlayHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
     tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
+    readyToPlayStart();
   }
   else if ((command == "F") && (value == 0x0103))
   {
@@ -450,6 +464,55 @@ void showReadyToPlay()
   {
     moveTail(degree);
   }
+}
+
+void readyToPlayInitialize()
+{
+  const int kickSpeed = 192;
+  const int kickDuration = 90;
+  const int freezeDuration = 200;
+  
+  readyToPlayReflex.initialize(8);
+
+  RoboAction actionLeftKick;
+  actionLeftKick.Command = 'L';
+  actionLeftKick.Value = kickSpeed;
+  actionLeftKick.Delay = kickDuration;
+  
+  RoboAction actionRightKick = actionLeftKick;
+  actionRightKick.Command = 'R';
+  
+  RoboAction actionLeftStop;
+  actionLeftStop.Command = 'L';
+  actionLeftStop.Value = 0;
+  actionLeftStop.Delay = freezeDuration;
+  
+  RoboAction actionRightStop = actionLeftStop;
+  actionRightStop.Command = 'R';
+
+  readyToPlayReflex.addAction(actionLeftKick);
+  readyToPlayReflex.addAction(actionLeftStop);
+  readyToPlayReflex.addAction(actionRightKick);
+  readyToPlayReflex.addAction(actionRightStop);
+  readyToPlayReflex.addAction(actionLeftKick);
+  readyToPlayReflex.addAction(actionLeftStop);
+  readyToPlayReflex.addAction(actionRightKick);
+  readyToPlayReflex.addAction(actionRightStop);
+}
+
+void readyToPlayRun()
+{
+  String command;
+  int value;
+  if (readyToPlayReflex.hasActionToExecute(command, value))
+  {
+    executeAction(command, value);
+  }
+}
+
+void readyToPlayStart()
+{
+  readyToPlayReflex.startExecution();
 }
 
 signed long sign(double value)
