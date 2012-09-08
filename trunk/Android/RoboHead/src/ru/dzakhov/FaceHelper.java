@@ -241,8 +241,9 @@ public final class FaceHelper {
 		if (mAnimation != null) {
 			mAnimation.stop();
 			mAnimation = null;
+			System.gc();
 		}
-
+		
 		mImageView.setBackgroundResource(resource);
 		mAnimation = (AnimationDrawable) mImageView.getBackground();
 		mAnimation.start();

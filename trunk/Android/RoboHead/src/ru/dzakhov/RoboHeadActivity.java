@@ -74,7 +74,7 @@ public class RoboHeadActivity extends Activity {
 				String message = (String) msg.obj;				
 				String command = MessageHelper.getMessageIdentifier(message);
 				String value = MessageHelper.getMessageValue(message);
-				
+
 				if (command.equals("F")) { // F [face] Ц смена мордочки
 					if (value.equals("0001")) {
 				        mFaceHelper.setFace(FaceType.ftOk);
