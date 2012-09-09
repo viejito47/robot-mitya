@@ -67,7 +67,7 @@ public final class FaceHelper {
 	};
 	
 	/**
-	 * Хэндлер, принимающий сообщения, сигнализирующие о необходимости что-sто сделать. 
+	 * Хэндлер, принимающий сообщения, сигнализирующие о необходимости что-то сделать. 
 	 */
 	private Handler mHandlerDelayedAction = new Handler() {
 		@Override
@@ -89,6 +89,8 @@ public final class FaceHelper {
 	public FaceHelper(final ImageView imageView) {
 		mImageView = imageView;
 		
+		// Thread для генерации Idle-событий. События генерируются с переменной периодичностью.
+		// Промежутки составляют 4 сек + random(4 сек).
 		new Thread() {
 			public void run() {
 				try {
@@ -105,6 +107,14 @@ public final class FaceHelper {
 				}
 			}
 		} .start();
+	}
+	
+	/**
+	 * Получение текущего состояния лица.
+	 * @return тип установленного выражения лица.
+	 */
+	public FaceType getFace() {
+		return mCurrentFace;
 	}
 	
 	/**

@@ -87,9 +87,25 @@ public final class SoundManager {
 	 * Currently hardcoded but could easily be changed to be flexible.
 	 */
 	public static void loadSounds()	{
-		mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.gun, 1));
-		mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.wilhelm_scream, 1));
+		mSoundPoolMap.put(GUN, mSoundPool.load(mContext, R.raw.gun, 1));
+		mSoundPoolMap.put(SCREAM, mSoundPool.load(mContext, R.raw.wilhelm_scream, 1));
+		mSoundPoolMap.put(BEEP, mSoundPool.load(mContext, R.raw.beep, 1));
 	}
+	
+	/**
+	 * Индекс звука выстрела.
+	 */
+	public static final int GUN = 1;
+	
+	/**
+	 * Индекс крика Вильгельма.
+	 */
+	public static final int SCREAM = 2;
+	
+	/**
+	 * Индекс звука клаксона.
+	 */
+	public static final int BEEP = 3;
 	
 	/**
 	 * Plays a Sound.
@@ -122,5 +138,14 @@ public final class SoundManager {
 	    mSoundPoolMap.clear();
 	    mAudioManager.unloadSoundEffects();
 	    mInstance = null;
+	}
+	
+	/**
+	 * Включение вибрации на заданное время.
+	 * @param millis время вибрации в миллисекундах.
+	 */
+	public static void vibrate(final long millis) {
+//		Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+//		vibrator.vibrate(millis);
 	}
 }
