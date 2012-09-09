@@ -65,9 +65,9 @@ IRrecv irrecv(targetPin);
 decode_results results;
 IRsend irsend;
 
-
 // Программа для робота: РобоСкрипт.
 RoboScript readyToPlayReflex;
+RoboScript angryReflex;
 
 // Функция инициализации скетча:
 void setup()
@@ -101,7 +101,8 @@ void setup()
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
   
-  readyToPlayInitialize();
+  readyToPlayReflexInitialize();
+  angryReflexInitialize();
 }
 
 // Функция главного цикла:
@@ -134,7 +135,8 @@ void loop()
   showYes();
   showBlue();
   showReadyToPlay();
-  readyToPlayRun();
+  readyToPlayReflexRun();
+  angryReflexRun();
 }
 
 // Проверка ИК-попадания в робота:
@@ -304,13 +306,17 @@ void executeAction(String command, unsigned int value)
     readyToPlayVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
     readyToPlayHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
     tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
-    readyToPlayStart();
+    readyToPlayReflexStart();
   }
   else if ((command == "F") && (value == 0x0103))
   {
     int verticalAmplitude = (servoHeadCurrentVerticalDegree - servoHeadVerticalMinDegree) * 2;
     blueVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
     blueHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
+  }
+  else if ((command == "F") && (value == 0x0104))
+  {
+    angryReflexStart();
   }
   else if (command == "I")
   {
@@ -466,30 +472,32 @@ void showReadyToPlay()
   }
 }
 
-void readyToPlayInitialize()
+signed long sign(double value)
+{
+  if (value > 0) return 1;
+  if (value < 0) return -1;
+  return 0;
+}
+
+void readyToPlayReflexInitialize()
 {
   const int kickSpeed = 192;
   const int kickDuration = 90;
   const int freezeDuration = 200;
   
   readyToPlayReflex.initialize(8);
-
   RoboAction actionLeftKick;
   actionLeftKick.Command = 'L';
   actionLeftKick.Value = kickSpeed;
   actionLeftKick.Delay = kickDuration;
-  
   RoboAction actionRightKick = actionLeftKick;
   actionRightKick.Command = 'R';
-  
   RoboAction actionLeftStop;
   actionLeftStop.Command = 'L';
   actionLeftStop.Value = 0;
   actionLeftStop.Delay = freezeDuration;
-  
   RoboAction actionRightStop = actionLeftStop;
   actionRightStop.Command = 'R';
-
   readyToPlayReflex.addAction(actionLeftKick);
   readyToPlayReflex.addAction(actionLeftStop);
   readyToPlayReflex.addAction(actionRightKick);
@@ -500,7 +508,7 @@ void readyToPlayInitialize()
   readyToPlayReflex.addAction(actionRightStop);
 }
 
-void readyToPlayRun()
+void readyToPlayReflexRun()
 {
   String command;
   int value;
@@ -510,15 +518,40 @@ void readyToPlayRun()
   }
 }
 
-void readyToPlayStart()
+void readyToPlayReflexStart()
 {
   readyToPlayReflex.startExecution();
 }
 
-signed long sign(double value)
+void angryReflexInitialize()
 {
-  if (value > 0) return 1;
-  if (value < 0) return -1;
-  return 0;
+  angryReflex.initialize(3);
+  RoboAction action;
+  action.Command = 'D';
+  action.Value = -192;
+  action.Delay = 100;
+  angryReflex.addAction(action);
+  action.Value = 255;
+  action.Delay = 20;
+  angryReflex.addAction(action);
+  action.Value = 0;
+  action.Delay = 0;
+  angryReflex.addAction(action);
 }
+
+void angryReflexRun()
+{
+  String command;
+  int value;
+  if (angryReflex.hasActionToExecute(command, value))
+  {
+    executeAction(command, value);
+  }
+}
+
+void angryReflexStart()
+{
+  angryReflex.startExecution();
+}
+
 

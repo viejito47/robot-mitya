@@ -68,37 +68,37 @@ public class RoboHeadActivity extends Activity {
         mFaceHelper = new FaceHelper(mFaceImageView);        
         mFaceHelper.setFace(FaceType.ftOk);
         
+		new FaceTouchHelper(mFaceImageView, mFaceHelper);
+		
     	mHandler = new Handler() {
 			@Override
 			public void handleMessage(final Message msg) {
 				String message = (String) msg.obj;				
 				String command = MessageHelper.getMessageIdentifier(message);
-				String value = MessageHelper.getMessageValue(message);
 
 				if (command.equals("F")) { // F [face] Ц смена мордочки
-					if (value.equals("0001")) {
+					if (message.equals(MessageConstant.FACETYPE_OK)) {
 				        mFaceHelper.setFace(FaceType.ftOk);
-					} else if (value.equals("0002")) {
+					} else if (message.equals(MessageConstant.FACETYPE_HAPPY)) {
 				        mFaceHelper.setFace(FaceType.ftHappy);
-					} else if (value.equals("0003")) {
+					} else if (message.equals(MessageConstant.FACETYPE_BLUE)) {
 				        mFaceHelper.setFace(FaceType.ftBlue);
-					} else if (value.equals("0004")) {
+					} else if (message.equals(MessageConstant.FACETYPE_ANGRY)) {
 				        mFaceHelper.setFace(FaceType.ftAngry);
-					} else if (value.equals("0005")) {
+					} else if (message.equals(MessageConstant.FACETYPE_ILL)) {
 				        mFaceHelper.setFace(FaceType.ftIll);
-					} else if (value.equals("0102")) {
+					} else if (message.equals(MessageConstant.FACETYPE_READY_TO_PLAY)) {
 				        mFaceHelper.setFace(FaceType.ftReadyToPlay);
 						sendMessageToRobot(message);
-					} else if (value.equals("0103")) {
+					} else if (message.equals(MessageConstant.FACETYPE_VERY_BLUE)) {
 				        mFaceHelper.setFace(FaceType.ftBlue);
 						sendMessageToRobot(message);
 					}
-					Logger.d(message);
 				} else if (command.equals("h")) { // h [hit] Ц попадание
-					if (value.equals("0001")) {
+					if (message.equals(MessageConstant.HIT)) {
 		                new Thread() {
 		                    public void run() {
-								SoundManager.playSound(2, 1);
+								SoundManager.playSound(SoundManager.SCREAM, 1);
 		                    }
 		                } .start();
 					}
@@ -106,18 +106,18 @@ public class RoboHeadActivity extends Activity {
 					// фиксации в хэш-таблице последних прин€тых сообщений значени€, отличного от 0001.
 				} else if (command.equals("E")) {
 					String errorMessage = "ќшибка: ";
-					if (value.equals("0001")) {
+					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
 						errorMessage += "неверное сообщение";
-					} else if (value.equals("0002")) {
+					} else if (message.equals(MessageConstant.UNKNOWN_COMMAND)) {
 						errorMessage += "неизвестна€ команда";
 					}
 					Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
 				} else {
 					if (command.equals("f")) { // f [fire] Ц выстрел
-						if (value.equals("0001")) {
+						if (message.equals(MessageConstant.FIRE)) {
 			                new Thread() {
 			                    public void run() {
-									SoundManager.playSound(1, 1);
+									SoundManager.playSound(SoundManager.GUN, 1);
 			                    }
 			                } .start();
 						}
@@ -292,12 +292,7 @@ public class RoboHeadActivity extends Activity {
 	 * @param message текст сообщени€.
 	 */
 	private void sendMessageToRobot(final String message) {
-//		byte[] buffer = new byte[message.length()];
-//		for (int i = 0; i < message.length(); i++) {
-//			buffer[i] = (byte) message.charAt(i);
-//		}		
-//		getOpenAccessory().write(buffer);
-		Logger.d("RoboHeadActivity: Sent to Robot: " + message);
+		Logger.d(message);
 		BluetoothHelper.send(message);
 	}
 	
