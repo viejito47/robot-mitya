@@ -16,6 +16,7 @@ namespace RoboControlTest
 
     using NUnit.Framework;
 
+    using RoboCommon;
     using RoboControl;
 
     /// <summary>
@@ -24,6 +25,9 @@ namespace RoboControlTest
     [TestFixture]
     public sealed class DriveHelperTest
     {
+        RobotHelper robotHelper;
+        ControlSettings controlSettings;
+
         /// <summary>
         /// Текст команды для левого двигателя.
         /// </summary>
@@ -39,9 +43,13 @@ namespace RoboControlTest
         /// </summary>
         public DriveHelperTest()
         {
+            ConnectSettings connectSettings = new ConnectSettings("192.168.1.1", 51974);
+            this.robotHelper = new RobotHelper(connectSettings);
+            this.controlSettings = new ControlSettings();
+
             // Специально для тестов переопределяю максимальные скорости нормального и турбо режимов моторов.
-            Settings.DriveModeNormalMaxSpeed = 190;
-            Settings.DriveModeTurboMaxSpeed = 255;
+            this.controlSettings.DriveModeNormalMaxSpeed = 190;
+            this.controlSettings.DriveModeTurboMaxSpeed = 255;
         }
 
         /// <summary>
@@ -50,7 +58,7 @@ namespace RoboControlTest
         [Test]
         public void TurboDriveTest()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
             driveHelper.TurboModeOn = true;
 
             int leftSpeed;
@@ -83,7 +91,7 @@ namespace RoboControlTest
         [Test]
         public void DriveTest()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
             driveHelper.TurboModeOn = false;
 
             int leftSpeed;
@@ -116,7 +124,7 @@ namespace RoboControlTest
         [Test]
         public void StopTest()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
             driveHelper.GenerateMotorCommands(0, 0, out this.leftMotorCommand, out this.rightMotorCommand);
             Assert.AreEqual("L0000", leftMotorCommand);
             Assert.AreEqual("R0000", rightMotorCommand);
@@ -128,7 +136,7 @@ namespace RoboControlTest
         [Test]
         public void ForwardTest()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
             driveHelper.TurboModeOn = false;
 
             int leftSpeed;
@@ -136,14 +144,14 @@ namespace RoboControlTest
 
             driveHelper.CalculateMotorsSpeed(0, 1, out leftSpeed, out rightSpeed);
             driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
-            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(Settings.DriveModeNormalMaxSpeed), leftMotorCommand);
-            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(Settings.DriveModeNormalMaxSpeed), rightMotorCommand);
+            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(this.controlSettings.DriveModeNormalMaxSpeed), leftMotorCommand);
+            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(this.controlSettings.DriveModeNormalMaxSpeed), rightMotorCommand);
 
             driveHelper.CalculateMotorsSpeed(0, 0.5, out leftSpeed, out rightSpeed);
             driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             int speed = Convert.ToInt32(255.0 * 0.5);
             speed = DriveHelper.NonlinearSpeedCorrection(speed);
-            speed = driveHelper.TurboModeOn ? speed : speed * Settings.DriveModeNormalMaxSpeed / 255;
+            speed = driveHelper.TurboModeOn ? speed : speed * this.controlSettings.DriveModeNormalMaxSpeed / 255;
             Assert.AreEqual("L" + MessageHelper.IntToMessageValue(speed), leftMotorCommand);
             Assert.AreEqual("R" + MessageHelper.IntToMessageValue(speed), rightMotorCommand);
         }
@@ -154,7 +162,7 @@ namespace RoboControlTest
         [Test]
         public void BackwardTest()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
             driveHelper.TurboModeOn = false;
 
             int leftSpeed;
@@ -162,14 +170,14 @@ namespace RoboControlTest
 
             driveHelper.CalculateMotorsSpeed(0, -1, out leftSpeed, out rightSpeed);
             driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
-            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(-Settings.DriveModeNormalMaxSpeed), leftMotorCommand);
-            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(-Settings.DriveModeNormalMaxSpeed), rightMotorCommand);
+            Assert.AreEqual("L" + MessageHelper.IntToMessageValue(-this.controlSettings.DriveModeNormalMaxSpeed), leftMotorCommand);
+            Assert.AreEqual("R" + MessageHelper.IntToMessageValue(-this.controlSettings.DriveModeNormalMaxSpeed), rightMotorCommand);
 
             driveHelper.CalculateMotorsSpeed(0, -0.5, out leftSpeed, out rightSpeed);
             driveHelper.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
             int speed = Convert.ToInt32(255.0 * 0.5);
             speed = DriveHelper.NonlinearSpeedCorrection(speed);
-            speed = driveHelper.TurboModeOn ? speed : speed * Settings.DriveModeNormalMaxSpeed / 255;
+            speed = driveHelper.TurboModeOn ? speed : speed * this.controlSettings.DriveModeNormalMaxSpeed / 255;
             Assert.AreEqual("L" + MessageHelper.IntToMessageValue(-speed), leftMotorCommand);
             Assert.AreEqual("R" + MessageHelper.IntToMessageValue(-speed), rightMotorCommand);
         }
@@ -180,7 +188,7 @@ namespace RoboControlTest
         [Test]
         public void RotationTest1()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
 
             driveHelper.TurboModeOn = true;
 
@@ -214,7 +222,7 @@ namespace RoboControlTest
         [Test]
         public void RotationTest2()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
 
             driveHelper.TurboModeOn = true;
             driveHelper.RotationModeOn = true;
@@ -249,7 +257,7 @@ namespace RoboControlTest
         [Test]
         public void HalfLeftForward()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
 
             driveHelper.TurboModeOn = true;
 
@@ -273,7 +281,7 @@ namespace RoboControlTest
         [Test]
         public void HalfRightForward()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
 
             driveHelper.TurboModeOn = true;
 
@@ -297,7 +305,7 @@ namespace RoboControlTest
         [Test]
         public void HalfLeftBackward()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
 
             driveHelper.TurboModeOn = true;
 
@@ -321,7 +329,7 @@ namespace RoboControlTest
         [Test]
         public void HalfRightBackward()
         {
-            var driveHelper = new DriveHelper();
+            var driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
 
             driveHelper.TurboModeOn = true;
 

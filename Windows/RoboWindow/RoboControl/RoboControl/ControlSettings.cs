@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Settings.cs" company="Dzakhov's jag">
+// <copyright file="ControlSettings.cs" company="Dzakhov's jag">
 //   Copyright © Dmitry Dzakhov 2011
 // </copyright>
 // <summary>
-//   Класс, хранящий настройки приложения.
+//   Класс, хранящий настройки приложения для управления роботом.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -22,226 +22,203 @@ namespace RoboControl
     /// <remarks>
     /// Класс должен взаимодействовать с файлом конфигурации приложения (пока не сделано).
     /// </remarks>
-    public static class Settings
+    public class ControlSettings
     {
         /// <summary>
-        /// Initializes static members of the Settings class.
+        /// Initializes a new instance of the ControlSettings class.
         /// </summary>
-        static Settings()
+        public ControlSettings()
         {
-            SinAlphaBound = 0.06;
+            this.SinAlphaBound = 0.06;
 
-            HorizontalMinimumDegree = 0;
-            HorizontalForwardDegree = 90;
-            HorizontalMaximumDegree = 180;
+            this.HorizontalMinimumDegree = 0;
+            this.HorizontalForwardDegree = 90;
+            this.HorizontalMaximumDegree = 180;
 
-            VerticalMinimumDegree1 = 0;
-            VerticalForwardDegree1 = 30;
-            VerticalMaximumDegree1 = 60;
+            this.VerticalMinimumDegree1 = 0;
+            this.VerticalForwardDegree1 = 30;
+            this.VerticalMaximumDegree1 = 60;
 
-            VerticalMinimumDegree2 = 0;
-            VerticalForwardDegree2 = 45;
-            VerticalMaximumDegree2 = 90;
+            this.VerticalMinimumDegree2 = 0;
+            this.VerticalForwardDegree2 = 45;
+            this.VerticalMaximumDegree2 = 90;
 
-            VerticalMinimumDegree = VerticalMinimumDegree1;
-            VerticalForwardDegree = VerticalForwardDegree1;
-            VerticalMaximumDegree = VerticalMaximumDegree1;
+            this.VerticalMinimumDegree = this.VerticalMinimumDegree1;
+            this.VerticalForwardDegree = this.VerticalForwardDegree1;
+            this.VerticalMaximumDegree = this.VerticalMaximumDegree1;
 
-            VerticalReadyToPlayDegree = 50;
+            this.VerticalReadyToPlayDegree = 50;
 
-            HorizontalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
-            HorizontalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
-            VerticalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
-            VerticalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
+            this.HorizontalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
+            this.HorizontalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
+            this.VerticalHighSpeed = 180f / 1000f; // 180 градусов за 1 секунду
+            this.VerticalLowSpeed = 180f / 5000f; // 180 градусов за 5 секунд
 
-            ReverseHeadTangage = Properties.Settings.Default.ReverseHeadTangage;
+            this.MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
 
-            MinCommandInterval = new TimeSpan(0, 0, 0, 0, 20);
+            this.GunChargeTime = new TimeSpan(0, 0, 5);
 
-            RoboHeadAddress = IPAddress.Parse(Properties.Settings.Default.RoboHeadAddress);
-
-            IpWebcamPort = Properties.Settings.Default.IpWebcamPort;
-
-            MessagePort = Properties.Settings.Default.MessagePort;
-
-            DriveModeNormalMaxSpeed = Properties.Settings.Default.DriveModeNormalMaxSpeed;
-            DriveModeTurboMaxSpeed = Properties.Settings.Default.DriveModeTurboMaxSpeed;
-
-            GunChargeTime = new TimeSpan(0, 0, 5);
-
-            SingleMessageRepetitionsCount = 3;
-
-            Speed1 = Properties.Settings.Default.Speed1;
-            Speed2 = Properties.Settings.Default.Speed2;
-            Speed3 = Properties.Settings.Default.Speed3;
-            Speed4 = Properties.Settings.Default.Speed4;
-            Speed5 = Properties.Settings.Default.Speed5;
+            // Значения по умолчанию для параметров, переопределяемых в конфигурационном файле:
+            this.ReverseHeadTangage = false;
+            this.IpWebcamPort = 8080;
+            this.DriveModeNormalMaxSpeed = 255;
+            this.DriveModeTurboMaxSpeed = 255;
+            this.Speed1 = 51;
+            this.Speed2 = 102;
+            this.Speed3 = 153;
+            this.Speed4 = 204;
+            this.Speed5 = 255;
         }
 
         /// <summary>
         /// Gets Граница для "малых" углов. Углы, синус которых превышает заданную веричину не считаются "малыми".
         /// Используется вместе с признаком режима разворота для разворота робота на месте.
         /// </summary>
-        public static double SinAlphaBound { get; private set; }
+        public double SinAlphaBound { get; private set; }
 
         /// <summary>
         /// Gets Минимальный угол поворота сервопривода, управляющего горизонтальным поворотом головы.
         /// </summary>
-        public static int HorizontalMinimumDegree { get; private set; }
+        public int HorizontalMinimumDegree { get; private set; }
 
         /// <summary>
         /// Gets Угол поворота сервопривода, управляющего горизонтальным поворотом головы, соответствующий центральной позиции.
         /// </summary>
-        public static int HorizontalForwardDegree { get; private set; }
+        public int HorizontalForwardDegree { get; private set; }
         
         /// <summary>
         /// Gets Максимальный угол поворота сервопривода, управляющего горизонтальным поворотом головы.
         /// </summary>
-        public static int HorizontalMaximumDegree { get; private set; }
+        public int HorizontalMaximumDegree { get; private set; }
 
         /// <summary>
         /// Gets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (обычный режим).
         /// </summary>        
-        public static int VerticalMinimumDegree1 { get; private set; }
+        public int VerticalMinimumDegree1 { get; private set; }
 
         /// <summary>
         /// Gets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
         /// центральной позиции (обычный режим).
         /// </summary>
-        public static int VerticalForwardDegree1 { get; private set; }
+        public int VerticalForwardDegree1 { get; private set; }
 
         /// <summary>
         /// Gets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (обычный режим).
         /// </summary>
-        public static int VerticalMaximumDegree1 { get; private set; }
+        public int VerticalMaximumDegree1 { get; private set; }
 
         /// <summary>
         /// Gets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
         /// </summary>        
-        public static int VerticalMinimumDegree2 { get; private set; }
+        public int VerticalMinimumDegree2 { get; private set; }
 
         /// <summary>
         /// Gets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
         /// центральной позиции (прогулочный режим).
         /// </summary>
-        public static int VerticalForwardDegree2 { get; private set; }
+        public int VerticalForwardDegree2 { get; private set; }
 
         /// <summary>
         /// Gets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
         /// </summary>
-        public static int VerticalMaximumDegree2 { get; private set; }
+        public int VerticalMaximumDegree2 { get; private set; }
 
         /// <summary>
         /// Gets or sets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (текущий режим).
         /// </summary>        
-        public static int VerticalMinimumDegree { get; set; }
+        public int VerticalMinimumDegree { get; set; }
         
         /// <summary>
         /// Gets or sets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
         /// центральной позиции (текущий режим).
         /// </summary>
-        public static int VerticalForwardDegree { get; set; }
+        public int VerticalForwardDegree { get; set; }
         
         /// <summary>
         /// Gets or sets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (текущий режим).
         /// </summary>
-        public static int VerticalMaximumDegree { get; set; }
+        public int VerticalMaximumDegree { get; set; }
 
         /// <summary>
         /// Gets Угол поворота сервопривода, управляющего вертикальным поворотом головы для игры.
         /// </summary>
-        public static int VerticalReadyToPlayDegree { get; private set; }
+        public int VerticalReadyToPlayDegree { get; private set; }
 
         /// <summary>
         /// Gets Значение, соответствующее высокой скорости горизонтального поворота головы.
         /// </summary>
-        public static float HorizontalHighSpeed { get; private set; }
+        public float HorizontalHighSpeed { get; private set; }
 
         /// <summary>
         /// Gets Значение, соответствующее низкой скорости горизонтального поворота головы.
         /// </summary>
-        public static float HorizontalLowSpeed { get; private set; }
+        public float HorizontalLowSpeed { get; private set; }
 
         /// <summary>
         /// Gets Значение, соответствующее высокой скорости вертикального поворота головы.
         /// </summary>
-        public static float VerticalHighSpeed { get; private set; }
+        public float VerticalHighSpeed { get; private set; }
 
         /// <summary>
         /// Gets Значение, соответствующее низкой скорости вертикального поворота головы.
         /// </summary>
-        public static float VerticalLowSpeed { get; private set; }
+        public float VerticalLowSpeed { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether управление движением головы по Y-координате перевёрнуто.
+        /// Gets or sets a value indicating whether управление движением головы по Y-координате перевёрнуто.
         /// </summary>
-        public static bool ReverseHeadTangage { get; private set; }
+        public bool ReverseHeadTangage { get; set; }
 
         /// <summary>
         /// Gets Период опроса джойстика движения и нефиксированного поворота головы.
         /// </summary>
-        public static TimeSpan MinCommandInterval { get; private set; }
+        public TimeSpan MinCommandInterval { get; private set; }
 
         /// <summary>
-        /// Gets Адрес головы робота.
+        /// Gets or sets Порт для связи с IP Webcam.
         /// </summary>
-        public static IPAddress RoboHeadAddress { get; private set; }
-
-        /// <summary>
-        /// Gets Порт для связи с IP Webcam.
-        /// </summary>
-        public static int IpWebcamPort { get; private set; }
-
-        /// <summary>
-        /// Gets Порт для передачи команд голове робота.
-        /// </summary>
-        public static int MessagePort { get; private set; }
+        public int IpWebcamPort { get; set; }
 
         /// <summary>
         /// Gets or sets Определяет скорость в нормальном (не турбо) режиме движения. 
         /// Окончательная скорость определяется умножением на коэффициент, равный DriveModeNormalMaxSpeed / 255.
         /// </summary>
-        public static byte DriveModeNormalMaxSpeed { get; set; }
+        public byte DriveModeNormalMaxSpeed { get; set; }
 
         /// <summary>
         /// Gets or sets Определяет скорость в турбо-режиме движения. 
         /// Окончательная скорость определяется умножением на коэффициент, равный DriveModeTurboMaxSpeed / 255.
         /// </summary>
-        public static byte DriveModeTurboMaxSpeed { get; set; }
+        public byte DriveModeTurboMaxSpeed { get; set; }
 
         /// <summary>
         /// Gets Время "заряда" пушки - минимальный временной интервал между выстрелами.
         /// </summary>
-        public static TimeSpan GunChargeTime { get; private set; }
+        public TimeSpan GunChargeTime { get; private set; }
 
         /// <summary>
-        /// Gets Количество повторений для одиночных команд. Например, когда по UDP передаётся команда включить фары, она дублируется несколько раз. Для автоматически повторяющихся команд, это не делается.
+        /// Gets or sets 1-ая скорость при управлении от клавиатуры.
         /// </summary>
-        public static byte SingleMessageRepetitionsCount { get; private set; }
+        public byte Speed1 { get; set; }
 
         /// <summary>
-        /// Gets 1-ая скорость при управлении от клавиатуры.
+        /// Gets or sets 2-ая скорость при управлении от клавиатуры.
         /// </summary>
-        public static byte Speed1 { get; private set; }
+        public byte Speed2 { get; set; }
 
         /// <summary>
-        /// Gets 2-ая скорость при управлении от клавиатуры.
+        /// Gets or sets 3-ья скорость при управлении от клавиатуры.
         /// </summary>
-        public static byte Speed2 { get; private set; }
+        public byte Speed3 { get; set; }
 
         /// <summary>
-        /// Gets 3-ья скорость при управлении от клавиатуры.
+        /// Gets or sets 4-ая скорость при управлении от клавиатуры.
         /// </summary>
-        public static byte Speed3 { get; private set; }
+        public byte Speed4 { get; set; }
 
         /// <summary>
-        /// Gets 4-ая скорость при управлении от клавиатуры.
+        /// Gets or sets 5-ая скорость при управлении от клавиатуры.
         /// </summary>
-        public static byte Speed4 { get; private set; }
-
-        /// <summary>
-        /// Gets 5-ая скорость при управлении от клавиатуры.
-        /// </summary>
-        public static byte Speed5 { get; private set; }
+        public byte Speed5 { get; set; }
     }
 }

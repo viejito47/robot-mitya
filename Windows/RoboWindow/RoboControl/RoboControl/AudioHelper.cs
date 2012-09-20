@@ -15,6 +15,7 @@ namespace RoboControl
     using System.Text;
 
     using AXVLC;
+    using RoboCommon;
 
     /// <summary>
     /// Класс для приёма и воспроизведения звука.
@@ -32,6 +33,41 @@ namespace RoboControl
         private AXVLC.VLCPlugin2 audio = new AXVLC.VLCPlugin2Class();
 
         /// <summary>
+        /// Опции соединения с роботом.
+        /// </summary>
+        private ConnectSettings connectSettings;
+
+        /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
+
+        /// <summary>
+        /// Initializes a new instance of the AudioHelper class.
+        /// </summary>
+        /// <param name="connectSettings">
+        /// Опции соединения с роботом.
+        /// </param>
+        /// <param name="controlSettings">
+        /// Опции управления роботом.
+        /// </param>
+        public AudioHelper(ConnectSettings connectSettings, ControlSettings controlSettings)
+        {
+            if (connectSettings == null)
+            {
+                throw new ArgumentNullException("connectSettings");
+            }
+
+            if (controlSettings == null)
+            {
+                throw new ArgumentNullException("controlSettings");
+            }
+
+            this.connectSettings = connectSettings;
+            this.controlSettings = controlSettings;
+        }
+
+        /// <summary>
         /// Инициализация аудиотрансляции.
         /// </summary>
         public void InitializeAudio()
@@ -45,8 +81,8 @@ namespace RoboControl
             this.audio.playlist.add(
                 String.Format(
                     @"http://{0}:{1}/audio.wav",
-                    Settings.RoboHeadAddress,
-                    Settings.IpWebcamPort),
+                    this.connectSettings.RoboHeadAddress,
+                    this.controlSettings.IpWebcamPort),
                 null,
                 options);
             this.audio.playlist.playItem(0);

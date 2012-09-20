@@ -22,6 +22,8 @@ namespace RoboControl
     using Microsoft.Xna.Framework.Input;
     using Microsoft.Xna.Framework.Media;
 
+    using RoboCommon;
+
     /// <summary>
     /// Состояние приложения: главное меню или управление роботом.
     /// </summary>
@@ -130,44 +132,54 @@ namespace RoboControl
         private static Vector2 debugStringPosition8 = new Vector2(20, debugStringPosition7.Y + debugStringInterval);
 
         /// <summary>
+        /// Опции соединения с роботом.
+        /// </summary>
+        private ConnectSettings connectSettings;
+
+        /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
+
+        /// <summary>
         /// Объект для взаимодействия с роботом.
         /// </summary>
-        private RobotHelper robotHelper = new RobotHelper();
+        private RobotHelper robotHelper;
 
         /// <summary>
         /// Объект для работы с фарами робота.
         /// </summary>
-        private FlashlightHelper flashlightHelper = new FlashlightHelper();
+        private FlashlightHelper flashlightHelper;
 
         /// <summary>
         /// Объект для работы с ходовыми двигателями робота.
         /// </summary>
-        private DriveHelper driveHelper = new DriveHelper();
+        private DriveHelper driveHelper;
 
         /// <summary>
         /// Объект для работы с сервоприводами головы робота.
         /// </summary>
-        private LookHelper lookHelper = new LookHelper();
+        private LookHelper lookHelper;
 
         /// <summary>
         /// Объект для установки эмоций робота.
         /// </summary>
-        private MoodHelper moodHelper = new MoodHelper();
+        private MoodHelper moodHelper;
 
         /// <summary>
         /// Объект для работы с ИК-пушкой робота.
         /// </summary>
-        private GunHelper gunHelper = new GunHelper();
+        private GunHelper gunHelper;
 
         /// <summary>
         /// Объект для приёма и воспроизведения видеопотока.
         /// </summary>
-        private VideoHelper videoHelper = new VideoHelper();
+        private VideoHelper videoHelper;
 
         /// <summary>
         /// Объект для приёма и воспроизведения аудиопотока.
         /// </summary>
-        private AudioHelper audioHelper = new AudioHelper();
+        private AudioHelper audioHelper;
 
         /// <summary>
         /// Менеджер графического устройства.
@@ -226,6 +238,23 @@ namespace RoboControl
             // this.graphics.IsFullScreen = true;
             // this.IsMouseVisible = false;
             Content.RootDirectory = "Content";
+
+            this.controlSettings = new ControlSettings();
+            this.LoadControlSettingsFromFile();
+
+            this.connectSettings = new ConnectSettings(
+                Properties.Settings.Default.RoboHeadAddress,
+                Properties.Settings.Default.MessagePort);
+            this.connectSettings.SingleMessageRepetitionsCount = Properties.Settings.Default.SingleMessageRepetitionsCount;
+
+            this.robotHelper = new RobotHelper(this.connectSettings);
+            this.flashlightHelper = new FlashlightHelper(this.robotHelper);
+            this.driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
+            this.lookHelper = new LookHelper(this.robotHelper, this.controlSettings);
+            this.moodHelper = new MoodHelper(this.robotHelper, this.controlSettings);
+            this.gunHelper = new GunHelper(this.robotHelper, this.controlSettings);
+            this.videoHelper = new VideoHelper(this.connectSettings, this.controlSettings);
+            this.audioHelper = new AudioHelper(this.connectSettings, this.controlSettings);
         }
 
         /// <summary>
@@ -242,11 +271,6 @@ namespace RoboControl
 
             this.previousGamePadState = GamePad.GetState(PlayerIndex.One);
             this.previousKeyboardState = Keyboard.GetState(PlayerIndex.One);
-            this.flashlightHelper.Initialize(this.robotHelper);
-            this.driveHelper.Initialize(this.robotHelper);
-            this.lookHelper.Initialize(this.robotHelper);
-            this.moodHelper.Initialize(this.robotHelper);
-            this.gunHelper.Initialize(this.robotHelper);
         }
 
         /// <summary>
@@ -556,32 +580,32 @@ namespace RoboControl
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && shiftIsNotPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = Settings.Speed1;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed1;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && shiftIsNotPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = Settings.Speed2;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed2;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && shiftIsNotPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = Settings.Speed3;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed3;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && shiftIsNotPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = Settings.Speed4;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed4;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && shiftIsNotPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = Settings.Speed5;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed5;
             }
 
             DateTime nowTime = DateTime.Now;
             TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
-            if (timePassed >= Settings.MinCommandInterval)
+            if (timePassed >= this.controlSettings.MinCommandInterval)
             {
                 this.driveHelper.Drive(
                     this.IsKeyPressed(keyboardState, Keys.W), 
@@ -682,7 +706,7 @@ namespace RoboControl
             {
                 DateTime nowTime = DateTime.Now;
                 TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
-                if (timePassed >= Settings.MinCommandInterval)
+                if (timePassed >= this.controlSettings.MinCommandInterval)
                 {
                     this.driveHelper.RotationModeOn = gamePadState.Buttons.LeftShoulder == ButtonState.Pressed;
                     this.driveHelper.Drive(gamePadState.ThumbSticks.Left.X, gamePadState.ThumbSticks.Left.Y);
@@ -852,6 +876,22 @@ namespace RoboControl
         private bool IsShiftPressed(KeyboardState keyboardState)
         {
             return this.IsKeyPressed(keyboardState, Keys.LeftShift) || this.IsKeyPressed(keyboardState, Keys.RightShift);
+        }
+
+        /// <summary>
+        /// Чтение епций приложения из файла конфигурации.
+        /// </summary>
+        private void LoadControlSettingsFromFile()
+        {
+            this.controlSettings.ReverseHeadTangage = Properties.Settings.Default.ReverseHeadTangage;
+            this.controlSettings.IpWebcamPort = Properties.Settings.Default.IpWebcamPort;
+            this.controlSettings.DriveModeNormalMaxSpeed = Properties.Settings.Default.DriveModeNormalMaxSpeed;
+            this.controlSettings.DriveModeTurboMaxSpeed = Properties.Settings.Default.DriveModeTurboMaxSpeed;
+            this.controlSettings.Speed1 = Properties.Settings.Default.Speed1;
+            this.controlSettings.Speed2 = Properties.Settings.Default.Speed2;
+            this.controlSettings.Speed3 = Properties.Settings.Default.Speed3;
+            this.controlSettings.Speed4 = Properties.Settings.Default.Speed4;
+            this.controlSettings.Speed5 = Properties.Settings.Default.Speed5;
         }
     }
 }

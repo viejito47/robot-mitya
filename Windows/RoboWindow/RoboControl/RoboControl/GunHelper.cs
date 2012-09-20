@@ -13,7 +13,10 @@ namespace RoboControl
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+
     using Microsoft.Xna.Framework;
+
+    using RoboCommon;
 
     /// <summary>
     /// Вспомогательный класс, предназначенный для организации работы с пушкой робота.
@@ -24,19 +27,40 @@ namespace RoboControl
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
         private RobotHelper robotHelper;
-        
+
+        /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
+
         /// <summary>
         /// Время начала зарядки пушки.
         /// </summary>
         private DateTime? chargeStartTime;
 
         /// <summary>
-        /// Инициализация экземпляра класса для взаимодействия с роботом.
+        /// Initializes a new instance of the GunHelper class.
         /// </summary>
-        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
-        public void Initialize(RobotHelper robotHelper)
+        /// <param name="robotHelper">
+        /// Объект для взаимодействия с головой робота.
+        /// </param>
+        /// <param name="controlSettings">
+        /// Опции управления роботом.
+        /// </param>
+        public GunHelper(RobotHelper robotHelper, ControlSettings controlSettings)
         {
+            if (robotHelper == null)
+            {
+                throw new ArgumentNullException("robotHelper");
+            }
+
+            if (controlSettings == null)
+            {
+                throw new ArgumentNullException("controlSettings");
+            }
+
             this.robotHelper = robotHelper;
+            this.controlSettings = controlSettings;
         }
 
         /// <summary>
@@ -52,7 +76,7 @@ namespace RoboControl
                 return 100;
             }
 
-            double chargePercent = (DateTime.Now - (DateTime)this.chargeStartTime).TotalMilliseconds / Settings.GunChargeTime.TotalMilliseconds * 100;
+            double chargePercent = (DateTime.Now - (DateTime)this.chargeStartTime).TotalMilliseconds / this.controlSettings.GunChargeTime.TotalMilliseconds * 100;
             byte result = chargePercent > 100 ? Convert.ToByte(100) : Convert.ToByte(chargePercent);
             return result;
         }
@@ -62,8 +86,6 @@ namespace RoboControl
         /// </summary>
         public void Fire()
         {
-            this.CheckRobotHelper();
-
             if (this.GetChargePercent() < 100)
             {
                 return;
@@ -74,14 +96,14 @@ namespace RoboControl
             // Сброс нужен из-за алгоритма приёма сообщений в голове робота. Там есть хэш-таблица команд роботу,
             // и одинаковые команды с повторяющимися значениями игнорируются. Поэтому чтобы выстрел обрабатывался
             // в следующий раз, значение "0001" для команды "h" надо сменить на "0000" в этой хэш-таблице.
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
                 this.robotHelper.SendMessageToRobot("f0001");
                 this.robotHelper.SendMessageToRobot("f0001");
                 this.robotHelper.SendMessageToRobot("f0001");
             }
 
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
                 this.robotHelper.SendMessageToRobot("f0000");
                 this.robotHelper.SendMessageToRobot("f0000");
@@ -89,17 +111,6 @@ namespace RoboControl
             }
             
             this.chargeStartTime = DateTime.Now;
-        }
-
-        /// <summary>
-        /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
-        /// </summary>
-        private void CheckRobotHelper()
-        {
-            if (this.robotHelper == null)
-            {
-                throw new NullReferenceException("GunHelper не инициализирован.");
-            }
         }
     }
 }
