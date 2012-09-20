@@ -14,6 +14,8 @@ namespace RoboControl
     using System.Linq;
     using System.Text;
 
+    using RoboCommon;
+
     /// <summary>
     /// Настроения робота.
     /// </summary>
@@ -56,9 +58,39 @@ namespace RoboControl
         private RobotHelper robotHelper;
 
         /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
+
+        /// <summary>
         /// Текущее настроение робота.
         /// </summary>
         private Mood mood = Mood.Normal;
+
+        /// <summary>
+        /// Initializes a new instance of the MoodHelper class.
+        /// </summary>
+        /// <param name="robotHelper">
+        /// Объект для взаимодействия с головой робота.
+        /// </param>
+        /// <param name="controlSettings">
+        /// Опции управления роботом.
+        /// </param>
+        public MoodHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        {
+            if (robotHelper == null)
+            {
+                throw new ArgumentNullException("robotHelper");
+            }
+
+            if (controlSettings == null)
+            {
+                throw new ArgumentNullException("controlSettings");
+            }
+
+            this.robotHelper = robotHelper;
+            this.controlSettings = controlSettings;
+        }
 
         /// <summary>
         /// Gets Текущее настроение робота.
@@ -130,7 +162,7 @@ namespace RoboControl
             this.robotHelper.SendNonrecurrentMessageToRobot("F0102", "F0000");
             this.mood = Mood.Normal;
 
-            lookHelper.FixedLook(lookHelper.FixedLookX, Settings.VerticalReadyToPlayDegree);
+            lookHelper.FixedLook(lookHelper.FixedLookX, this.controlSettings.VerticalReadyToPlayDegree);
         }
 
         /// <summary>
@@ -144,7 +176,7 @@ namespace RoboControl
             this.robotHelper.SendNonrecurrentMessageToRobot("F0103", "F0000");
             this.mood = Mood.Blue;
 
-            lookHelper.FixedLook(lookHelper.FixedLookX, Settings.VerticalMinimumDegree);
+            lookHelper.FixedLook(lookHelper.FixedLookX, this.controlSettings.VerticalMinimumDegree);
         }
 
         /// <summary>

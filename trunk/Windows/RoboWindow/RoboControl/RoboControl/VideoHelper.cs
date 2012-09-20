@@ -17,6 +17,7 @@ namespace RoboControl
     using Microsoft.Xna.Framework.Graphics;
 
     using MjpegProcessor;
+    using RoboCommon;
 
     /// <summary>
     /// Класс для приёма и воспроизведения видео.
@@ -33,6 +34,41 @@ namespace RoboControl
         private MjpegDecoder mjpeg = new MjpegDecoder();
 
         /// <summary>
+        /// Опции соединения с роботом.
+        /// </summary>
+        private ConnectSettings connectSettings;
+
+        /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
+
+        /// <summary>
+        /// Initializes a new instance of the VideoHelper class.
+        /// </summary>
+        /// <param name="connectSettings">
+        /// Опции соединения с роботом.
+        /// </param>
+        /// <param name="controlSettings">
+        /// Опции управления роботом.
+        /// </param>
+        public VideoHelper(ConnectSettings connectSettings, ControlSettings controlSettings)
+        {
+            if (connectSettings == null)
+            {
+                throw new ArgumentNullException("connectSettings");
+            }
+
+            if (controlSettings == null)
+            {
+                throw new ArgumentNullException("controlSettings");
+            }
+
+            this.connectSettings = connectSettings;
+            this.controlSettings = controlSettings;
+        }
+
+        /// <summary>
         /// Инициализация видеотрансляции.
         /// </summary>
         public void InitializeVideo()
@@ -41,8 +77,8 @@ namespace RoboControl
             this.mjpeg.StopStream();
             this.mjpeg.ParseStream(new Uri(String.Format(
                 @"http://{0}:{1}/videofeed",
-                Settings.RoboHeadAddress,
-                Settings.IpWebcamPort)));
+                this.connectSettings.RoboHeadAddress,
+                this.controlSettings.IpWebcamPort)));
         }
 
         /// <summary>

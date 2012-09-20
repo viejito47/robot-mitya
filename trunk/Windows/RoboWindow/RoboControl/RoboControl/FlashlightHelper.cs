@@ -14,6 +14,8 @@ namespace RoboControl
     using System.Linq;
     using System.Text;
 
+    using RoboCommon;
+
     /// <summary>
     /// Вспомогательный класс, предназначенный для организации работы с фонарём робота.
     /// </summary>
@@ -23,7 +25,7 @@ namespace RoboControl
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
         private RobotHelper robotHelper;
-        
+
         /// <summary>
         /// Признак включённости фонаря.
         /// </summary>
@@ -33,6 +35,22 @@ namespace RoboControl
         /// Последняя команда управления фонарём, переданная роботу.
         /// </summary>
         private string flashlightCommand = string.Empty;
+
+        /// <summary>
+        /// Initializes a new instance of the FlashlightHelper class.
+        /// </summary>
+        /// <param name="robotHelper">
+        /// Класс для взаимодействия с головой робота.
+        /// </param>
+        public FlashlightHelper(RobotHelper robotHelper)
+        {
+            if (robotHelper == null)
+            {
+                throw new ArgumentNullException("robotHelper");
+            }
+
+            this.robotHelper = robotHelper;
+        }
 
         /// <summary>
         /// Gets a value indicating whether Состояние фар робота.
@@ -74,7 +92,7 @@ namespace RoboControl
             this.GenerateFlashlightTurnOnCommand();
             this.flashlightTurnedOn = true;
 
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
                 this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
                 this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
@@ -91,7 +109,7 @@ namespace RoboControl
             this.GenerateFlashlightTurnOffCommand();
             this.flashlightTurnedOn = false;
 
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
                 this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
                 this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
@@ -108,7 +126,7 @@ namespace RoboControl
             this.GenerateSwitchFlashlightCommand();
             this.flashlightTurnedOn = !this.flashlightTurnedOn;
 
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
                 this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
                 this.robotHelper.SendMessageToRobot(this.FlashlightCommand);

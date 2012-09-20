@@ -77,6 +77,10 @@
     <Compile Include="Runner.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RoboCommon\RoboCommon.csproj">
+      <Project>{79D8EC26-C49B-4C6B-BB85-BB3D4F89A881}</Project>
+      <Name>RoboCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RoboControl\RoboControl\RoboControl.csproj">
       <Project>{71C60388-011C-4E62-B8DB-5E3BE046330D}</Project>
       <Name>RoboControl</Name>

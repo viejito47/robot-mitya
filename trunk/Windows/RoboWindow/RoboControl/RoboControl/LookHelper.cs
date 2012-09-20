@@ -15,6 +15,8 @@ namespace RoboControl
     using System.Text;
     using Microsoft.Xna.Framework;
 
+    using RoboCommon;
+
     /// <summary>
     /// Вспомогательный класс, предназначенный для управления поворотами головы робота.
     /// </summary>
@@ -24,6 +26,11 @@ namespace RoboControl
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
         private RobotHelper robotHelper;
+
+        /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
 
         /// <summary>
         /// Признак медленного поворота головы.
@@ -56,12 +63,12 @@ namespace RoboControl
         /// <summary>
         /// Последняя обработанная x-координата (горизонтальная) ThumbStick-джойстика для режима обзора с фиксацией.
         /// </summary>
-        private float fixedLookX = Settings.HorizontalForwardDegree;
+        private float fixedLookX;
 
         /// <summary>
         /// Последняя обработанная y-координата (вертикальная) ThumbStick-джойстика для режима обзора с фиксацией.
         /// </summary>
-        private float fixedLookY = Settings.VerticalForwardDegree;
+        private float fixedLookY;
 
         /// <summary>
         /// Последняя отправленная "горизонтальному" сервоприводу команда.
@@ -72,6 +79,34 @@ namespace RoboControl
         /// Последняя отправленная "вертикальному" сервоприводу команда.
         /// </summary>
         private string verticalServoCommand = string.Empty;
+
+        /// <summary>
+        /// Initializes a new instance of the LookHelper class.
+        /// </summary>
+        /// <param name="robotHelper">
+        /// Объект для взаимодействия с головой робота.
+        /// </param>
+        /// <param name="controlSettings">
+        /// Опции управления роботом.
+        /// </param>
+        public LookHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        {
+            if (robotHelper == null)
+            {
+                throw new ArgumentNullException("robotHelper");
+            }
+
+            if (controlSettings == null)
+            {
+                throw new ArgumentNullException("controlSettings");
+            }
+
+            this.robotHelper = robotHelper;
+            this.controlSettings = controlSettings;
+
+            this.fixedLookX = this.controlSettings.HorizontalForwardDegree;
+            this.fixedLookY = this.controlSettings.VerticalForwardDegree;
+        }
 
         /// <summary>
         /// Gets Последняя команда, переданная "горизонтальному" сервоприводу.
@@ -124,22 +159,22 @@ namespace RoboControl
         {
             get
             {
-                return Settings.VerticalForwardDegree == Settings.VerticalForwardDegree1;
+                return this.controlSettings.VerticalForwardDegree == this.controlSettings.VerticalForwardDegree1;
             }
 
             set
             {
                 if (value)
                 {
-                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree1;
-                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree1;
-                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree1;
+                    this.controlSettings.VerticalMinimumDegree = this.controlSettings.VerticalMinimumDegree1;
+                    this.controlSettings.VerticalForwardDegree = this.controlSettings.VerticalForwardDegree1;
+                    this.controlSettings.VerticalMaximumDegree = this.controlSettings.VerticalMaximumDegree1;
                 }
                 else
                 {
-                    Settings.VerticalMinimumDegree = Settings.VerticalMinimumDegree2;
-                    Settings.VerticalForwardDegree = Settings.VerticalForwardDegree2;
-                    Settings.VerticalMaximumDegree = Settings.VerticalMaximumDegree2;
+                    this.controlSettings.VerticalMinimumDegree = this.controlSettings.VerticalMinimumDegree2;
+                    this.controlSettings.VerticalForwardDegree = this.controlSettings.VerticalForwardDegree2;
+                    this.controlSettings.VerticalMaximumDegree = this.controlSettings.VerticalMaximumDegree2;
                 }
             }
         }
@@ -233,7 +268,7 @@ namespace RoboControl
         {
             this.CheckRobotHelper();
 
-            if (!Settings.ReverseHeadTangage)
+            if (!this.controlSettings.ReverseHeadTangage)
             {
                 y = -y;
             }
@@ -245,13 +280,13 @@ namespace RoboControl
                 if (this.horizontalFixedControl)
                 {
                     this.horizontalFixedControl = false;
-                    this.fixedLookX = Settings.HorizontalForwardDegree;
+                    this.fixedLookX = this.controlSettings.HorizontalForwardDegree;
                 }
 
                 if (this.verticalFixedControl)
                 {
                     this.verticalFixedControl = false;
-                    this.fixedLookY = Settings.VerticalForwardDegree;
+                    this.fixedLookY = this.controlSettings.VerticalForwardDegree;
                 }
             }
 
@@ -299,8 +334,8 @@ namespace RoboControl
         {
             this.CheckRobotHelper();
 
-            this.fixedLookX = Settings.HorizontalForwardDegree;
-            this.fixedLookY = Settings.VerticalForwardDegree;
+            this.fixedLookX = this.controlSettings.HorizontalForwardDegree;
+            this.fixedLookY = this.controlSettings.VerticalForwardDegree;
             this.lookX = 0;
             this.lookY = 0;
             
@@ -374,7 +409,7 @@ namespace RoboControl
                 this.lookY = 0;
             }
 
-            if (Settings.ReverseHeadTangage)
+            if (this.controlSettings.ReverseHeadTangage)
             {
                 this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
             }
@@ -405,7 +440,7 @@ namespace RoboControl
                 this.lookY = 0;
             }
 
-            if (Settings.ReverseHeadTangage)
+            if (this.controlSettings.ReverseHeadTangage)
             {
                 this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
             }
@@ -484,7 +519,7 @@ namespace RoboControl
         /// </param>
         private void GenerateHorizontalServoCommand(float x, out string horizontalServoCommand)
         {
-            double degree = ((1 - x) * ((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) / 2)) + Settings.HorizontalMinimumDegree;
+            double degree = ((1 - x) * ((this.controlSettings.HorizontalMaximumDegree - this.controlSettings.HorizontalMinimumDegree) / 2)) + this.controlSettings.HorizontalMinimumDegree;
             this.GenerateHorizontalServoCommandByDegree(Convert.ToInt32(degree), out horizontalServoCommand);
         }
 
@@ -513,8 +548,8 @@ namespace RoboControl
         /// </param>
         private void GenerateVerticalServoCommand(float y, out string verticalServoCommand)
         {
-            double degree = ((y + 1) * ((Settings.VerticalMaximumDegree - Settings.VerticalMinimumDegree) / 2)) + Settings.VerticalMinimumDegree;
-            degree = Settings.VerticalMinimumDegree + Settings.VerticalMaximumDegree - degree; // Удобнее, когда если джойстик от себя, робот смотрит вниз (увеличение "y" должно уменьшать угол.
+            double degree = ((y + 1) * ((this.controlSettings.VerticalMaximumDegree - this.controlSettings.VerticalMinimumDegree) / 2)) + this.controlSettings.VerticalMinimumDegree;
+            degree = this.controlSettings.VerticalMinimumDegree + this.controlSettings.VerticalMaximumDegree - degree; // Удобнее, когда если джойстик от себя, робот смотрит вниз (увеличение "y" должно уменьшать угол.
             this.GenerateVerticalServoCommandByDegree(Convert.ToInt32(degree), out verticalServoCommand);
         }
 
@@ -538,8 +573,8 @@ namespace RoboControl
         /// <param name="verticalServoCommand">Выходной параметр. Сформированная команда вертикального поворота головы.</param>
         private void GenerateLookForwardServoCommand(out string horizontalServoCommand, out string verticalServoCommand)
         {
-            this.GenerateHorizontalServoCommandByDegree(Settings.HorizontalForwardDegree, out horizontalServoCommand);
-            this.GenerateVerticalServoCommandByDegree(Settings.VerticalForwardDegree, out verticalServoCommand);
+            this.GenerateHorizontalServoCommandByDegree(this.controlSettings.HorizontalForwardDegree, out horizontalServoCommand);
+            this.GenerateVerticalServoCommandByDegree(this.controlSettings.VerticalForwardDegree, out verticalServoCommand);
         }
 
         /// <summary>
@@ -549,9 +584,9 @@ namespace RoboControl
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void DecrementHorizontalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.fastModeOn ? Settings.HorizontalHighSpeed : Settings.HorizontalLowSpeed;
+            float speed = this.fastModeOn ? this.controlSettings.HorizontalHighSpeed : this.controlSettings.HorizontalLowSpeed;
             degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree < Settings.HorizontalMinimumDegree) ? Settings.HorizontalMinimumDegree : degree;
+            degree = (degree < this.controlSettings.HorizontalMinimumDegree) ? this.controlSettings.HorizontalMinimumDegree : degree;
         }
 
         /// <summary>
@@ -561,9 +596,9 @@ namespace RoboControl
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void IncrementHorizontalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.fastModeOn ? Settings.HorizontalHighSpeed : Settings.HorizontalLowSpeed;
+            float speed = this.fastModeOn ? this.controlSettings.HorizontalHighSpeed : this.controlSettings.HorizontalLowSpeed;
             degree += gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree > Settings.HorizontalMaximumDegree) ? Settings.HorizontalMaximumDegree : degree;
+            degree = (degree > this.controlSettings.HorizontalMaximumDegree) ? this.controlSettings.HorizontalMaximumDegree : degree;
         }
 
         /// <summary>
@@ -573,9 +608,9 @@ namespace RoboControl
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void DecrementVerticalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.fastModeOn ? Settings.VerticalHighSpeed : Settings.VerticalLowSpeed;
+            float speed = this.fastModeOn ? this.controlSettings.VerticalHighSpeed : this.controlSettings.VerticalLowSpeed;
             degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree < Settings.VerticalMinimumDegree) ? Settings.VerticalMinimumDegree : degree;
+            degree = (degree < this.controlSettings.VerticalMinimumDegree) ? this.controlSettings.VerticalMinimumDegree : degree;
         }
 
         /// <summary>
@@ -585,9 +620,9 @@ namespace RoboControl
         /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
         private void IncrementVerticalDegree(ref float degree, GameTime gameTime)
         {
-            float speed = this.fastModeOn ? Settings.VerticalHighSpeed : Settings.VerticalLowSpeed;
+            float speed = this.fastModeOn ? this.controlSettings.VerticalHighSpeed : this.controlSettings.VerticalLowSpeed;
             degree += gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree > Settings.VerticalMaximumDegree) ? Settings.VerticalMaximumDegree : degree;
+            degree = (degree > this.controlSettings.VerticalMaximumDegree) ? this.controlSettings.VerticalMaximumDegree : degree;
         }
 
         /// <summary>

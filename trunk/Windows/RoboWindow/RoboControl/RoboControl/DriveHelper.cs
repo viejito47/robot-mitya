@@ -14,6 +14,8 @@ namespace RoboControl
     using System.Linq;
     using System.Text;
 
+    using RoboCommon;
+
     /// <summary>
     /// Вспомогательный класс, предназначенный для организации работы с ходовыми двигателями робота.
     /// </summary>
@@ -23,6 +25,11 @@ namespace RoboControl
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
         private RobotHelper robotHelper;
+
+        /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ControlSettings controlSettings;
 
         /// <summary>
         /// Признак турбо-режима робота.
@@ -37,7 +44,7 @@ namespace RoboControl
         /// <summary>
         /// Текущая установленная скорость при управлении роботом от клавиатуры.
         /// </summary>
-        private byte speedForKeyboardControl = Settings.Speed3;
+        private byte speedForKeyboardControl;
 
         /// <summary>
         /// Признак режима разворота.
@@ -57,6 +64,33 @@ namespace RoboControl
         /// Последняя команда, переданная на левый мотор.
         /// </summary>
         private string rightMotorCommand = string.Empty;
+
+        /// <summary>
+        /// Initializes a new instance of the DriveHelper class.
+        /// </summary>
+        /// <param name="robotHelper">
+        /// Объект для взаимодействия с головой робота.
+        /// </param>
+        /// <param name="controlSettings">
+        /// Опции управления роботом.
+        /// </param>
+        public DriveHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        {
+            if (robotHelper == null)
+            {
+                throw new ArgumentNullException("robotHelper");
+            }
+
+            if (controlSettings == null)
+            {
+                throw new ArgumentNullException("controlSettings");
+            }
+
+            this.robotHelper = robotHelper;
+            this.controlSettings = controlSettings;
+
+            this.speedForKeyboardControl = controlSettings.Speed3;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether турбо-режим включен.
@@ -171,7 +205,7 @@ namespace RoboControl
             sinAlpha = sinAlpha < 0 ? 0 : sinAlpha;
             sinAlpha = sinAlpha > 1 ? 1 : sinAlpha;
 
-            bool smallAlpha = sinAlpha < Settings.SinAlphaBound;
+            bool smallAlpha = sinAlpha < this.controlSettings.SinAlphaBound;
             bool rotationModeOn = this.rotationModeOn && smallAlpha;
 
             if ((x >= 0) && (y >= 0))
@@ -441,7 +475,7 @@ namespace RoboControl
         private void CorrectMotorsSpeedForTurboMode(ref int leftSpeed, ref int rightSpeed)
         {
             // Линейное снижение скорости (если не включен режим Турбо) - берегу двигатели.
-            int coef = this.turboModeOn ? Settings.DriveModeTurboMaxSpeed : Settings.DriveModeNormalMaxSpeed;
+            int coef = this.turboModeOn ? this.controlSettings.DriveModeTurboMaxSpeed : this.controlSettings.DriveModeNormalMaxSpeed;
             leftSpeed = leftSpeed * coef / 255;
             rightSpeed = rightSpeed * coef / 255;
         }

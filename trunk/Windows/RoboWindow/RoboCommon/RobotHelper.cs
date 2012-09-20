@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace RoboControl
+namespace RoboCommon
 {
     using System;
     using System.Collections.Generic;
@@ -30,6 +30,27 @@ namespace RoboControl
         private string lastErrorMessage = string.Empty;
 
         /// <summary>
+        /// Опции управления роботом.
+        /// </summary>
+        private ConnectSettings connectSettings;
+
+        /// <summary>
+        /// Initializes a new instance of the RobotHelper class.
+        /// </summary>
+        /// <param name="connectSettings">
+        /// Опции соединения с роботом.
+        /// </param>
+        public RobotHelper(ConnectSettings connectSettings)
+        {
+            if (connectSettings == null)
+            {
+                throw new ArgumentNullException("connectSettings");
+            }
+
+            this.connectSettings = connectSettings;
+        }
+
+        /// <summary>
         /// Gets Текст последней ошибки.
         /// </summary>
         public string LastErrorMessage 
@@ -38,6 +59,17 @@ namespace RoboControl
             { 
                 return this.lastErrorMessage; 
             } 
+        }
+
+        /// <summary>
+        /// Gets Опции соединения с роботом.
+        /// </summary>
+        public ConnectSettings ConnectSettings
+        {
+            get
+            {
+                return this.connectSettings;
+            }
         }
 
         /// <summary>
@@ -60,7 +92,7 @@ namespace RoboControl
                 byte[] messageBytes = Encoding.ASCII.GetBytes(message + (char)13 + (char)10);
 
                 UdpClient udpClient = new UdpClient();
-                IPEndPoint endPoint = new IPEndPoint(Settings.RoboHeadAddress, Settings.MessagePort);
+                IPEndPoint endPoint = new IPEndPoint(this.connectSettings.RoboHeadAddress, this.connectSettings.MessagePort);
                 int bytesSent = udpClient.Send(messageBytes, messageBytes.Length, endPoint);
                 if (bytesSent != messageBytes.Length)
                 {
@@ -99,7 +131,7 @@ namespace RoboControl
         /// </remarks>
         public bool SendNonrecurrentMessageToRobot(string message, string voidMessage)
         {
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.connectSettings.SingleMessageRepetitionsCount; i++)
             {
                 if (!this.SendMessageToRobot(message))
                 {
@@ -107,7 +139,7 @@ namespace RoboControl
                 }
             }
 
-            for (int i = 0; i < Settings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.connectSettings.SingleMessageRepetitionsCount; i++)
             {
                 if (!this.SendMessageToRobot(voidMessage))
                 {

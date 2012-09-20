@@ -121,5 +121,14 @@ namespace RoboControl.Properties {
                 return ((bool)(this["ReverseHeadTangage"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public byte SingleMessageRepetitionsCount {
+            get {
+                return ((byte)(this["SingleMessageRepetitionsCount"]));
+            }
+        }
     }
 }

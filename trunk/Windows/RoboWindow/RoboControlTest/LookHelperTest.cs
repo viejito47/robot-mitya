@@ -17,6 +17,7 @@ namespace RoboControlTest
     using NUnit.Framework;
 
     using RoboControl;
+    using RoboCommon;
 
     /// <summary>
     /// Класс, тестирующий класс LookHelper.
@@ -24,6 +25,8 @@ namespace RoboControlTest
     [TestFixture]
     public sealed class LookHelperTest
     {
+        private ControlSettings controlSettings = new ControlSettings();
+
         /// <summary>
         /// Создание экземпляра класса LookHelper.
         /// </summary>
@@ -32,8 +35,7 @@ namespace RoboControlTest
         /// </returns>
         private LookHelper CreateLookHelper()
         {
-            var result = new LookHelper();
-            result.Initialize(new RobotHelper());
+            var result = new LookHelper(new RobotHelper(new ConnectSettings("0.0.0.1", 51974)), this.controlSettings);
             return result;
         }
 
@@ -47,7 +49,7 @@ namespace RoboControlTest
             lookHelper.Look(0.5f, 0.5f); // (только чтобы сбить начальные координаты, иначе следующая команда не выполнится)
             lookHelper.Look(0, 0);
             Assert.AreEqual(
-                "H" + MessageHelper.IntToMessageValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) / 2),
+                "H" + MessageHelper.IntToMessageValue((this.controlSettings.HorizontalMaximumDegree - this.controlSettings.HorizontalMinimumDegree) / 2),
                 lookHelper.HorizontalServoCommand);
         }
         
@@ -61,12 +63,12 @@ namespace RoboControlTest
 
             lookHelper.Look(-1f, 0);
             Assert.AreEqual(
-                "H" + MessageHelper.IntToMessageValue(Settings.HorizontalMaximumDegree),
+                "H" + MessageHelper.IntToMessageValue(this.controlSettings.HorizontalMaximumDegree),
                 lookHelper.HorizontalServoCommand);
 
             lookHelper.Look(-0.5f, 0);
             Assert.AreEqual(
-                "H" + MessageHelper.IntToMessageValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) * 3 / 4),
+                "H" + MessageHelper.IntToMessageValue((this.controlSettings.HorizontalMaximumDegree - this.controlSettings.HorizontalMinimumDegree) * 3 / 4),
                 lookHelper.HorizontalServoCommand);
         }
 
@@ -80,12 +82,12 @@ namespace RoboControlTest
 
             lookHelper.Look(1f, 0);
             Assert.AreEqual(
-                "H" + MessageHelper.IntToMessageValue(Settings.HorizontalMinimumDegree),
+                "H" + MessageHelper.IntToMessageValue(this.controlSettings.HorizontalMinimumDegree),
                 lookHelper.HorizontalServoCommand);
 
             lookHelper.Look(0.5f, 0);
             Assert.AreEqual(
-                "H" + MessageHelper.IntToMessageValue((Settings.HorizontalMaximumDegree - Settings.HorizontalMinimumDegree) * 1 / 4),
+                "H" + MessageHelper.IntToMessageValue((this.controlSettings.HorizontalMaximumDegree - this.controlSettings.HorizontalMinimumDegree) * 1 / 4),
                 lookHelper.HorizontalServoCommand);
         }
 
