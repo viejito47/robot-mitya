@@ -16,8 +16,8 @@ namespace RoboControlTest
 
     using NUnit.Framework;
 
-    using RoboControl;
     using RoboCommon;
+    using RoboControl;
 
     /// <summary>
     /// Класс, тестирующий класс LookHelper.
@@ -25,19 +25,10 @@ namespace RoboControlTest
     [TestFixture]
     public sealed class LookHelperTest
     {
-        private ControlSettings controlSettings = new ControlSettings();
-
         /// <summary>
-        /// Создание экземпляра класса LookHelper.
+        /// Опции управления роботом.
         /// </summary>
-        /// <returns>
-        /// Созданный и инициированный экземпляр.
-        /// </returns>
-        private LookHelper CreateLookHelper()
-        {
-            var result = new LookHelper(new RobotHelper(new ConnectSettings("0.0.0.1", 51974)), this.controlSettings);
-            return result;
-        }
+        private ControlSettings controlSettings = new ControlSettings();
 
         /// <summary>
         /// Тест поворота головы вперёд.
@@ -137,13 +128,13 @@ namespace RoboControlTest
             y = (float)Math.Sin(Math.PI / 6) * 0.5f;
             LookHelper.CorrectCoordinatesFromCyrcleToSquareArea(ref x, ref y);
             Assert.Greater(0.000001, Math.Abs(0.5f - x));
-            Assert.Greater(0.000001, Math.Abs(0.5f * (float)Math.Tan(Math.PI / 6) - y));
+            Assert.Greater(0.000001, Math.Abs((0.5f * (float)Math.Tan(Math.PI / 6)) - y));
 
             // Джойстик на 60 градусов на 50%:
             x = (float)Math.Cos(Math.PI / 3) * 0.5f;
             y = (float)Math.Sin(Math.PI / 3) * 0.5f;
             LookHelper.CorrectCoordinatesFromCyrcleToSquareArea(ref x, ref y);
-            Assert.Greater(0.000001, Math.Abs(0.5f * (float)Math.Tan(Math.PI / 6) - x));
+            Assert.Greater(0.000001, Math.Abs((0.5f * (float)Math.Tan(Math.PI / 6)) - x));
             Assert.Greater(0.000001, Math.Abs(0.5f - y));
 
             // Джойстик на 135 градусов на 50%:
@@ -166,6 +157,18 @@ namespace RoboControlTest
             LookHelper.CorrectCoordinatesFromCyrcleToSquareArea(ref x, ref y);
             Assert.Greater(0.000001, Math.Abs(0.5f - x));
             Assert.Greater(0.000001, Math.Abs(-0.5f - y));
+        }
+
+        /// <summary>
+        /// Создание экземпляра класса LookHelper.
+        /// </summary>
+        /// <returns>
+        /// Созданный и инициированный экземпляр.
+        /// </returns>
+        private LookHelper CreateLookHelper()
+        {
+            var result = new LookHelper(new RobotHelper(new ConnectSettings("0.0.0.1", 51974)), this.controlSettings);
+            return result;
         }
     }
 }

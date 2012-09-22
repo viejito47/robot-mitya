@@ -1,4 +1,13 @@
-﻿using System.Reflection;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="Dzakhov's jag">
+//   Copyright © Dmitry Dzakhov 2011
+// </copyright>
+// <summary>
+//   Опции сборки.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

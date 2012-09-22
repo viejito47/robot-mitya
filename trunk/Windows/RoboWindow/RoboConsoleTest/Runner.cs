@@ -9,7 +9,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace RoboControlTest
+namespace RoboConsoleTest
 {
     using System;
     using System.Collections.Generic;

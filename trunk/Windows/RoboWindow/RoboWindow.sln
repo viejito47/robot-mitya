@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoboConsole", "RoboConsole\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoboCommon", "RoboCommon\RoboCommon.csproj", "{79D8EC26-C49B-4C6B-BB85-BB3D4F89A881}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoboConsoleTest", "RoboConsoleTest\RoboConsoleTest.csproj", "{5ECCC53B-4340-499E-8728-CCC7CDBF245F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,16 @@ Global
 		{79D8EC26-C49B-4C6B-BB85-BB3D4F89A881}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{79D8EC26-C49B-4C6B-BB85-BB3D4F89A881}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{79D8EC26-C49B-4C6B-BB85-BB3D4F89A881}.Release|x86.ActiveCfg = Release|Any CPU
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Debug|x86.ActiveCfg = Debug|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Debug|x86.Build.0 = Debug|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Release|Any CPU.ActiveCfg = Release|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Release|Mixed Platforms.Build.0 = Release|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Release|x86.ActiveCfg = Release|x86
+		{5ECCC53B-4340-499E-8728-CCC7CDBF245F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

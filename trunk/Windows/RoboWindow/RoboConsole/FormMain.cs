@@ -51,10 +51,34 @@ namespace RoboConsole
         /// <param name="e">Аргументы события.</param>
         private void ButtonSend_Click(object sender, EventArgs e)
         {
-            bool sendResult = this.robotHelper.SendMessageToRobot(this.textBoxSend.Text);
-            if (!sendResult)
+            SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.robotHelper);
+        }
+
+        /// <summary>
+        /// Обработчик нажатия на клавишу поля ввода команд.
+        /// </summary>
+        /// <param name="sender">Источник события.</param>
+        /// <param name="e">Аргументы события.</param>
+        private void TextBoxSend_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Alt || e.Control || e.Shift)
             {
-                this.textBoxReceive.Text = "Ошибка: " + this.robotHelper.LastErrorMessage;
+                return;
+            }
+
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.robotHelper);
+                    break;
+                case Keys.Up:
+                    SendHelper.SelectPreviousCommand(this.textBoxSend);
+                    e.Handled = true;
+                    break;
+                case Keys.Down:
+                    SendHelper.SelectNextCommand(this.textBoxSend);
+                    e.Handled = true;
+                    break;
             }
         }
     }
