@@ -253,8 +253,8 @@ namespace RoboControl
             this.lookHelper = new LookHelper(this.robotHelper, this.controlSettings);
             this.moodHelper = new MoodHelper(this.robotHelper, this.controlSettings);
             this.gunHelper = new GunHelper(this.robotHelper, this.controlSettings);
-            this.videoHelper = new VideoHelper(this.connectSettings, this.controlSettings);
-            this.audioHelper = new AudioHelper(this.connectSettings, this.controlSettings);
+            this.videoHelper = new VideoHelper(this.robotHelper, this.controlSettings);
+            this.audioHelper = new AudioHelper(this.robotHelper, this.controlSettings);
         }
 
         /// <summary>
@@ -892,6 +892,8 @@ namespace RoboControl
             this.controlSettings.Speed3 = Properties.Settings.Default.Speed3;
             this.controlSettings.Speed4 = Properties.Settings.Default.Speed4;
             this.controlSettings.Speed5 = Properties.Settings.Default.Speed5;
+            this.controlSettings.PlayVideo = Properties.Settings.Default.PlayVideo;
+            this.controlSettings.PlayAudio = Properties.Settings.Default.PlayAudio;
         }
     }
 }

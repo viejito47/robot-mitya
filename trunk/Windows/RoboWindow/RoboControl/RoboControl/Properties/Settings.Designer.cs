@@ -130,5 +130,23 @@ namespace RoboControl.Properties {
                 return ((byte)(this["SingleMessageRepetitionsCount"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PlayVideo {
+            get {
+                return ((bool)(this["PlayVideo"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PlayAudio {
+            get {
+                return ((bool)(this["PlayAudio"]));
+            }
+        }
     }
 }

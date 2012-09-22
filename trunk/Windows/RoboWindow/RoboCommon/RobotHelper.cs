@@ -43,12 +43,14 @@ namespace RoboCommon
             }
 
             this.connectSettings = connectSettings;
+            this.LastErrorMessage = string.Empty;
+            this.LastSentMessage = string.Empty;
         }
 
         /// <summary>
-        /// Gets Текст последней ошибки.
+        /// Gets or sets Текст последней ошибки.
         /// </summary>  
-        public string LastErrorMessage { get; private set; }
+        public string LastErrorMessage { get; set; }
 
         /// <summary>
         /// Gets Последнее успешно отправленное роботу сообщение.

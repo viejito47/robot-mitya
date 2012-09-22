@@ -34,9 +34,9 @@ namespace RoboControl
         private MjpegDecoder mjpeg = new MjpegDecoder();
 
         /// <summary>
-        /// Опции соединения с роботом.
+        /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private ConnectSettings connectSettings;
+        private RobotHelper robotHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -46,17 +46,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the VideoHelper class.
         /// </summary>
-        /// <param name="connectSettings">
-        /// Опции соединения с роботом.
+        /// <param name="robotHelper">
+        /// Объект, упращающий взаимодействие с роботом.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public VideoHelper(ConnectSettings connectSettings, ControlSettings controlSettings)
+        public VideoHelper(RobotHelper robotHelper, ControlSettings controlSettings)
         {
-            if (connectSettings == null)
+            if (robotHelper == null)
             {
-                throw new ArgumentNullException("connectSettings");
+                throw new ArgumentNullException("robotHelper");
             }
 
             if (controlSettings == null)
@@ -64,7 +64,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.connectSettings = connectSettings;
+            this.robotHelper = robotHelper;
             this.controlSettings = controlSettings;
         }
 
@@ -74,11 +74,21 @@ namespace RoboControl
         public void InitializeVideo()
         {
             // Запуск воспроизведения видео:
-            this.mjpeg.StopStream();
-            this.mjpeg.ParseStream(new Uri(String.Format(
-                @"http://{0}:{1}/videofeed",
-                this.connectSettings.RoboHeadAddress,
-                this.controlSettings.IpWebcamPort)));
+            if (this.controlSettings.PlayVideo)
+            {
+                try
+                {
+                    this.mjpeg.StopStream();
+                    this.mjpeg.ParseStream(new Uri(String.Format(
+                        @"http://{0}:{1}/videofeed",
+                        this.robotHelper.ConnectSettings.RoboHeadAddress,
+                        this.controlSettings.IpWebcamPort)));
+                }
+                catch (Exception e)
+                {
+                    this.robotHelper.LastErrorMessage = e.Message;
+                }
+            }
         }
 
         /// <summary>
@@ -86,7 +96,17 @@ namespace RoboControl
         /// </summary>
         public void FinalizeVideo()
         {
-            this.mjpeg.StopStream();
+            if (this.controlSettings.PlayVideo)
+            {
+                try
+                {
+                    this.mjpeg.StopStream();
+                }
+                catch (Exception e)
+                {
+                    this.robotHelper.LastErrorMessage = e.Message;
+                }
+            }
         }
 
         /// <summary>
@@ -96,7 +116,20 @@ namespace RoboControl
         /// <returns>Текстура с кадром.</returns>
         public Texture2D GetVideoTexture(GraphicsDevice graphicsDevice)
         {
-            return this.mjpeg.GetMjpegFrame(graphicsDevice);
+            if (this.controlSettings.PlayVideo)
+            {
+                try
+                {
+                    return this.mjpeg.GetMjpegFrame(graphicsDevice);
+                }
+                catch (Exception e)
+                {
+                    this.robotHelper.LastErrorMessage = e.Message;
+                    return null;
+                }
+            }
+
+            return null;
         }
     }
 }
