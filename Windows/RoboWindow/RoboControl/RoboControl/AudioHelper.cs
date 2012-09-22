@@ -30,12 +30,12 @@ namespace RoboControl
         /// Объект из ActiveX-библиотеки VLC (www.videolan.org).
         /// Требует установки VLC, регистрации ActiveX-библиотеки axvlc.dll, а затем добавления в ссылки проекта COM-компоненты "VideoLAN VLC ActiveX Plugin" (в обозревателе решений отображается как "AXVLC").
         /// </remarks>
-        private AXVLC.VLCPlugin2 audio = new AXVLC.VLCPlugin2Class();
+        private AXVLC.VLCPlugin2 audio;
 
         /// <summary>
-        /// Опции соединения с роботом.
+        /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private ConnectSettings connectSettings;
+        private RobotHelper robotHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -45,17 +45,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the AudioHelper class.
         /// </summary>
-        /// <param name="connectSettings">
-        /// Опции соединения с роботом.
+        /// <param name="robotHelper">
+        /// Объект, упращающий взаимодействие с роботом.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public AudioHelper(ConnectSettings connectSettings, ControlSettings controlSettings)
+        public AudioHelper(RobotHelper robotHelper, ControlSettings controlSettings)
         {
-            if (connectSettings == null)
+            if (robotHelper == null)
             {
-                throw new ArgumentNullException("connectSettings");
+                throw new ArgumentNullException("robotHelper");
             }
 
             if (controlSettings == null)
@@ -63,7 +63,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.connectSettings = connectSettings;
+            this.robotHelper = robotHelper;
             this.controlSettings = controlSettings;
         }
 
@@ -73,19 +73,34 @@ namespace RoboControl
         public void InitializeAudio()
         {
             // Запуск воспроизведения аудио:
-            this.audio.Visible = false;
-            this.audio.playlist.items.clear();
-            this.audio.AutoPlay = true;
-            this.audio.Volume = 200;
-            string[] options = new string[] { @":network-caching=20" };
-            this.audio.playlist.add(
-                String.Format(
-                    @"http://{0}:{1}/audio.wav",
-                    this.connectSettings.RoboHeadAddress,
-                    this.controlSettings.IpWebcamPort),
-                null,
-                options);
-            this.audio.playlist.playItem(0);
+            if (this.controlSettings.PlayAudio)
+            {
+                try
+                {
+                    if (this.audio == null)
+                    {
+                        this.audio = new AXVLC.VLCPlugin2Class();
+                    }
+
+                    this.audio.Visible = false;
+                    this.audio.playlist.items.clear();
+                    this.audio.AutoPlay = true;
+                    this.audio.Volume = 200;
+                    string[] options = new string[] { @":network-caching=20" };
+                    this.audio.playlist.add(
+                        String.Format(
+                            @"http://{0}:{1}/audio.wav",
+                            this.robotHelper.ConnectSettings.RoboHeadAddress,
+                            this.controlSettings.IpWebcamPort),
+                        null,
+                        options);
+                    this.audio.playlist.playItem(0);
+                }
+                catch (Exception e)
+                {
+                    this.robotHelper.LastErrorMessage = e.Message;
+                }
+            }
         }
 
         /// <summary>
@@ -93,13 +108,23 @@ namespace RoboControl
         /// </summary>
         public void FinalizeAudio()
         {
-            if (this.audio.playlist.items.count > 0)
+            if (this.controlSettings.PlayAudio)
             {
-                if (this.audio.playlist.isPlaying)
+                try
                 {
-                    this.audio.playlist.stop();
+                    if (this.audio.playlist.items.count > 0)
+                    {
+                        if (this.audio.playlist.isPlaying)
+                        {
+                            this.audio.playlist.stop();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.robotHelper.LastErrorMessage = e.Message;
                 }
             }
         }
-    }
-}
+    } // class
+} // namespace

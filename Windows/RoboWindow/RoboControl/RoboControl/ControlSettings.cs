@@ -220,5 +220,15 @@ namespace RoboControl
         /// Gets or sets 5-ая скорость при управлении от клавиатуры.
         /// </summary>
         public byte Speed5 { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether видео воспроизводится.
+        /// </summary>
+        public bool PlayVideo { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether звук воспроизводится.
+        /// </summary>
+        public bool PlayAudio { get; set; }
     }
 }
