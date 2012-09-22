@@ -22,13 +22,8 @@ namespace RoboCommon
     /// <summary>
     /// Класс для взаимодействия с головой робота.
     /// </summary>
-    public sealed class RobotHelper
+    public sealed class RobotHelper : IRobotHelper
     {
-        /// <summary>
-        /// Текст последней ошибки.
-        /// </summary>
-        private string lastErrorMessage = string.Empty;
-
         /// <summary>
         /// Опции управления роботом.
         /// </summary>
@@ -52,14 +47,16 @@ namespace RoboCommon
 
         /// <summary>
         /// Gets Текст последней ошибки.
-        /// </summary>
-        public string LastErrorMessage 
-        { 
-            get
-            { 
-                return this.lastErrorMessage; 
-            } 
-        }
+        /// </summary>  
+        public string LastErrorMessage { get; private set; }
+
+        /// <summary>
+        /// Gets Последнее успешно отправленное роботу сообщение.
+        /// Сообщение, передаваемое методу SendMessageToRobot, может быть представлено в краткой форме.
+        /// Числовое значение может отсутствовать или не содержать лидирующих нулей. После успешной отправки
+        /// свойство LastSentMessage будет содержать это сообщение, представленное в полной форме.
+        /// </summary>  
+        public string LastSentMessage { get; private set; }
 
         /// <summary>
         /// Gets Опции соединения с роботом.
@@ -83,30 +80,32 @@ namespace RoboCommon
         /// </returns>
         public bool SendMessageToRobot(string message)
         {
-            /*if (message.StartsWith("L") || message.StartsWith("R"))
-            {
-                Debug.Print(message);
-            }*/
+            string correctedMessage;
             try
             {
-                byte[] messageBytes = Encoding.ASCII.GetBytes(message + (char)13 + (char)10);
+                if (!this.CorrectMessage(message, out correctedMessage))
+                {
+                    return false;
+                }
+
+                byte[] messageBytes = Encoding.ASCII.GetBytes(correctedMessage + (char)13 + (char)10);
 
                 UdpClient udpClient = new UdpClient();
                 IPEndPoint endPoint = new IPEndPoint(this.connectSettings.RoboHeadAddress, this.connectSettings.MessagePort);
                 int bytesSent = udpClient.Send(messageBytes, messageBytes.Length, endPoint);
                 if (bytesSent != messageBytes.Length)
                 {
-                    this.lastErrorMessage = "Нет связи с роботом";
+                    this.LastErrorMessage = "Нет связи с роботом";
                     return false;
                 }
             }
             catch (Exception e)
             {
-                this.lastErrorMessage = e.Message;
+                this.LastErrorMessage = e.Message;
                 return false;
             }
 
-            this.lastErrorMessage = string.Empty;
+            this.LastSentMessage = correctedMessage;
             return true;
         }
 
@@ -147,6 +146,51 @@ namespace RoboCommon
                 }
             }
             
+            return true;
+        }
+
+        /// <summary>
+        /// Проверка и коррекция сообщения. Сообщение приводится к виду: идентификатор (1 символ), 
+        /// HEX значение (4 символа 0..9, A..F).
+        /// </summary>
+        /// <param name="message">Исходное значение. В значении могут отсутствовать лидирующие нули.</param>
+        /// <param name="correctedMessage">Скорректированное пятисимвольное сообщение.</param>
+        /// <returns>true, если удалось, false и LastErrorMessage если нет.</returns>
+        private bool CorrectMessage(string message, out string correctedMessage)
+        {
+            const int IdentifierLength = 1;
+            const int ValueLength = 4;
+
+            correctedMessage = string.Empty;
+
+            if ((message.Length == 0) || (message.Length > IdentifierLength + ValueLength))
+            {
+                this.LastErrorMessage = "Неверный размер сообщения.";
+                return false;
+            }
+
+            string valueText = message.Remove(0, IdentifierLength);
+            valueText = valueText.ToUpper();
+            if (valueText.Length < ValueLength)
+            {
+                int charsToAdd = ValueLength - valueText.Length;
+                for (int i = 0; i < charsToAdd; i++)
+                {
+                    valueText = "0" + valueText;
+                }
+            }
+
+            try
+            {
+                Int32.Parse(valueText, System.Globalization.NumberStyles.AllowHexSpecifier);
+            }
+            catch (Exception)
+            {
+                this.LastErrorMessage = "Неверно задано значение сообщения.";
+                return false;
+            }
+
+            correctedMessage = message[0] + valueText;
             return true;
         }
     } // class
