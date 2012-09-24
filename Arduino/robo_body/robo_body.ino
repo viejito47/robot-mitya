@@ -12,6 +12,9 @@
 #include <Swinger.h>
 #include <RoboScript.h>
 
+// Эхо-режим. Возврат всех полученных сообщений.
+const boolean ECHO_MODE = false;
+
 // Длина сообщения:
 const int MESSAGELENGTH = 5;
 // Неуместившаяся команда из буфера, прочитанного на предыдущей итерации чтения:
@@ -68,6 +71,18 @@ IRsend irsend;
 // Программа для робота: РобоСкрипт.
 RoboScript readyToPlayReflex;
 RoboScript angryReflex;
+
+// Массив пользовательских программ на РобоСкрипте.
+const int CUSTOM_ROBOSCRIPTS_COUNT = 10;
+RoboScript customRoboScript[CUSTOM_ROBOSCRIPTS_COUNT];
+// Признак состояния записи РобоСкрипта.
+boolean recordingRoboScript = false;
+// Текущий (последний) выполняемый скрипт.
+signed int currentRoboScriptIndex = -1;
+// Признак для контроля следования команд при записи РобоСкрипта.
+boolean actionStarted = false;
+// Текущее записываемое действие в РобоСкрипт.
+RoboAction recordedAction;
 
 // Функция инициализации скетча:
 void setup()
@@ -129,14 +144,16 @@ void loop()
   }
   
   processMessageBuffer(bufferText);
-  
+
   wagTail();
-  showNo();
+  showNo(); 
   showYes();
   showBlue();
   showReadyToPlay();
   readyToPlayReflexRun();
   angryReflexRun();
+  
+  customRoboScriptRun();
 }
 
 // Проверка ИК-попадания в робота:
@@ -161,8 +178,16 @@ boolean checkIrHit()
 // Извлечение и обработка команд из входного буфера:
 void processMessageBuffer(String bufferText)
 {
+/*if (bufferText != "")
+{
+  Serial.println("bufferText 1: " + bufferText);
+}*/
   // Если от предыдущей итерации остался кусок команды, прибавляю его слева:
   bufferText = previousBufferRest + bufferText;
+/*if (bufferText != "")
+{
+  Serial.println("prevBufRest + buf: " + bufferText);
+}*/
   if (bufferText.length() < MESSAGELENGTH)
   {
     previousBufferRest = bufferText;
@@ -173,6 +198,7 @@ void processMessageBuffer(String bufferText)
   // Последовательно извлекаю из полученной строки команды длиной MESSAGELENGTH символов.
   // Что не уместилось пойдёт в "довесок" (previousBufferRest) к следующей итереции.
   int i = 0;
+  String message;
   int bufferLength = bufferText.length();
   while (i < bufferLength)
   {
@@ -180,12 +206,16 @@ void processMessageBuffer(String bufferText)
     
     if (currentBufferLength >= MESSAGELENGTH)
     {
-      String message = "";
+      message = "";
       for (int j = 0; j < MESSAGELENGTH; j++)
       {
-        message += bufferText[i + j];
+        message = message + String(bufferText[i + j]);
       }
 
+/*if (message != "")
+{
+  Serial.println("message 1: " + bufferText);
+}*/
       // Обработка команды:      
       processMessage(message);
     }
@@ -195,7 +225,7 @@ void processMessageBuffer(String bufferText)
       previousBufferRest = "";
       for (int j = 0; j < currentBufferLength; j++)
       {
-        previousBufferRest += bufferText[i + j];
+        previousBufferRest = previousBufferRest + String(bufferText[i + j]);
       }
     }
 
@@ -248,6 +278,11 @@ boolean hexCharToInt(char ch, int &value)
 // Процедура обработки сообщения:
 void processMessage(String message)
 {
+  if (ECHO_MODE)
+  {
+    Serial.print(message);
+  }  
+  
   // Парсер команды:
   String command;
   int value;
@@ -255,15 +290,129 @@ void processMessage(String message)
   {
     //Serial.flush();
     Serial.print("E0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
+    if (recordingRoboScript)
+    {
+      stopRecording();
+    }
     return;
   }
   
-  executeAction(command, value);
+  if (recordingRoboScript)
+  {
+    addActionToRoboScript(command, value);
+  }
+  else
+  {
+    executeAction(command, value);
+  }
+}
+
+void stopRecording()
+{
+  actionStarted = false;
+  customRoboScript[currentRoboScriptIndex].finalize();
+  currentRoboScriptIndex = -1;
+  recordingRoboScript = false;
+  Serial.print("r0200");
+}
+
+void addActionToRoboScript(String command, unsigned int value)
+{
+  if (command == "Z")
+  {
+    if (value == 0) // Z0000 - команда на окончание записи (Zero)
+    {
+      if (actionStarted)
+      {
+        Serial.print("E0004"); // неверная последовательность команд в РобоСкрипт
+        stopRecording();
+        return;
+      }
+      
+      recordingRoboScript = false;
+      Serial.print("r0200");
+    }
+    else // Zxxxx - команда на выделение памяти для хранения РобоСкрипта (siZe)
+    {
+      int result = customRoboScript[currentRoboScriptIndex].initialize(value);
+      if (result != ROBOSCRIPT_OK)
+      {
+        Serial.print("E0005"); // невозможно выделить необходимый объём памяти
+        stopRecording();
+        return;
+      }
+    }
+  }
+  else if (command == "r")
+  {
+    Serial.print("E0003"); // недопустимая команда в РобоСкрипт
+    stopRecording();
+    return;
+  }
+  else if (command == "W")
+  {
+    if (!actionStarted)
+    {
+      Serial.print("E0004"); // неверная последовательность команд в РобоСкрипт
+      stopRecording();
+      return;
+    }
+
+    actionStarted = false;
+    recordedAction.Delay = value;
+    int result = customRoboScript[currentRoboScriptIndex].addAction(recordedAction);
+    if (result != ROBOSCRIPT_OK)
+    {
+      Serial.print("E0006"); // выход за границы выделенной для РобоСкрипт памяти
+      stopRecording();
+      return;
+    }
+  }
+  else
+  {
+    if (actionStarted)
+    {
+      Serial.print("E0004"); // неверная последовательность команд в РобоСкрипт
+      stopRecording();
+      return;
+    }
+    
+    actionStarted = true;
+    recordedAction.Command = command[0];
+    recordedAction.Value = value;
+  }
 }
 
 void executeAction(String command, unsigned int value)
 {
-  if ((command == "L") || (command == "R") || (command == "D")) 
+  if (command == "r")
+  {
+    unsigned int recording = value >> 8;
+    unsigned int scriptIndex = value & 0xFF;
+    if ((scriptIndex >= 0) && (scriptIndex < CUSTOM_ROBOSCRIPTS_COUNT))
+    {
+      currentRoboScriptIndex = scriptIndex;
+      if (recording != 0)
+      {
+        recordingRoboScript = true;
+      }
+      else
+      {
+        customRoboScript[currentRoboScriptIndex].startExecution();
+      }
+    }
+  }
+  else if (command == "W")
+  {
+    Serial.print("E0007"); // недопустимая команда вне РобоСкрипт
+    return;
+  }
+  else if (command == "Z")
+  {
+    Serial.print("E0007"); // недопустимая команда вне РобоСкрипт
+    return;
+  }
+  else if ((command == "L") || (command == "R") || (command == "D")) 
   {
     // Команда двигателям:
     moveMotor(command, value);
@@ -330,7 +479,7 @@ void executeAction(String command, unsigned int value)
   }
   else
   {
-    //Serial.flush();
+    ////Serial.flush();
     Serial.print("E0002"); // неизвестная команда
     return;
   }
@@ -552,6 +701,19 @@ void angryReflexRun()
 void angryReflexStart()
 {
   angryReflex.startExecution();
+}
+
+void customRoboScriptRun()
+{
+  if (currentRoboScriptIndex >= 0)
+  {
+    String command;
+    int value;
+    if (customRoboScript[currentRoboScriptIndex].hasActionToExecute(command, value))
+    {
+      executeAction(command, value);
+    }
+  }
 }
 
 

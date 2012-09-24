@@ -49,6 +49,14 @@ public class RoboHeadActivity extends Activity {
 	private FaceType testFace = FaceType.ftOk;
 	
 	/**
+	 * Режим записи РобоСкрипта. В этом режиме команды, выполняемые на уровне RoboHead
+	 * (мимика, воспроизведение звука) не выполняются, а просто передаются на уровень robo_body.
+	 * Выполняться они будут когда будет запущено воспроизведение РобоСкрипта на уровне robo_body
+	 * и команды начнут поступать в RoboHead из robo_body.
+	 */
+	private boolean mRecordingRoboScriptMode = false;
+	
+	/**
 	 * Метод, вызывающийся при создании активити.
 	 * @param savedInstanceState ранее сохранённое состояние экземпляра.
 	 */
@@ -77,21 +85,25 @@ public class RoboHeadActivity extends Activity {
 				String command = MessageHelper.getMessageIdentifier(message);
 
 				if (command.equals("F")) { // F [face] – смена мордочки
-					if (message.equals(MessageConstant.FACETYPE_OK)) {
-				        mFaceHelper.setFace(FaceType.ftOk);
-					} else if (message.equals(MessageConstant.FACETYPE_HAPPY)) {
-				        mFaceHelper.setFace(FaceType.ftHappy);
-					} else if (message.equals(MessageConstant.FACETYPE_BLUE)) {
-				        mFaceHelper.setFace(FaceType.ftBlue);
-					} else if (message.equals(MessageConstant.FACETYPE_ANGRY)) {
-				        mFaceHelper.setFace(FaceType.ftAngry);
-					} else if (message.equals(MessageConstant.FACETYPE_ILL)) {
-				        mFaceHelper.setFace(FaceType.ftIll);
-					} else if (message.equals(MessageConstant.FACETYPE_READY_TO_PLAY)) {
-				        mFaceHelper.setFace(FaceType.ftReadyToPlay);
-						sendMessageToRobot(message);
-					} else if (message.equals(MessageConstant.FACETYPE_VERY_BLUE)) {
-				        mFaceHelper.setFace(FaceType.ftBlue);
+					if (!mRecordingRoboScriptMode) {
+						if (message.equals(MessageConstant.FACETYPE_OK)) {
+					        mFaceHelper.setFace(FaceType.ftOk);
+						} else if (message.equals(MessageConstant.FACETYPE_HAPPY)) {
+					        mFaceHelper.setFace(FaceType.ftHappy);
+						} else if (message.equals(MessageConstant.FACETYPE_BLUE)) {
+					        mFaceHelper.setFace(FaceType.ftBlue);
+						} else if (message.equals(MessageConstant.FACETYPE_ANGRY)) {
+					        mFaceHelper.setFace(FaceType.ftAngry);
+						} else if (message.equals(MessageConstant.FACETYPE_ILL)) {
+					        mFaceHelper.setFace(FaceType.ftIll);
+						} else if (message.equals(MessageConstant.FACETYPE_READY_TO_PLAY)) {
+					        mFaceHelper.setFace(FaceType.ftReadyToPlay);
+							sendMessageToRobot(message);
+						} else if (message.equals(MessageConstant.FACETYPE_VERY_BLUE)) {
+					        mFaceHelper.setFace(FaceType.ftBlue);
+							sendMessageToRobot(message);
+						}
+					} else {
 						sendMessageToRobot(message);
 					}
 				} else if (command.equals("h")) { // h [hit] – попадание
@@ -104,25 +116,52 @@ public class RoboHeadActivity extends Activity {
 					}
 					// Осознано ничего не делаем для значения 0000. Это сообщение используется для
 					// фиксации в хэш-таблице последних принятых сообщений значения, отличного от 0001.
+				} else if (command.equals("r")) {
+					if (message.startsWith(MessageConstant.ROBOSCRIPT_REC_STARTED)) {
+						// Начало записи РобоСкрипта. Сообщение приходит от ПК.
+						mRecordingRoboScriptMode = true;
+						MessageUniqueFilter.setActive(false);
+						sendMessageToRobot(message);
+					} else if (message.startsWith(MessageConstant.ROBOSCRIPT_REC_STOPPED)) {
+						// Конец записи РобоСкрипта. Сообщение проходит от робота.
+						mRecordingRoboScriptMode = false;
+						MessageUniqueFilter.setActive(true);
+					} else {
+						// Запуск РобоСкрипта на выполнение. Сообщение приходит от ПК.
+						sendMessageToRobot(message);
+					}
 				} else if (command.equals("E")) {
 					String errorMessage = "Ошибка: ";
 					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
 						errorMessage += "неверное сообщение";
 					} else if (message.equals(MessageConstant.UNKNOWN_COMMAND)) {
 						errorMessage += "неизвестная команда";
+					} else if (message.equals(MessageConstant.ROBOSCRIPT_ILLEGAL_COMMAND)) {
+						errorMessage += "недопустимая команда в РобоСкрипт";
+					} else if (message.equals(MessageConstant.ROBOSCRIPT_ILLEGAL_COMMAND_SEQUENCE)) {
+						errorMessage += "неверная последовательность команд в РобоСкрипт";
+					} else if (message.equals(MessageConstant.ROBOSCRIPT_NO_MEMORY)) {
+						errorMessage += "невозможно выделить необходимый объём памяти для РобоСкрипта";
+					} else if (message.equals(MessageConstant.ROBOSCRIPT_OUT_OF_BOUNDS)) {
+						errorMessage += "попытка выхода за границы выделенной для РобоСкрипт памяти";
+					} else if (message.equals(MessageConstant.ILLEGAL_COMMAND)) {
+						errorMessage += "недопустимая команда вне РобоСкрипт";
 					}
 					Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
+					Logger.e(errorMessage);
 				} else {
-					if (command.equals("f")) { // f [fire] – выстрел
-						if (message.equals(MessageConstant.FIRE)) {
-			                new Thread() {
-			                    public void run() {
-									SoundManager.playSound(SoundManager.GUN, 1);
-			                    }
-			                } .start();
+					if (!mRecordingRoboScriptMode) {
+						if (command.equals("f")) { // f [fire] – выстрел
+							if (message.equals(MessageConstant.FIRE)) {
+				                new Thread() {
+				                    public void run() {
+										SoundManager.playSound(SoundManager.GUN, 1);
+				                    }
+				                } .start();
+							}
+							// Осознано ничего не делаем для значения 0000. Это сообщение используется для
+							// фиксации в хэш-таблице последних принятых сообщений значения, отличного от 0001.
 						}
-						// Осознано ничего не делаем для значения 0000. Это сообщение используется для
-						// фиксации в хэш-таблице последних принятых сообщений значения, отличного от 0001.
 					}
 					sendMessageToRobot(message);
 				}
