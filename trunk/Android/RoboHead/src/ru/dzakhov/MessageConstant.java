@@ -67,6 +67,16 @@ public final class MessageConstant {
 	public static final String FIRE = "f0001";
 	
 	/**
+	 * Начало сообщения о начале записи РобоСкрипта.
+	 */
+	public static final String ROBOSCRIPT_REC_STARTED = "r01";
+	
+	/**
+	 * Начало сообщения о конце записи РобоСкрипта.
+	 */
+	public static final String ROBOSCRIPT_REC_STOPPED = "r02";
+	
+	/**
 	 * Ошибка неверное сообщение.
 	 */
 	public static final String WRONG_MESSAGE = "E0001";
@@ -75,6 +85,31 @@ public final class MessageConstant {
 	 * Ошибка неизвестная команда.
 	 */
 	public static final String UNKNOWN_COMMAND = "E0002";
+	
+	/**
+	 * Недопустимая команда в РобоСкрипт.
+	 */
+	public static final String ROBOSCRIPT_ILLEGAL_COMMAND = "E0003";
+	
+	/**
+	 * Неверная последовательность команд в РобоСкрипт.
+	 */
+	public static final String ROBOSCRIPT_ILLEGAL_COMMAND_SEQUENCE = "E0004";
+	
+	/**
+	 * Невозможно выделить необходимый объём памяти для РобоСкрипта.
+	 */
+	public static final String ROBOSCRIPT_NO_MEMORY = "E0005";
+	
+	/**
+	 * Попытка выхода за границы выделенной для РобоСкрипт памяти.
+	 */
+	public static final String ROBOSCRIPT_OUT_OF_BOUNDS = "E0006";
+	
+	/**
+	 * Недопустимая команда вне РобоСкрипт.
+	 */
+	public static final String ILLEGAL_COMMAND = "E0007";
 	
 	/**
 	 * Закрытый конструктор класса.

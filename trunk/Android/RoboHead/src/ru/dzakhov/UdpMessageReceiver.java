@@ -50,16 +50,13 @@ public class UdpMessageReceiver implements Runnable {
 				datagramSocket = new DatagramSocket(Settings.getMessageSocketPort());
 				Logger.d("UdpMessageReceiver: Connected.");
 				
-				// Хэш-таблица для исключения из обработки повторяющихся сообщений.
-				MessageUniqueFilter messageUniqueFilter = new MessageUniqueFilter();				
-				
 				while (true) {
 					byte[] receiveData = new byte[Settings.MESSAGE_LENGTH];
 					DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 					datagramSocket.receive(receivePacket);
 					String receivedText = new String(receivePacket.getData());
 					
-					if (messageUniqueFilter.isNewMessage(receivedText)) {
+					if (MessageUniqueFilter.isNewMessage(receivedText)) {
 						// Команды передаются в RoboHeadActivity:
 						Message message = new Message();					
 						message.obj = receivedText;
