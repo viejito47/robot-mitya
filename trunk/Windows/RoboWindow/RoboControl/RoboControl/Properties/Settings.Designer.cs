@@ -148,5 +148,96 @@ namespace RoboControl.Properties {
                 return ((bool)(this["PlayAudio"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("r0101, Z0001, I0000, W0000, Z0000")]
+        public string RoboScript0 {
+            get {
+                return ((string)(this["RoboScript0"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript1 {
+            get {
+                return ((string)(this["RoboScript1"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("r0103, Z000A, L00FF, W0000, R0050, W03E8, LFFB0, W0000, RFF01, W03E8, L00FF, W000" +
+            "0, R0050, W03E8, L00FF, W0000, RFF01, W03E8, L0000, W0000, R0000, W0000, Z0000")]
+        public string RoboScript2 {
+            get {
+                return ((string)(this["RoboScript2"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript3 {
+            get {
+                return ((string)(this["RoboScript3"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript4 {
+            get {
+                return ((string)(this["RoboScript4"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript5 {
+            get {
+                return ((string)(this["RoboScript5"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript6 {
+            get {
+                return ((string)(this["RoboScript6"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript7 {
+            get {
+                return ((string)(this["RoboScript7"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoboScript8 {
+            get {
+                return ((string)(this["RoboScript8"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("r0100, Z0001, I0001, W0000, Z0000")]
+        public string RoboScript9 {
+            get {
+                return ((string)(this["RoboScript9"]));
+            }
+        }
     }
 }

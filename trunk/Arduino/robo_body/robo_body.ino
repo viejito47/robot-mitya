@@ -303,7 +303,7 @@ void processMessage(String message)
   }
   else
   {
-    executeAction(command, value);
+    executeAction(command, value, false);
   }
 }
 
@@ -383,7 +383,7 @@ void addActionToRoboScript(String command, unsigned int value)
   }
 }
 
-void executeAction(String command, unsigned int value)
+void executeAction(String command, unsigned int value, boolean inPlaybackMode)
 {
   if (command == "r")
   {
@@ -456,16 +456,28 @@ void executeAction(String command, unsigned int value)
     readyToPlayHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
     tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
     readyToPlayReflexStart();
+    if (inPlaybackMode)
+    {
+      sendMessageToRobot(command, value);
+    }
   }
   else if ((command == "F") && (value == 0x0103))
   {
     int verticalAmplitude = (servoHeadCurrentVerticalDegree - servoHeadVerticalMinDegree) * 2;
     blueVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
     blueHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
+    if (inPlaybackMode)
+    {
+      sendMessageToRobot(command, value);
+    }
   }
   else if ((command == "F") && (value == 0x0104))
   {
     angryReflexStart();
+    if (inPlaybackMode)
+    {
+      sendMessageToRobot(command, value);
+    }
   }
   else if (command == "I")
   {
@@ -479,9 +491,15 @@ void executeAction(String command, unsigned int value)
   }
   else
   {
-    ////Serial.flush();
-    Serial.print("E0002"); // неизвестная команда
-    return;
+    if (inPlaybackMode)
+    {
+      sendMessageToRobot(command, value);
+    }
+    else
+    {
+      ////Serial.flush();
+      Serial.print("E0002"); // неизвестная команда
+    }
   }
 }
 
@@ -663,7 +681,7 @@ void readyToPlayReflexRun()
   int value;
   if (readyToPlayReflex.hasActionToExecute(command, value))
   {
-    executeAction(command, value);
+    executeAction(command, value, true);
   }
 }
 
@@ -694,7 +712,7 @@ void angryReflexRun()
   int value;
   if (angryReflex.hasActionToExecute(command, value))
   {
-    executeAction(command, value);
+    executeAction(command, value, true);
   }
 }
 
@@ -711,9 +729,15 @@ void customRoboScriptRun()
     int value;
     if (customRoboScript[currentRoboScriptIndex].hasActionToExecute(command, value))
     {
-      executeAction(command, value);
+      executeAction(command, value, true);
     }
   }
 }
 
+void sendMessageToRobot(String command, unsigned int value)
+{
+  String hexValue = String(value, HEX);
+  hexValue.toUpperCase();
+  Serial.print(command + hexValue);
+}
 

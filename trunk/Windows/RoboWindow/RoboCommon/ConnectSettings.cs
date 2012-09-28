@@ -17,6 +17,11 @@ namespace RoboCommon
     public class ConnectSettings
     {
         /// <summary>
+        /// Длина сообщений языка.
+        /// </summary>
+        private static byte messageLength = 5;
+
+        /// <summary>
         /// Initializes a new instance of the ConnectSettings class.
         /// </summary>
         /// <param name="roboHeadAddress">
@@ -27,9 +32,20 @@ namespace RoboCommon
         /// </param>
         public ConnectSettings(string roboHeadAddress, int messagePort)
         {
-            this.RoboHeadAddress = IPAddress.Parse(roboHeadAddress); // IPAddress.Parse(Properties.Settings.Default.RoboHeadAddress);
-            this.MessagePort = messagePort; // Properties.Settings.Default.MessagePort;
+            this.RoboHeadAddress = IPAddress.Parse(roboHeadAddress);
+            this.MessagePort = messagePort;
             this.SingleMessageRepetitionsCount = 3;
+        }
+
+        /// <summary>
+        /// Gets длина сообщений языка.
+        /// </summary>
+        public static byte MessageLength 
+        { 
+            get 
+            { 
+                return messageLength; 
+            } 
         }
 
         /// <summary>

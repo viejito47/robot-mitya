@@ -74,6 +74,7 @@
     <Compile Include="DriveHelperTest.cs" />
     <Compile Include="LookHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoboScriptItemTest.cs" />
     <Compile Include="Runner.cs" />
   </ItemGroup>
   <ItemGroup>

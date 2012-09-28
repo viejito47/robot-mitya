@@ -128,6 +128,7 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="RoboScriptItem.cs" />
     <Compile Include="VideoHelper.cs" />
   </ItemGroup>
   <ItemGroup>

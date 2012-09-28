@@ -68,6 +68,12 @@ namespace RoboControl
             this.Speed3 = 153;
             this.Speed4 = 204;
             this.Speed5 = 255;
+
+            this.RoboScripts = new RoboScriptItem[10];
+            for (int i = this.RoboScripts.GetLowerBound(0); i <= this.RoboScripts.GetUpperBound(0); i++)
+            {
+                this.RoboScripts[i] = new RoboScriptItem((byte)i);
+            }
         }
 
         /// <summary>
@@ -230,5 +236,10 @@ namespace RoboControl
         /// Gets or sets a value indicating whether звук воспроизводится.
         /// </summary>
         public bool PlayAudio { get; set; }
+
+        /// <summary>
+        /// Gets массив РобоСкриптов.
+        /// </summary>
+        public RoboScriptItem[] RoboScripts { get; private set; }
     }
 }
