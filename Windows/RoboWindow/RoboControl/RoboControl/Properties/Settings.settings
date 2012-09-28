@@ -44,5 +44,35 @@
     <Setting Name="PlayAudio" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="RoboScript0" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">r0101, Z0001, I0000, W0000, Z0000</Value>
+    </Setting>
+    <Setting Name="RoboScript1" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript2" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">r0103, Z000A, L00FF, W0000, R0050, W03E8, LFFB0, W0000, RFF01, W03E8, L00FF, W0000, R0050, W03E8, L00FF, W0000, RFF01, W03E8, L0000, W0000, R0000, W0000, Z0000</Value>
+    </Setting>
+    <Setting Name="RoboScript3" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript4" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript5" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript6" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript7" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript8" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RoboScript9" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">r0100, Z0001, I0001, W0000, Z0000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

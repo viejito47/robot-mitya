@@ -43,7 +43,7 @@ namespace RoboConsole
         {
             commandHistory.Add(commandLineTextBox.Text);
             
-            IEnumerable<string> commands = GetCommands(commandLineTextBox.Text);
+            IEnumerable<string> commands = RobotHelper.ParseRoboScript(commandLineTextBox.Text);
 
             var notSentCommands = new List<string>();
             foreach (string command in commands)
@@ -107,20 +107,6 @@ namespace RoboConsole
         public static void SelectNextCommand(TextBox commandLineTextBox)
         {
             commandLineTextBox.Text = commandHistory.GetNextCommand();
-        }
-
-        /// <summary>
-        /// Вычленение списка команд из строки ввода.
-        /// </summary>
-        /// <param name="commandLineText">
-        /// Строка ввода. Может содержать несколько команд, разделённых запятой.
-        /// </param>
-        /// <returns>
-        /// Список команд.
-        /// </returns>
-        private static IEnumerable<string> GetCommands(string commandLineText)
-        {
-            return commandLineText.Split(',').Select(x => x.Trim()).ToArray();
         }
 
         /// <summary>

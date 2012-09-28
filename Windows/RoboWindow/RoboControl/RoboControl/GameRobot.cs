@@ -69,7 +69,7 @@ namespace RoboControl
         /// <summary>
         /// Ширина строк на экране.
         /// </summary>
-        private static int debugStringColumnWidth = 130;
+        private static int debugStringColumnWidth = 190;
 
         /// <summary>
         /// Координаты первой ячейки 1-й строки.
@@ -185,7 +185,12 @@ namespace RoboControl
         /// Менеджер графического устройства.
         /// </summary>
         private GraphicsDeviceManager graphics;
-        
+
+        /// <summary>
+        /// Признак необходимости переключить режим отображения с полного экрана на окно или наоборот.
+        /// </summary>
+        private bool toggleFullScreen;
+
         /// <summary>
         /// Область для рисования.
         /// </summary>
@@ -317,8 +322,23 @@ namespace RoboControl
             KeyboardState keyboardState = Keyboard.GetState(PlayerIndex.One);
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
+            bool shiftIsPressed = this.IsShiftPressed(keyboardState);
+            bool shiftIsNotPressed = !shiftIsPressed;
+            bool ctrlIsPressed = this.IsCtrlPressed(keyboardState);
+            bool ctrlIsNotPressed = !ctrlIsPressed;
+            bool altIsPressed = this.IsAltPressed(keyboardState);
+            bool altIsNotPressed = !altIsPressed;
+            bool nothingIsPressed = shiftIsNotPressed && ctrlIsNotPressed && altIsNotPressed;
+            bool onlyAltIsPressed = shiftIsNotPressed && altIsPressed && ctrlIsNotPressed;
+
+            // Переключение режима отображения: полный экран / окно.
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Enter) && onlyAltIsPressed)
+            {
+                this.toggleFullScreen = true;
+            }
+
             // Запуск режима управления роботом клавиатурой.
-            if (this.IsKeyChangedToDown(keyboardState, Keys.Space))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Space) && nothingIsPressed)
             {
                 this.controlType = ControlType.ctKeyboard;
                 this.gameState = GameState.gsRobotControl;
@@ -367,6 +387,13 @@ namespace RoboControl
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // Переключение режима отображения: полный экран / окно.
+            if (this.toggleFullScreen)
+            {
+                this.graphics.ToggleFullScreen();
+                this.toggleFullScreen = false;
+            }
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
             // Отрисовка экрана пока производится только режиме управления роботом.
@@ -458,55 +485,131 @@ namespace RoboControl
         {
             bool shiftIsPressed = this.IsShiftPressed(keyboardState);
             bool shiftIsNotPressed = !shiftIsPressed;
+            bool ctrlIsPressed = this.IsCtrlPressed(keyboardState);
+            bool ctrlIsNotPressed = !ctrlIsPressed;
+            bool altIsPressed = this.IsAltPressed(keyboardState);
+            bool altIsNotPressed = !altIsPressed;
+            bool nothingIsPressed = shiftIsNotPressed && ctrlIsNotPressed && altIsNotPressed;
+            bool onlyCtrlIsPressed = shiftIsNotPressed && altIsNotPressed && ctrlIsPressed;
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F1) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F1) && nothingIsPressed)
             {
                 this.moodHelper.SetMood(Mood.Normal);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && nothingIsPressed)
             {
                 this.moodHelper.SetMood(Mood.Happy);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && shiftIsPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && nothingIsPressed)
             {
                 this.moodHelper.ShowReadyToPlay(this.lookHelper);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && nothingIsPressed)
             {
                 this.moodHelper.SetMood(Mood.Blue);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && shiftIsPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && nothingIsPressed)
             {
                 this.moodHelper.ShowDepression(this.lookHelper);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F4) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F4) && nothingIsPressed)
             {
                 this.moodHelper.SetMood(Mood.Disaster);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F5) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F5) && nothingIsPressed)
             {
                 this.moodHelper.SetMood(Mood.Angry);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.T) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.T) && nothingIsPressed)
             {
                 this.moodHelper.WagTail();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.Y) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Y) && nothingIsPressed)
             {
                 this.moodHelper.ShowYes();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.N) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.N) && nothingIsPressed)
             {
                 this.moodHelper.ShowNo();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D0) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[0]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[1]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[2]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[3]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[4]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[5]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D6) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[6]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D7) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[7]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D8) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[8]);
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D9) && onlyCtrlIsPressed)
+            {
+                this.PlayRoboScript(this.controlSettings.RoboScripts[9]);
+            }
+        }
+
+        /// <summary>
+        /// Выполнение РобоСкрипта после нажатия на горячую клавишу.
+        /// </summary>
+        /// <param name="roboScriptItem">
+        /// Объект-РобоСкрипт, загруженный из опций.
+        /// </param>
+        private void PlayRoboScript(RoboScriptItem roboScriptItem)
+        {
+            if (!roboScriptItem.IsEmpty)
+            {
+                if (!roboScriptItem.WasSent)
+                {
+                    this.robotHelper.SendRoboScriptToRobot(roboScriptItem.RoboScript);
+                    roboScriptItem.WasSent = true;
+                }
+
+                this.robotHelper.SendMessageToRobot(roboScriptItem.PlayCommand);
             }
         }
 
@@ -519,23 +622,29 @@ namespace RoboControl
         {
             bool shiftIsPressed = this.IsShiftPressed(keyboardState);
             bool shiftIsNotPressed = !shiftIsPressed;
+            bool ctrlIsPressed = this.IsCtrlPressed(keyboardState);
+            bool ctrlIsNotPressed = !ctrlIsPressed;
+            bool altIsPressed = this.IsAltPressed(keyboardState);
+            bool altIsNotPressed = !altIsPressed;
+            bool nothingIsPressed = shiftIsNotPressed && ctrlIsNotPressed && altIsNotPressed;
+            bool onlyCtrlIsPressed = shiftIsNotPressed && altIsNotPressed && ctrlIsPressed;
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.L) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.L) && nothingIsPressed)
             {
                 this.flashlightHelper.Switch();
             }
 
-            if ((this.IsKeyChangedToDown(keyboardState, Keys.LeftControl) || this.IsKeyChangedToDown(keyboardState, Keys.RightControl)) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Tab) && nothingIsPressed)
             {
                 this.gunHelper.Fire();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.Scroll))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Scroll) && nothingIsPressed)
             {
                 this.driveHelper.SwitchTurboMode();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.CapsLock))
+            if (this.IsKeyChangedToDown(keyboardState, Keys.CapsLock) && nothingIsPressed)
             {
                 // В прогулочном режиме центральное направление взгляда по вертикали - строго горизонтально.
                 // Так проще целиться управлять движением. В режиме общения (не прогулочный) - чуть вверх.
@@ -543,7 +652,7 @@ namespace RoboControl
                 this.lookHelper.LookForward();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.Home) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Home) && nothingIsPressed)
             {
                 // Установка головы в положение "смотреть вперёд".
                 this.lookHelper.LookForward();
@@ -554,51 +663,51 @@ namespace RoboControl
             // голова поворачивается с большей скоростью.
             this.lookHelper.FastModeOn = shiftIsPressed;
 
-            if (this.IsKeyPressed(keyboardState, Keys.Left))
+            if (this.IsKeyPressed(keyboardState, Keys.Left) && ctrlIsNotPressed && altIsNotPressed)
             {
                 // Поворот головы влево с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookLeft(gameTime);
             }
 
-            if (this.IsKeyPressed(keyboardState, Keys.Right))
+            if (this.IsKeyPressed(keyboardState, Keys.Right) && ctrlIsNotPressed && altIsNotPressed)
             {
                 // Поворот головы вправо с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookRight(gameTime);
             }
 
-            if (this.IsKeyPressed(keyboardState, Keys.Up))
+            if (this.IsKeyPressed(keyboardState, Keys.Up) && ctrlIsNotPressed && altIsNotPressed)
             {
                 // Поворот головы вверх с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookUp(gameTime);
             }
 
-            if (this.IsKeyPressed(keyboardState, Keys.Down))
+            if (this.IsKeyPressed(keyboardState, Keys.Down) && ctrlIsNotPressed && altIsNotPressed)
             {
                 // Поворот головы вниз с фиксацией. Угол поворота определяется значением gameTime.
                 this.lookHelper.FixedLookDown(gameTime);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && nothingIsPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed1;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && nothingIsPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed2;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && nothingIsPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed3;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && nothingIsPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed4;
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && shiftIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && nothingIsPressed)
             {
                 this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed5;
             }
@@ -728,14 +837,8 @@ namespace RoboControl
         {
             this.spriteBatch.Begin();
 
-            if (this.videoTexture != null)
+            if (this.IsActive && (this.videoTexture != null))
             {
-                // this.spriteBatch.Draw(this.videoTexture, Vector2.Zero, Color.White);
-                // Rectangle rectangle = new Rectangle(
-                //    this.graphics.PreferredBackBufferWidth - this.videoTexture.Width - 10,
-                //    (this.graphics.PreferredBackBufferHeight - this.videoTexture.Height) / 2,
-                //    this.videoTexture.Width,
-                //    this.videoTexture.Height);
                 Rectangle rectangle = new Rectangle(
                     0,
                     0,
@@ -746,13 +849,13 @@ namespace RoboControl
 
             Color color;
             string motorCommand;
-            string speedText = " (" + Math.Round((double)this.driveHelper.SpeedForKeyboardControl * 100 / 255).ToString() + "%)";
+            string speedText = " (max " + Math.Round((double)this.driveHelper.SpeedForKeyboardControl * 100 / 255).ToString() + "%)";
 
             motorCommand = this.driveHelper.LeftMotorCommand + speedText;
             color = Color.White;
             this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition1, color);
 
-            motorCommand = this.driveHelper.RightMotorCommand + speedText;
+            motorCommand = this.driveHelper.RightMotorCommand;
             color = Color.White;
             this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition2, color);
 
@@ -879,6 +982,26 @@ namespace RoboControl
         }
 
         /// <summary>
+        /// Определяет нажата ли хоть одна клавиша Ctrl.
+        /// </summary>
+        /// <param name="keyboardState">Состояние клавиатуры.</param>
+        /// <returns>True, если нажата клавиша Ctrl.</returns>
+        private bool IsCtrlPressed(KeyboardState keyboardState)
+        {
+            return this.IsKeyPressed(keyboardState, Keys.LeftControl) || this.IsKeyPressed(keyboardState, Keys.RightControl);
+        }
+
+        /// <summary>
+        /// Определяет нажата ли хоть одна клавиша Alt.
+        /// </summary>
+        /// <param name="keyboardState">Состояние клавиатуры.</param>
+        /// <returns>True, если нажата клавиша Alt.</returns>
+        private bool IsAltPressed(KeyboardState keyboardState)
+        {
+            return this.IsKeyPressed(keyboardState, Keys.LeftAlt) || this.IsKeyPressed(keyboardState, Keys.RightAlt);
+        }
+
+        /// <summary>
         /// Чтение епций приложения из файла конфигурации.
         /// </summary>
         private void LoadControlSettingsFromFile()
@@ -894,6 +1017,16 @@ namespace RoboControl
             this.controlSettings.Speed5 = Properties.Settings.Default.Speed5;
             this.controlSettings.PlayVideo = Properties.Settings.Default.PlayVideo;
             this.controlSettings.PlayAudio = Properties.Settings.Default.PlayAudio;
+            this.controlSettings.RoboScripts[0].Initialize(Properties.Settings.Default.RoboScript0);
+            this.controlSettings.RoboScripts[1].Initialize(Properties.Settings.Default.RoboScript1);
+            this.controlSettings.RoboScripts[2].Initialize(Properties.Settings.Default.RoboScript2);
+            this.controlSettings.RoboScripts[3].Initialize(Properties.Settings.Default.RoboScript3);
+            this.controlSettings.RoboScripts[4].Initialize(Properties.Settings.Default.RoboScript4);
+            this.controlSettings.RoboScripts[5].Initialize(Properties.Settings.Default.RoboScript5);
+            this.controlSettings.RoboScripts[6].Initialize(Properties.Settings.Default.RoboScript6);
+            this.controlSettings.RoboScripts[7].Initialize(Properties.Settings.Default.RoboScript7);
+            this.controlSettings.RoboScripts[8].Initialize(Properties.Settings.Default.RoboScript8);
+            this.controlSettings.RoboScripts[9].Initialize(Properties.Settings.Default.RoboScript9);
         }
     }
 }

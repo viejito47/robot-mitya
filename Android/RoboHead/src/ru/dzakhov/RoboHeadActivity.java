@@ -123,13 +123,19 @@ public class RoboHeadActivity extends Activity {
 						MessageUniqueFilter.setActive(false);
 						sendMessageToRobot(message);
 					} else if (message.startsWith(MessageConstant.ROBOSCRIPT_REC_STOPPED)) {
-						// Конец записи РобоСкрипта. Сообщение проходит от робота.
+						// Конец записи РобоСкрипта. Сообщение приходит от робота. 
+						// При ошибках в РобоСкрипте тоже приходит.
 						mRecordingRoboScriptMode = false;
 						MessageUniqueFilter.setActive(true);
 					} else {
 						// Запуск РобоСкрипта на выполнение. Сообщение приходит от ПК.
 						sendMessageToRobot(message);
 					}
+				} else if (message.equals("Z0000")) {
+					// Конец записи РобоСкрипта.
+					mRecordingRoboScriptMode = false;
+					MessageUniqueFilter.setActive(true);
+					sendMessageToRobot(message);
 				} else if (command.equals("E")) {
 					String errorMessage = "Ошибка: ";
 					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
@@ -331,7 +337,7 @@ public class RoboHeadActivity extends Activity {
 	 * @param message текст сообщения.
 	 */
 	private void sendMessageToRobot(final String message) {
-		Logger.d(message);
+		Logger.d("Sent to robot: " + message);
 		BluetoothHelper.send(message);
 	}
 	

@@ -72,6 +72,16 @@ namespace RoboCommon
         }
 
         /// <summary>
+        /// Получение списка команд из строки на РобоСкрипте с разделителями-запятыми.
+        /// </summary>
+        /// <param name="roboScript">Текст РобоСкрипта.</param>
+        /// <returns>Список команд.</returns>
+        public static IEnumerable<string> ParseRoboScript(string roboScript)
+        {
+            return roboScript.Split(',').Select(x => x.Trim()).ToArray();
+        }
+
+        /// <summary>
         /// Передать роботу сообщение.
         /// </summary>
         /// <param name="message">
@@ -148,6 +158,27 @@ namespace RoboCommon
                 }
             }
             
+            return true;
+        }
+
+        /// <summary>
+        /// Передача текста РобоСкрипта роботу.
+        /// </summary>
+        /// <param name="roboScript">Текст РобоСкрипта с разделителями-запятыми.</param>
+        /// <returns>false, если возникла ошибка. Тест ошибки будет в свойстве LastErrorMessage.</returns>
+        public bool SendRoboScriptToRobot(string roboScript)
+        {
+            IEnumerable<string> commands = ParseRoboScript(roboScript);
+
+            foreach (string command in commands)
+            {
+                bool result = this.SendMessageToRobot(command);
+                if (!result)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
