@@ -738,6 +738,7 @@ void sendMessageToRobot(String command, unsigned int value)
 {
   String hexValue = String(value, HEX);
   hexValue.toUpperCase();
+  while (hexValue.length() < 4) hexValue = "0" + hexValue;
   Serial.print(command + hexValue);
 }
 
