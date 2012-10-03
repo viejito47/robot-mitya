@@ -62,6 +62,9 @@ Swinger blueVerticalSwinger;
 Swinger blueHorizontalSwinger;
 Swinger readyToPlayVerticalSwinger;
 Swinger readyToPlayHorizontalSwinger;
+Swinger musicVerticalSwinger;
+Swinger musicHorizontalSwinger;
+const int musicPeriod = 535;
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
 IRrecv irrecv(targetPin);
@@ -71,6 +74,7 @@ IRsend irsend;
 // Программа для робота: РобоСкрипт.
 RoboScript readyToPlayReflex;
 RoboScript angryReflex;
+RoboScript musicReflex;
 
 // Массив пользовательских программ на РобоСкрипте.
 const int CUSTOM_ROBOSCRIPTS_COUNT = 10;
@@ -118,6 +122,7 @@ void setup()
   
   readyToPlayReflexInitialize();
   angryReflexInitialize();
+  musicReflexInitialize();
 }
 
 // Функция главного цикла:
@@ -152,6 +157,8 @@ void loop()
   showReadyToPlay();
   readyToPlayReflexRun();
   angryReflexRun();
+  showMusic();
+  musicReflexRun();
   
   customRoboScriptRun();
 }
@@ -288,7 +295,8 @@ void processMessage(String message)
   int value;
   if (! parseMessage(message, command, value))
   {
-    //Serial.flush();
+    Serial.flush();
+//Serial.print(message); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
     Serial.print("E0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
     if (recordingRoboScript)
     {
@@ -479,6 +487,18 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       sendMessageToRobot(command, value);
     }
   }
+  else if ((command == "F") && (value == 0x0105))
+  {
+    int musicTacts = 12;
+    musicVerticalSwinger.startSwing(45, 1, musicPeriod, musicTacts, 30, 1, true);
+    musicHorizontalSwinger.startSwing(90, 2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
+    tailSwinger.startSwing(servoTailCurrentDegree, value, musicPeriod, musicTacts, 70, 1, true);
+    musicReflexStart();
+    /*if (inPlaybackMode)
+    {
+      sendMessageToRobot(command, value);
+    }*/
+  }
   else if (command == "I")
   {
     setHeadlightState(value);
@@ -639,6 +659,19 @@ void showReadyToPlay()
   }
 }
 
+void showMusic()
+{
+  int degree;
+  if (musicVerticalSwinger.swing(degree))
+  {
+    moveHead("V", degree);
+  }
+  if (musicHorizontalSwinger.swing(degree))
+  {
+    moveHead("H", degree);
+  }
+}
+
 signed long sign(double value)
 {
   if (value > 0) return 1;
@@ -721,6 +754,90 @@ void angryReflexStart()
   angryReflex.startExecution();
 }
 
+void musicReflexInitialize()
+{
+  const int kickSpeed = 192;
+  const int kickDuration = 90;
+  const int freezeDuration = musicPeriod - kickDuration;
+  
+  musicReflex.initialize(26);
+  
+  RoboAction actionHappyFace;
+  actionHappyFace.Command = 'F';
+  actionHappyFace.Value = 2;
+  actionHappyFace.Delay = 0;
+  RoboAction actionNormalFace;
+  actionNormalFace.Command = 'F';
+  actionNormalFace.Value = 1;
+  actionNormalFace.Delay = 0;
+
+  RoboAction actionLeftKick;
+  actionLeftKick.Command = 'L';
+  actionLeftKick.Value = kickSpeed;
+  actionLeftKick.Delay = kickDuration;
+  RoboAction actionRightKick = actionLeftKick;
+  actionRightKick.Command = 'R';
+
+  RoboAction actionLeftBackKick = actionLeftKick;
+  actionLeftBackKick.Value = -kickSpeed;
+  RoboAction actionRightBackKick = actionRightKick;
+  actionRightBackKick.Value = -kickSpeed;
+
+  RoboAction actionLeftStop;
+  actionLeftStop.Command = 'L';
+  actionLeftStop.Value = 0;
+  actionLeftStop.Delay = freezeDuration;
+  RoboAction actionRightStop = actionLeftStop;
+  actionRightStop.Command = 'R';
+
+  musicReflex.addAction(actionHappyFace);
+  
+  musicReflex.addAction(actionLeftKick);
+  musicReflex.addAction(actionLeftStop);
+  musicReflex.addAction(actionRightKick);
+  musicReflex.addAction(actionRightStop);
+  musicReflex.addAction(actionLeftKick);
+  musicReflex.addAction(actionLeftStop);
+  
+  musicReflex.addAction(actionLeftBackKick);
+  musicReflex.addAction(actionLeftStop);
+  musicReflex.addAction(actionRightBackKick);
+  musicReflex.addAction(actionRightStop);
+  musicReflex.addAction(actionLeftBackKick);
+  musicReflex.addAction(actionLeftStop);
+
+  musicReflex.addAction(actionRightKick);
+  musicReflex.addAction(actionRightStop);
+  musicReflex.addAction(actionLeftKick);
+  musicReflex.addAction(actionLeftStop);
+  musicReflex.addAction(actionRightKick);
+  musicReflex.addAction(actionRightStop);
+  
+  musicReflex.addAction(actionRightBackKick);
+  musicReflex.addAction(actionRightStop);
+  musicReflex.addAction(actionLeftBackKick);
+  musicReflex.addAction(actionLeftStop);
+  musicReflex.addAction(actionRightBackKick);
+  musicReflex.addAction(actionRightStop);
+  
+  musicReflex.addAction(actionNormalFace);
+}
+
+void musicReflexRun()
+{
+  String command;
+  int value;
+  if (musicReflex.hasActionToExecute(command, value))
+  {
+    executeAction(command, value, true);
+  }
+}
+
+void musicReflexStart()
+{
+  musicReflex.startExecution();
+}
+
 void customRoboScriptRun()
 {
   if (currentRoboScriptIndex >= 0)
@@ -742,3 +859,8 @@ void sendMessageToRobot(String command, unsigned int value)
   Serial.print(command + hexValue);
 }
 
+void show(RoboAction action)
+{
+  sendMessageToRobot(String((char)action.Command), action.Value);
+  Serial.println("");
+}
