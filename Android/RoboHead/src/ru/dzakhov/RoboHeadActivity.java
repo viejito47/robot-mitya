@@ -102,6 +102,10 @@ public class RoboHeadActivity extends Activity {
 						} else if (message.equals(MessageConstant.FACETYPE_VERY_BLUE)) {
 					        mFaceHelper.setFace(FaceType.ftBlue);
 							sendMessageToRobot(message);
+						} else if (message.equals(MessageConstant.FACETYPE_ANGRY_JUMP_BACK)) {
+							sendMessageToRobot(message);
+						} else if (message.equals(MessageConstant.FACETYPE_MUSIC_LOVER)) {
+							sendMessageToRobot(message);
 						}
 					} else {
 						sendMessageToRobot(message);
