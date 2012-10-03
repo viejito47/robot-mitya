@@ -142,7 +142,7 @@ namespace RoboControl.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool PlayAudio {
             get {
                 return ((bool)(this["PlayAudio"]));
@@ -151,7 +151,7 @@ namespace RoboControl.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("r0101, Z0001, I0000, W0000, Z0000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("r0100, Z0001, I0000, W0000, Z0000")]
         public string RoboScript0 {
             get {
                 return ((string)(this["RoboScript0"]));
@@ -160,7 +160,7 @@ namespace RoboControl.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("r0101, Z0001, F0105, W0000, Z0000")]
         public string RoboScript1 {
             get {
                 return ((string)(this["RoboScript1"]));
@@ -169,7 +169,7 @@ namespace RoboControl.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("r0103, Z000A, L00FF, W0000, R0050, W03E8, LFFB0, W0000, RFF01, W03E8, L00FF, W000" +
+        [global::System.Configuration.DefaultSettingValueAttribute("r0102, Z000A, L00FF, W0000, R0050, W03E8, LFFB0, W0000, RFF01, W03E8, L00FF, W000" +
             "0, R0050, W03E8, L00FF, W0000, RFF01, W03E8, L0000, W0000, R0000, W0000, Z0000")]
         public string RoboScript2 {
             get {
@@ -233,7 +233,7 @@ namespace RoboControl.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("r0100, Z0001, I0001, W0000, Z0000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("r0109, Z0001, I0001, W0000, Z0000")]
         public string RoboScript9 {
             get {
                 return ((string)(this["RoboScript9"]));

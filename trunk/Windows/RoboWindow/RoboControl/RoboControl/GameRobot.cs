@@ -319,6 +319,11 @@ namespace RoboControl
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (!this.IsActive)
+            {
+                return;
+            }
+
             KeyboardState keyboardState = Keyboard.GetState(PlayerIndex.One);
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
 
@@ -502,7 +507,7 @@ namespace RoboControl
                 this.moodHelper.SetMood(Mood.Happy);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && nothingIsPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F2) && onlyCtrlIsPressed)
             {
                 this.moodHelper.ShowReadyToPlay(this.lookHelper);
             }
@@ -512,7 +517,7 @@ namespace RoboControl
                 this.moodHelper.SetMood(Mood.Blue);
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && nothingIsPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.F3) && onlyCtrlIsPressed)
             {
                 this.moodHelper.ShowDepression(this.lookHelper);
             }

@@ -57,6 +57,11 @@ public final class MessageConstant {
 	public static final String FACETYPE_ANGRY_JUMP_BACK = "F0104";
 	
 	/**
+	 * Команда управления настроением: "меломан".
+	 */
+	public static final String FACETYPE_MUSIC_LOVER = "F0105";
+	
+	/**
 	 * Сигнал попадания.
 	 */
 	public static final String HIT = "h0001";
