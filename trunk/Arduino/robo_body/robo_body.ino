@@ -17,8 +17,8 @@ const boolean ECHO_MODE = false;
 
 // Длина сообщения:
 const int MESSAGELENGTH = 5;
-// Неуместившаяся команда из буфера, прочитанного на предыдущей итерации чтения:
-String previousBufferRest = "";
+// Текущий необработанный текст из буфера, прочитанного на предыдущей итерации чтения:
+String MessageBuffer = "";
 
 // Пин контроллера, использующийся для ИК-выстрела (цифровой выход).
 int gunPin = 3;
@@ -100,7 +100,7 @@ void setup()
   digitalWrite(gunPin, LOW);
 
   // Инициализация двигателей (установка нулевой скорости):
-  moveMotor("D", 0);
+  moveMotor("G", 0);
 
   // Установка горизонтального сервопривода в положение для установки телефона:
   pinMode(servoHeadHorizontalPin, OUTPUT);
@@ -122,7 +122,7 @@ void setup()
   
   readyToPlayReflexInitialize();
   angryReflexInitialize();
-  musicReflexInitialize();
+  musicReflexInitialize();  
 }
 
 // Функция главного цикла:
@@ -141,14 +141,7 @@ void loop()
     Serial.print("h0000");
   }
   
-  String bufferText = "";
-  while (Serial.available() > 0)
-  {
-    char ch = Serial.read();
-    bufferText += ch;
-  }
-  
-  processMessageBuffer(bufferText);
+  processMessageBuffer();
 
   wagTail();
   showNo(); 
@@ -182,62 +175,49 @@ boolean checkIrHit()
   return result;
 }
 
+
 // Извлечение и обработка команд из входного буфера:
-void processMessageBuffer(String bufferText)
+void processMessageBuffer()
 {
-/*if (bufferText != "")
-{
-  Serial.println("bufferText 1: " + bufferText);
-}*/
-  // Если от предыдущей итерации остался кусок команды, прибавляю его слева:
-  bufferText = previousBufferRest + bufferText;
-/*if (bufferText != "")
-{
-  Serial.println("prevBufRest + buf: " + bufferText);
-}*/
-  if (bufferText.length() < MESSAGELENGTH)
+    
+// Если что пришло из буфера, добавляем.
+  while (Serial.available() > 0)
   {
-    previousBufferRest = bufferText;
+    MessageBuffer += (char)Serial.read();
+  }
+// Размер буфера
+  int bufferLength = MessageBuffer.length();
+
+  if (bufferLength < MESSAGELENGTH)
+  {
     return;
   }
-  previousBufferRest = "";
-  
+//  Serial.println("MessageBuffer: " + MessageBuffer);
+
   // Последовательно извлекаю из полученной строки команды длиной MESSAGELENGTH символов.
-  // Что не уместилось пойдёт в "довесок" (previousBufferRest) к следующей итереции.
+  // Что не уместилось пойдёт снова в MessageBuffer.
   int i = 0;
   String message;
-  int bufferLength = bufferText.length();
-  while (i < bufferLength)
-  {
-    int currentBufferLength = bufferLength - i;
-    
-    if (currentBufferLength >= MESSAGELENGTH)
-    {
-      message = "";
-      for (int j = 0; j < MESSAGELENGTH; j++)
-      {
-        message = message + String(bufferText[i + j]);
-      }
 
-/*if (message != "")
-{
-  Serial.println("message 1: " + bufferText);
-}*/
-      // Обработка команды:      
-      processMessage(message);
+  while (i < bufferLength-MESSAGELENGTH+1)
+  { //Ищем первый символ не-цифру в шестнадцатиричом исчислении. Это будет комманда значит.
+    if(((MessageBuffer[i]>='0')&&(MessageBuffer[i]<='9'))||((MessageBuffer[i]>='A')&&(MessageBuffer[i]<='F'))||((MessageBuffer[i]>='a')&&(MessageBuffer[i]<='f')))
+    {  //Оказалась цифра
+          Serial.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
+          Serial.print((char)MessageBuffer[i]); // Что конкретно за цифра - чисто для отладки, потом если что удалить.
+          i++;
+    }else
+    {  //Попалась не цифра
+        message = MessageBuffer.substring(i, i+MESSAGELENGTH);
+//        Serial.println("message: " + message);
+      
+        processMessage( message );
+        i += MESSAGELENGTH;        
     }
-    else
-    {
-      // "Довесок" к следующей итерации:
-      previousBufferRest = "";
-      for (int j = 0; j < currentBufferLength; j++)
-      {
-        previousBufferRest = previousBufferRest + String(bufferText[i + j]);
-      }
-    }
-
-    i += MESSAGELENGTH;
   }
+  MessageBuffer = MessageBuffer.substring(i, bufferLength); 
+//  Serial.println("NewMessageBuffer: " + MessageBuffer);
+ 
 }
 
 boolean parseMessage(String message, String &command, int &value)
@@ -297,7 +277,7 @@ void processMessage(String message)
   {
     Serial.flush();
 //Serial.print(message); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
-    Serial.print("E0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
+    Serial.print("#0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
     if (recordingRoboScript)
     {
       stopRecording();
@@ -332,7 +312,7 @@ void addActionToRoboScript(String command, unsigned int value)
     {
       if (actionStarted)
       {
-        Serial.print("E0004"); // неверная последовательность команд в РобоСкрипт
+        Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
         stopRecording();
         return;
       }
@@ -345,7 +325,7 @@ void addActionToRoboScript(String command, unsigned int value)
       int result = customRoboScript[currentRoboScriptIndex].initialize(value);
       if (result != ROBOSCRIPT_OK)
       {
-        Serial.print("E0005"); // невозможно выделить необходимый объём памяти
+        Serial.print("#0005"); // невозможно выделить необходимый объём памяти
         stopRecording();
         return;
       }
@@ -353,7 +333,7 @@ void addActionToRoboScript(String command, unsigned int value)
   }
   else if (command == "r")
   {
-    Serial.print("E0003"); // недопустимая команда в РобоСкрипт
+    Serial.print("#0003"); // недопустимая команда в РобоСкрипт
     stopRecording();
     return;
   }
@@ -361,7 +341,7 @@ void addActionToRoboScript(String command, unsigned int value)
   {
     if (!actionStarted)
     {
-      Serial.print("E0004"); // неверная последовательность команд в РобоСкрипт
+      Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
       stopRecording();
       return;
     }
@@ -371,7 +351,7 @@ void addActionToRoboScript(String command, unsigned int value)
     int result = customRoboScript[currentRoboScriptIndex].addAction(recordedAction);
     if (result != ROBOSCRIPT_OK)
     {
-      Serial.print("E0006"); // выход за границы выделенной для РобоСкрипт памяти
+      Serial.print("#0006"); // выход за границы выделенной для РобоСкрипт памяти
       stopRecording();
       return;
     }
@@ -380,7 +360,7 @@ void addActionToRoboScript(String command, unsigned int value)
   {
     if (actionStarted)
     {
-      Serial.print("E0004"); // неверная последовательность команд в РобоСкрипт
+      Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
       stopRecording();
       return;
     }
@@ -393,134 +373,156 @@ void addActionToRoboScript(String command, unsigned int value)
 
 void executeAction(String command, unsigned int value, boolean inPlaybackMode)
 {
-  if (command == "r")
-  {
-    unsigned int recording = value >> 8;
-    unsigned int scriptIndex = value & 0xFF;
-    if ((scriptIndex >= 0) && (scriptIndex < CUSTOM_ROBOSCRIPTS_COUNT))
+  switch(command[0]) {  // Сейчас у нас односимвольные команды, но на случай развития команда определена как String
+    case 'r':
     {
-      currentRoboScriptIndex = scriptIndex;
-      if (recording != 0)
+      unsigned int recording = value >> 8;
+      unsigned int scriptIndex = value & 0xFF;
+      if ((scriptIndex >= 0) && (scriptIndex < CUSTOM_ROBOSCRIPTS_COUNT))
       {
-        recordingRoboScript = true;
+        currentRoboScriptIndex = scriptIndex;
+        if (recording != 0)
+        {
+          recordingRoboScript = true;
+        }
+        else
+        {
+          customRoboScript[currentRoboScriptIndex].startExecution();
+        }
+      }
+      break;
+    }
+    case 'W':
+    case 'Z':
+    {
+      Serial.print("#0007"); // недопустимая команда вне РобоСкрипт
+      return;
+    }
+    case 'L':
+    case 'R':
+    case 'G':  
+    {
+      // Команда двигателям:
+      moveMotor(command, value);
+      break;
+    }
+    case 'H':  
+    case 'V':  
+    {
+      // Команда голове:
+      moveHead(command, value);
+      break;
+    }
+    case 'T':  
+    {
+      moveTail(value);
+      break;
+    }
+    case 't':      
+    {
+      if (value != 0)
+      {
+        tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
+      }
+      break;
+    }
+    case 'n':     
+    {
+      if (value != 0)
+      {
+        noSwinger.startSwing(servoHeadCurrentHorizontalDegree, value, 400, 2.5, 60, 0.75, true);
+      }
+      break;
+    }
+    case 'y':
+    {
+      if (value != 0)
+      {
+        yesSwinger.startSwing(servoHeadCurrentVerticalDegree, value, 400, 2.5, 30, 0.8, true);
+      }
+      break;
+    }
+    case 'M':  
+    {
+      switch(value)
+      {
+        case 0x0102:
+        {
+          const int ReadyToPlayVerticalDegree = 70;
+          int verticalAmplitude = abs((ReadyToPlayVerticalDegree - servoHeadCurrentVerticalDegree) * 2);
+          boolean swingDirection = ReadyToPlayVerticalDegree > servoHeadCurrentVerticalDegree;
+          readyToPlayVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
+          readyToPlayHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
+          tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
+          readyToPlayReflexStart();
+          if (inPlaybackMode)
+          {
+            sendMessageToRobot(command, value);
+          }
+         break; 
+        }
+       case 0x0103:
+       {
+          int verticalAmplitude = (servoHeadCurrentVerticalDegree - servoHeadVerticalMinDegree) * 2;
+          blueVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
+          blueHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
+          if (inPlaybackMode)
+          {
+            sendMessageToRobot(command, value);
+          }
+          break;
+       }
+       case 0x0104:
+       {
+          angryReflexStart();
+          if (inPlaybackMode)
+          {
+            sendMessageToRobot(command, value);
+          }
+          break;
+       }
+       case 0x0105:  
+       {
+          int musicTacts = 12;
+          musicVerticalSwinger.startSwing(45, 1, musicPeriod, musicTacts, 30, 1, true);
+          musicHorizontalSwinger.startSwing(90, 2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
+          tailSwinger.startSwing(servoTailCurrentDegree, value, musicPeriod, musicTacts, 70, 1, true);
+          musicReflexStart();
+          /*if (inPlaybackMode)
+          {
+            sendMessageToRobot(command, value);
+          }*/
+          break;
+       }
+      }
+    }
+    case 'I':    
+    {
+      setHeadlightState(value);
+      break;
+    }
+    case 's':    
+    {
+      // Команда выстрела пушке:
+      irsend.sendSony(0xABC0, 16);
+      irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
+      break;
+    }
+    default:
+    {
+      if (inPlaybackMode)
+      {
+        sendMessageToRobot(command, value);
       }
       else
       {
-        customRoboScript[currentRoboScriptIndex].startExecution();
+        ////Serial.flush();
+        Serial.print("#0002"); // неизвестная команда
+        return;
       }
     }
-  }
-  else if (command == "W")
-  {
-    Serial.print("E0007"); // недопустимая команда вне РобоСкрипт
-    return;
-  }
-  else if (command == "Z")
-  {
-    Serial.print("E0007"); // недопустимая команда вне РобоСкрипт
-    return;
-  }
-  else if ((command == "L") || (command == "R") || (command == "D")) 
-  {
-    // Команда двигателям:
-    moveMotor(command, value);
-  }
-  else if ((command == "H") || (command == "V"))
-  {
-    // Команда голове:
-    moveHead(command, value);
-  }
-  else if (command == "T")
-  {
-    moveTail(value);
-  }
-  else if (command == "t")
-  {
-    if (value != 0)
-    {
-      tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
-    }
-  }
-  else if (command == "n")
-  {
-    if (value != 0)
-    {
-      noSwinger.startSwing(servoHeadCurrentHorizontalDegree, value, 400, 2.5, 60, 0.75, true);
-    }
-  }
-  else if (command == "y")
-  {
-    if (value != 0)
-    {
-      yesSwinger.startSwing(servoHeadCurrentVerticalDegree, value, 400, 2.5, 30, 0.8, true);
-    }
-  }
-  else if ((command == "F") && (value == 0x0102))
-  {
-    const int ReadyToPlayVerticalDegree = 70;
-    int verticalAmplitude = abs((ReadyToPlayVerticalDegree - servoHeadCurrentVerticalDegree) * 2);
-    boolean swingDirection = ReadyToPlayVerticalDegree > servoHeadCurrentVerticalDegree;
-    readyToPlayVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
-    readyToPlayHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
-    tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
-    readyToPlayReflexStart();
-    if (inPlaybackMode)
-    {
-      sendMessageToRobot(command, value);
-    }
-  }
-  else if ((command == "F") && (value == 0x0103))
-  {
-    int verticalAmplitude = (servoHeadCurrentVerticalDegree - servoHeadVerticalMinDegree) * 2;
-    blueVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
-    blueHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
-    if (inPlaybackMode)
-    {
-      sendMessageToRobot(command, value);
-    }
-  }
-  else if ((command == "F") && (value == 0x0104))
-  {
-    angryReflexStart();
-    if (inPlaybackMode)
-    {
-      sendMessageToRobot(command, value);
-    }
-  }
-  else if ((command == "F") && (value == 0x0105))
-  {
-    int musicTacts = 12;
-    musicVerticalSwinger.startSwing(45, 1, musicPeriod, musicTacts, 30, 1, true);
-    musicHorizontalSwinger.startSwing(90, 2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
-    tailSwinger.startSwing(servoTailCurrentDegree, value, musicPeriod, musicTacts, 70, 1, true);
-    musicReflexStart();
-    /*if (inPlaybackMode)
-    {
-      sendMessageToRobot(command, value);
-    }*/
-  }
-  else if (command == "I")
-  {
-    setHeadlightState(value);
-  }
-  else if (command == "f")
-  {
-    // Команда выстрела пушке:
-    irsend.sendSony(0xABC0, 16);
-    irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
-  }
-  else
-  {
-    if (inPlaybackMode)
-    {
-      sendMessageToRobot(command, value);
-    }
-    else
-    {
-      ////Serial.flush();
-      Serial.print("E0002"); // неизвестная команда
-    }
-  }
+  }//main switch
+  Serial.print("#0000"); // Успешное выполнение команды, (потом можно удалить.)
 }
 
 int correctDegree(int degree, int minValue, int maxValue)
@@ -577,12 +579,12 @@ void moveMotor(String side, int speed)
     directionPinValue = LOW; // это для режима отключения мотора
   }
   
-  if ((side == "L") || (side == "D")) {
+  if ((side == "L") || (side == "G")) {
     digitalWrite(motorLeftDirectionPin, directionPinValue);
     analogWrite(motorLeftSpeedPin, speed);
   }
   
-  if ((side == "R") || (side == "D")) {
+  if ((side == "R") || (side == "G")) {
     digitalWrite(motorRightDirectionPin, directionPinValue);
     analogWrite(motorRightSpeedPin, speed);
   }
@@ -727,7 +729,7 @@ void angryReflexInitialize()
 {
   angryReflex.initialize(3);
   RoboAction action;
-  action.Command = 'D';
+  action.Command = 'G';
   action.Value = -192;
   action.Delay = 100;
   angryReflex.addAction(action);
@@ -763,11 +765,11 @@ void musicReflexInitialize()
   musicReflex.initialize(26);
   
   RoboAction actionHappyFace;
-  actionHappyFace.Command = 'F';
+  actionHappyFace.Command = 'M';
   actionHappyFace.Value = 2;
   actionHappyFace.Delay = 0;
   RoboAction actionNormalFace;
-  actionNormalFace.Command = 'F';
+  actionNormalFace.Command = 'M';
   actionNormalFace.Value = 1;
   actionNormalFace.Delay = 0;
 
