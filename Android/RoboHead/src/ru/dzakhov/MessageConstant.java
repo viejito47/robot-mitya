@@ -19,47 +19,47 @@ public final class MessageConstant {
 	/**
 	 * Команда управления настроением: "нормальное настроение".
 	 */
-	public static final String FACETYPE_OK = "F0001";
+	public static final String FACETYPE_OK = "M0001";
 
 	/**
 	 * Команда управления настроением: "счастье".
 	 */
-	public static final String FACETYPE_HAPPY = "F0002";
+	public static final String FACETYPE_HAPPY = "M0002";
 
 	/**
 	 * Команда управления настроением: "грусть".
 	 */
-	public static final String FACETYPE_BLUE = "F0003";
+	public static final String FACETYPE_BLUE = "M0003";
 
 	/**
 	 * Команда управления настроением: "злость".
 	 */
-	public static final String FACETYPE_ANGRY = "F0004";
+	public static final String FACETYPE_ANGRY = "M0004";
 
 	/**
 	 * Команда управления настроением: "болезнь".
 	 */
-	public static final String FACETYPE_ILL = "F0005";
+	public static final String FACETYPE_ILL = "M0005";
 
 	/**
 	 * Команда управления настроением: "готов играть".
 	 */
-	public static final String FACETYPE_READY_TO_PLAY = "F0102";
+	public static final String FACETYPE_READY_TO_PLAY = "M0102";
 
 	/**
 	 * Команда управления настроением: "очень грустно".
 	 */
-	public static final String FACETYPE_VERY_BLUE = "F0103";
+	public static final String FACETYPE_VERY_BLUE = "M0103";
 
 	/**
 	 * Команда управления настроением: "злюсь, отпрыгиваю".
 	 */
-	public static final String FACETYPE_ANGRY_JUMP_BACK = "F0104";
+	public static final String FACETYPE_ANGRY_JUMP_BACK = "M0104";
 	
 	/**
 	 * Команда управления настроением: "меломан".
 	 */
-	public static final String FACETYPE_MUSIC_LOVER = "F0105";
+	public static final String FACETYPE_MUSIC_LOVER = "M0105";
 	
 	/**
 	 * Сигнал попадания.
@@ -69,7 +69,7 @@ public final class MessageConstant {
 	/**
 	 * Команда выстрела.
 	 */
-	public static final String FIRE = "f0001";
+	public static final String FIRE = "s0001";
 	
 	/**
 	 * Начало сообщения о начале записи РобоСкрипта.
@@ -82,39 +82,44 @@ public final class MessageConstant {
 	public static final String ROBOSCRIPT_REC_STOPPED = "r02";
 	
 	/**
+	 * Сообщение об успешно выполненной команде.
+	 */
+	public static final String OK = "#0000";
+	
+	/**
 	 * Ошибка неверное сообщение.
 	 */
-	public static final String WRONG_MESSAGE = "E0001";
+	public static final String WRONG_MESSAGE = "#0001";
 	
 	/**
 	 * Ошибка неизвестная команда.
 	 */
-	public static final String UNKNOWN_COMMAND = "E0002";
+	public static final String UNKNOWN_COMMAND = "#0002";
 	
 	/**
 	 * Недопустимая команда в РобоСкрипт.
 	 */
-	public static final String ROBOSCRIPT_ILLEGAL_COMMAND = "E0003";
+	public static final String ROBOSCRIPT_ILLEGAL_COMMAND = "#0003";
 	
 	/**
 	 * Неверная последовательность команд в РобоСкрипт.
 	 */
-	public static final String ROBOSCRIPT_ILLEGAL_COMMAND_SEQUENCE = "E0004";
+	public static final String ROBOSCRIPT_ILLEGAL_COMMAND_SEQUENCE = "#0004";
 	
 	/**
 	 * Невозможно выделить необходимый объём памяти для РобоСкрипта.
 	 */
-	public static final String ROBOSCRIPT_NO_MEMORY = "E0005";
+	public static final String ROBOSCRIPT_NO_MEMORY = "#0005";
 	
 	/**
 	 * Попытка выхода за границы выделенной для РобоСкрипт памяти.
 	 */
-	public static final String ROBOSCRIPT_OUT_OF_BOUNDS = "E0006";
+	public static final String ROBOSCRIPT_OUT_OF_BOUNDS = "#0006";
 	
 	/**
 	 * Недопустимая команда вне РобоСкрипт.
 	 */
-	public static final String ILLEGAL_COMMAND = "E0007";
+	public static final String ILLEGAL_COMMAND = "#0007";
 	
 	/**
 	 * Закрытый конструктор класса.

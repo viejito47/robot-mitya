@@ -123,7 +123,7 @@ namespace RoboControl
             this.CheckRobotHelper();
 
             string command = this.GenerateMoodCommand(mood);
-            this.robotHelper.SendNonrecurrentMessageToRobot(command, "F0000");
+            this.robotHelper.SendNonrecurrentMessageToRobot(command, "M0000");
             this.mood = mood;
         }
 
@@ -159,7 +159,7 @@ namespace RoboControl
         /// </param>
         public void ShowReadyToPlay(LookHelper lookHelper)
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("F0102", "F0000");
+            this.robotHelper.SendNonrecurrentMessageToRobot("M0102", "M0000");
             this.mood = Mood.Normal;
 
             lookHelper.FixedLook(lookHelper.FixedLookX, this.controlSettings.VerticalReadyToPlayDegree);
@@ -173,7 +173,7 @@ namespace RoboControl
         /// </param>
         public void ShowDepression(LookHelper lookHelper)
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("F0103", "F0000");
+            this.robotHelper.SendNonrecurrentMessageToRobot("M0103", "M0000");
             this.mood = Mood.Blue;
 
             lookHelper.FixedLook(lookHelper.FixedLookX, this.controlSettings.VerticalMinimumDegree);
@@ -200,17 +200,17 @@ namespace RoboControl
             switch (mood)
             {
                 case Mood.Normal:
-                    return "F0001";
+                    return "M0001";
                 case Mood.Happy:
-                    return "F0002";
+                    return "M0002";
                 case Mood.Blue:
-                    return "F0003";
+                    return "M0003";
                 case Mood.Angry:
-                    return "F0004";
+                    return "M0004";
                 case Mood.Disaster:
-                    return "F0005";
+                    return "M0005";
                 default:
-                    return "F0000";
+                    return "M0000";
             }
         }
     }

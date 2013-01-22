@@ -49,5 +49,14 @@ namespace RoboConsole.Properties {
                 return ((byte)(this["SingleMessageRepetitionsCount"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("COM3")]
+        public string ComPort {
+            get {
+                return ((string)(this["ComPort"]));
+            }
+        }
     }
 }

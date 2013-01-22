@@ -84,7 +84,7 @@ public class RoboHeadActivity extends Activity {
 				String message = (String) msg.obj;				
 				String command = MessageHelper.getMessageIdentifier(message);
 
-				if (command.equals("F")) { // F [face] Ц смена мордочки
+				if (command.equals("M")) { // M [mood] Ц смена мордочки
 					if (!mRecordingRoboScriptMode) {
 						if (message.equals(MessageConstant.FACETYPE_OK)) {
 					        mFaceHelper.setFace(FaceType.ftOk);
@@ -140,7 +140,10 @@ public class RoboHeadActivity extends Activity {
 					mRecordingRoboScriptMode = false;
 					MessageUniqueFilter.setActive(true);
 					sendMessageToRobot(message);
-				} else if (command.equals("E")) {
+				} else if (message.equals("#0000")) {
+					// Ќичего не делаем.
+					Logger.d("OK");
+				} else if (command.equals("#")) {
 					String errorMessage = "ќшибка: ";
 					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
 						errorMessage += "неверное сообщение";
@@ -161,7 +164,7 @@ public class RoboHeadActivity extends Activity {
 					Logger.e(errorMessage);
 				} else {
 					if (!mRecordingRoboScriptMode) {
-						if (command.equals("f")) { // f [fire] Ц выстрел
+						if (command.equals("s")) { // s [shoot] Ц выстрел
 							if (message.equals(MessageConstant.FIRE)) {
 				                new Thread() {
 				                    public void run() {
@@ -291,7 +294,7 @@ public class RoboHeadActivity extends Activity {
 
 		    	switch (item) {
 		    	case cStop:
-		    		sendMessageToRobot("D0000");
+		    		sendMessageToRobot("G0000");
 		    		break;
 		    	case cLightsOn:
 		    		sendMessageToRobot("I0001");
@@ -301,14 +304,14 @@ public class RoboHeadActivity extends Activity {
 		    		break;
 		    	case cFire:
 					Message message = new Message();
-					message.obj = "f0001";
+					message.obj = "s0001";
 					mHandler.sendMessage(message);
 		    		break;
 		    	case cDriveForward255:
-		    		sendMessageToRobot("D00FF");
+		    		sendMessageToRobot("G00FF");
 		    		break;
 		    	case cDriveBackward100:
-		    		sendMessageToRobot("DFF9C");
+		    		sendMessageToRobot("GFF9C");
 		    		break;
 		    	case cLeftForward127RightBackward127:
 		    		sendMessageToRobot("L007F");

@@ -98,16 +98,16 @@ namespace RoboControl
             // в следующий раз, значение "0001" для команды "h" надо сменить на "0000" в этой хэш-таблице.
             for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
-                this.robotHelper.SendMessageToRobot("f0001");
-                this.robotHelper.SendMessageToRobot("f0001");
-                this.robotHelper.SendMessageToRobot("f0001");
+                this.robotHelper.SendMessageToRobot("s0001");
+                this.robotHelper.SendMessageToRobot("s0001");
+                this.robotHelper.SendMessageToRobot("s0001");
             }
 
             for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
             {
-                this.robotHelper.SendMessageToRobot("f0000");
-                this.robotHelper.SendMessageToRobot("f0000");
-                this.robotHelper.SendMessageToRobot("f0000");
+                this.robotHelper.SendMessageToRobot("s0000");
+                this.robotHelper.SendMessageToRobot("s0000");
+                this.robotHelper.SendMessageToRobot("s0000");
             }
             
             this.chargeStartTime = DateTime.Now;
