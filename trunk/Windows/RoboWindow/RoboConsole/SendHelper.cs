@@ -61,7 +61,7 @@ namespace RoboConsole
                 }
                 else
                 {
-                    bool sendResult = robotHelper.SendMessageToRobot(command);
+                    bool sendResult = SendMessageToRobot(robotHelper, false, command); //...
                     if (sendResult)
                     {
                         outputTextBox.AppendText(robotHelper.LastSentMessage);
@@ -107,6 +107,26 @@ namespace RoboConsole
         public static void SelectNextCommand(TextBox commandLineTextBox)
         {
             commandLineTextBox.Text = commandHistory.GetNextCommand();
+        }
+
+        /// <summary>
+        /// Отправляет команду роботу. Или по Wi-Fi или по COM.
+        /// </summary>
+        /// <param name="robotHelper">
+        /// Объект, реализующий взаимодействие с роботом.
+        /// </param>
+        /// <param name="throughCom">
+        /// Если true, то передача команды осуществляется посредством COM-порта, иначе – по WiFi.
+        /// </param>
+        /// <param name="command">
+        /// Команда роботу.
+        /// </param>
+        /// <returns>
+        /// false, если ошибка.
+        /// </returns>
+        private static bool SendMessageToRobot(IRobotHelper robotHelper, bool throughCom, string command)
+        {
+            return robotHelper.SendMessageToRobot(command);
         }
 
         /// <summary>

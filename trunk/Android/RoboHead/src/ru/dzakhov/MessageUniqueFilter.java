@@ -40,7 +40,7 @@ public final class MessageUniqueFilter {
 		String key = MessageHelper.getMessageIdentifier(message);
 		
 		// Функция работает только для команд управления движением и ориентации головы.
-		final String controlCommands = "LRDHV";
+		final String controlCommands = "LRGHV";
 		if (controlCommands.indexOf(key) < 0) {
 			return true;
 		}
