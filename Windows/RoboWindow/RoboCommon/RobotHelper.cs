@@ -142,7 +142,9 @@ namespace RoboCommon
         /// </remarks>
         public bool SendNonrecurrentMessageToRobot(string message, string voidMessage)
         {
-            for (int i = 0; i < this.connectSettings.SingleMessageRepetitionsCount; i++)
+            int repetitions = 1; // this.connectSettings.SingleMessageRepetitionsCount;
+
+            for (int i = 0; i < repetitions; i++)
             {
                 if (!this.SendMessageToRobot(message))
                 {
@@ -150,7 +152,7 @@ namespace RoboCommon
                 }
             }
 
-            for (int i = 0; i < this.connectSettings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < repetitions; i++)
             {
                 if (!this.SendMessageToRobot(voidMessage))
                 {
@@ -215,7 +217,7 @@ namespace RoboCommon
 
             try
             {
-                Int32.Parse(valueText, System.Globalization.NumberStyles.AllowHexSpecifier);
+                int.Parse(valueText, System.Globalization.NumberStyles.AllowHexSpecifier);
             }
             catch (Exception)
             {

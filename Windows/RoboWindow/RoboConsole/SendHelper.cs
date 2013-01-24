@@ -61,7 +61,7 @@ namespace RoboConsole
                 }
                 else
                 {
-                    bool sendResult = SendMessageToRobot(robotHelper, false, command); //...
+                    bool sendResult = SendMessageToRobot(robotHelper, false, command);
                     if (sendResult)
                     {
                         outputTextBox.AppendText(robotHelper.LastSentMessage);
