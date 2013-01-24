@@ -88,7 +88,7 @@ namespace RoboControl
                     this.audio.Volume = 200;
                     string[] options = new string[] { @":network-caching=20" };
                     this.audio.playlist.add(
-                        String.Format(
+                        string.Format(
                             @"http://{0}:{1}/audio.wav",
                             this.robotHelper.ConnectSettings.RoboHeadAddress,
                             this.controlSettings.IpWebcamPort),

@@ -79,7 +79,7 @@ namespace RoboControl
                 try
                 {
                     this.mjpeg.StopStream();
-                    this.mjpeg.ParseStream(new Uri(String.Format(
+                    this.mjpeg.ParseStream(new Uri(string.Format(
                         @"http://{0}:{1}/videofeed",
                         this.robotHelper.ConnectSettings.RoboHeadAddress,
                         this.controlSettings.IpWebcamPort)));
