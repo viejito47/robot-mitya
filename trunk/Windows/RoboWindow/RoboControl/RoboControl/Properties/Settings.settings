@@ -47,9 +47,6 @@
     <Setting Name="RoboScript0" Type="System.String" Scope="Application">
       <Value Profile="(Default)">r0100, Z0001, I0000, W0000, Z0000</Value>
     </Setting>
-    <Setting Name="RoboScript1" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">r0101, Z0001, F0105, W0000, Z0000</Value>
-    </Setting>
     <Setting Name="RoboScript2" Type="System.String" Scope="Application">
       <Value Profile="(Default)">r0102, Z000A, L00FF, W0000, R0050, W03E8, LFFB0, W0000, RFF01, W03E8, L00FF, W0000, R0050, W03E8, L00FF, W0000, RFF01, W03E8, L0000, W0000, R0000, W0000, Z0000</Value>
     </Setting>
@@ -73,6 +70,9 @@
     </Setting>
     <Setting Name="RoboScript9" Type="System.String" Scope="Application">
       <Value Profile="(Default)">r0109, Z0001, I0001, W0000, Z0000</Value>
+    </Setting>
+    <Setting Name="RoboScript1" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">r0101, Z0001, M0105, W0000, Z0000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

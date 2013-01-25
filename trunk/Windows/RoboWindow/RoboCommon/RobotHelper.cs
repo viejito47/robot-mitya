@@ -142,7 +142,7 @@ namespace RoboCommon
         /// </remarks>
         public bool SendNonrecurrentMessageToRobot(string message, string voidMessage)
         {
-            int repetitions = 1; // this.connectSettings.SingleMessageRepetitionsCount;
+            int repetitions = this.connectSettings.SingleMessageRepetitionsCount;
 
             for (int i = 0; i < repetitions; i++)
             {

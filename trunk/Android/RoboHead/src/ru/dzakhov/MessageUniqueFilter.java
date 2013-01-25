@@ -3,14 +3,14 @@ package ru.dzakhov;
 import java.util.HashMap;
 
 /**
- * Класс для отсеивания повторяющихся сообщений.
- * @author Дмитрий Дзахов
+ * Class to exclude repeatable messages.
+ * @author Dmitry Dzakhov
  *
  */
 public final class MessageUniqueFilter {
 	/**
-	 * Хэш-таблица сообщений. Идентификатор сообщения - ключ в хэш-таблице.
-	 * Сообщение считается повторяющимся, если ключ уже есть в хэш-таблице и значения совпадают.
+	 * Hash-table for messages. Message identifier is a key in hash-table.
+	 * The message considered to be repeatable if its key already exsists in hash-table and values are equal.
 	 */
 	private static HashMap<String, String> messageHash = new HashMap<String, String>();
 	
@@ -20,17 +20,17 @@ public final class MessageUniqueFilter {
 	private static boolean mActive = true;
 	
 	/**
-	 * Все члены класса статические, поэтому конструктор закрыт.
+	 * All members of the class are static. That's why constructor is privet.
 	 */
 	private MessageUniqueFilter() {		
 	}
 	
 	/**
-	 * Повторяющиеся сообщения должны игнорироваться. Метод определяет каким было значение 
-	 * последнего сообщения с аналогичным идентификатором и если значения совпадают, возвращает false,
-	 * иначе - true. Если фильтр неактивен, возвращаемое значение всегда true.
-	 * @param message проверяемое сообщение.
-	 * @return true, если не совпадает с последним сообщением того же типа.
+	 * Repeatable messages should be ignored. The method determine last message's value
+	 * with the same identifier. If the values are equal it returns false, otherwise true.
+	 * If the filter is inactive returned value is always true.
+	 * @param message to be tested.
+	 * @return true, if the message is not equal to the last message of the same type.
 	 */
 	public static boolean isNewMessage(final String message) {
 		if (!mActive) {
@@ -39,8 +39,10 @@ public final class MessageUniqueFilter {
 		
 		String key = MessageHelper.getMessageIdentifier(message);
 		
-		// Функция работает только для команд управления движением и ориентации головы.
-		final String controlCommands = "LRGHV";
+		// The function works only with motion commands L, R, G, 
+		// head orientation commands H and V and 
+		// mood changing command M.
+		final String controlCommands = "LRGHVM";
 		if (controlCommands.indexOf(key) < 0) {
 			return true;
 		}
@@ -62,16 +64,16 @@ public final class MessageUniqueFilter {
 	}
 	
 	/**
-	 * Геттер активности фильтра сообщений.
-	 * @return значение активности.
+	 * Getter of the field Activity.
+	 * @return value of the filter's activity.
 	 */
 	public static boolean getActive() {
 		return mActive;
 	}
 	
 	/**
-	 * Мутатор активности фильтра сообщений.
-	 * @param value устанавливаемое значение активности.
+	 * Setter of the field Activity.
+	 * @param value is the new value of the filter's activity.
 	 */
 	public static void setActive(final boolean value) {
 		mActive = value;
