@@ -204,9 +204,8 @@ void processMessageBuffer()
     if(((MessageBuffer[i]>='0')&&(MessageBuffer[i]<='9'))||((MessageBuffer[i]>='A')&&(MessageBuffer[i]<='F'))||((MessageBuffer[i]>='a')&&(MessageBuffer[i]<='f')))
     {  //Оказалась цифра
           Serial.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
-          Serial.print((char)MessageBuffer[i]); // Что конкретно за цифра - чисто для отладки, потом если что удалить.
           i++;
-    }else
+    } else
     {  //Попалась не цифра
         message = MessageBuffer.substring(i, i+MESSAGELENGTH);
 //        Serial.println("message: " + message);
