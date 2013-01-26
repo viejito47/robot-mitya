@@ -860,8 +860,3 @@ void sendMessageToRobot(String command, unsigned int value)
   Serial.print(command + hexValue);
 }
 
-void show(RoboAction action)
-{
-  sendMessageToRobot(String((char)action.Command), action.Value);
-  Serial.println("");
-}
