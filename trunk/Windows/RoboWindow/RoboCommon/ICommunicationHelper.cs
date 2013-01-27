@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IRobotHelper.cs" company="Dzakhov's jag">
+// <copyright file="ICommunicationHelper.cs" company="Dzakhov's jag">
 //   Copyright © Dmitry Dzakhov 2012
 // </copyright>
 // <summary>
@@ -17,7 +17,7 @@ namespace RoboCommon
     /// <summary>
     /// Интерфейс для взаимодействия с головой робота.
     /// </summary>
-    public interface IRobotHelper
+    public interface ICommunicationHelper
     {
         /// <summary>
         /// Gets Текст последней ошибки.
@@ -31,11 +31,6 @@ namespace RoboCommon
         /// свойство LastSentMessage будет содержать это сообщение, представленное в полной форме.
         /// </summary>  
         string LastSentMessage { get; }
-
-        /// <summary>
-        /// Gets Опции соединения с роботом.
-        /// </summary>
-        ConnectSettings ConnectSettings { get; }
 
         /// <summary>
         /// Передать роботу сообщение.

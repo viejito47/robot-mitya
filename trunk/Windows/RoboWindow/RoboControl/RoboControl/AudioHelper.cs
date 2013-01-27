@@ -35,7 +35,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private UdpCommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -45,17 +45,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the AudioHelper class.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект, упращающий взаимодействие с роботом.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public AudioHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        public AudioHelper(UdpCommunicationHelper communicationHelper, ControlSettings controlSettings)
         {
-            if (robotHelper == null)
+            if (communicationHelper == null)
             {
-                throw new ArgumentNullException("robotHelper");
+                throw new ArgumentNullException("communicationHelper");
             }
 
             if (controlSettings == null)
@@ -63,7 +63,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
             this.controlSettings = controlSettings;
         }
 
@@ -90,7 +90,7 @@ namespace RoboControl
                     this.audio.playlist.add(
                         string.Format(
                             @"http://{0}:{1}/audio.wav",
-                            this.robotHelper.ConnectSettings.RoboHeadAddress,
+                            this.communicationHelper.RoboHeadAddress,
                             this.controlSettings.IpWebcamPort),
                         null,
                         options);
@@ -98,7 +98,7 @@ namespace RoboControl
                 }
                 catch (Exception e)
                 {
-                    this.robotHelper.LastErrorMessage = e.Message;
+                    this.communicationHelper.LastErrorMessage = e.Message;
                 }
             }
         }
@@ -122,7 +122,7 @@ namespace RoboControl
                 }
                 catch (Exception e)
                 {
-                    this.robotHelper.LastErrorMessage = e.Message;
+                    this.communicationHelper.LastErrorMessage = e.Message;
                 }
             }
         }

@@ -55,7 +55,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private CommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -70,17 +70,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the MoodHelper class.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект для взаимодействия с головой робота.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public MoodHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        public MoodHelper(CommunicationHelper communicationHelper, ControlSettings controlSettings)
         {
-            if (robotHelper == null)
+            if (communicationHelper == null)
             {
-                throw new ArgumentNullException("robotHelper");
+                throw new ArgumentNullException("communicationHelper");
             }
 
             if (controlSettings == null)
@@ -88,7 +88,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
             this.controlSettings = controlSettings;
         }
 
@@ -106,10 +106,10 @@ namespace RoboControl
         /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
-        public void Initialize(RobotHelper robotHelper)
+        /// <param name="communicationHelper">Уже проинициализированный экземпляр.</param>
+        public void Initialize(CommunicationHelper communicationHelper)
         {
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
         }
 
         /// <summary>
@@ -120,10 +120,10 @@ namespace RoboControl
         /// </param>
         public void SetMood(Mood mood)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             string command = this.GenerateMoodCommand(mood);
-            this.robotHelper.SendNonrecurrentMessageToRobot(command, "M0000");
+            this.communicationHelper.SendNonrecurrentMessageToRobot(command, "M0000");
             this.mood = mood;
         }
 
@@ -132,7 +132,7 @@ namespace RoboControl
         /// </summary>
         public void WagTail()
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("t0002", "t0000");
+            this.communicationHelper.SendNonrecurrentMessageToRobot("t0002", "t0000");
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace RoboControl
         /// </summary>
         public void ShowYes()
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("y0002", "y0000");
+            this.communicationHelper.SendNonrecurrentMessageToRobot("y0002", "y0000");
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace RoboControl
         /// </summary>
         public void ShowNo()
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("n0002", "n0000");
+            this.communicationHelper.SendNonrecurrentMessageToRobot("n0002", "n0000");
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace RoboControl
         /// </param>
         public void ShowReadyToPlay(LookHelper lookHelper)
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("M0102", "M0000");
+            this.communicationHelper.SendNonrecurrentMessageToRobot("M0102", "M0000");
             this.mood = Mood.Normal;
 
             lookHelper.FixedLook(lookHelper.FixedLookX, this.controlSettings.VerticalReadyToPlayDegree);
@@ -173,7 +173,7 @@ namespace RoboControl
         /// </param>
         public void ShowDepression(LookHelper lookHelper)
         {
-            this.robotHelper.SendNonrecurrentMessageToRobot("M0103", "M0000");
+            this.communicationHelper.SendNonrecurrentMessageToRobot("M0103", "M0000");
             this.mood = Mood.Blue;
 
             lookHelper.FixedLook(lookHelper.FixedLookX, this.controlSettings.VerticalMinimumDegree);
@@ -182,9 +182,9 @@ namespace RoboControl
         /// <summary>
         /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        private void CheckRobotHelper()
+        private void CheckCommunicationHelper()
         {
-            if (this.robotHelper == null)
+            if (this.communicationHelper == null)
             {
                 throw new NullReferenceException("MoodHelper не инициализирован.");
             }

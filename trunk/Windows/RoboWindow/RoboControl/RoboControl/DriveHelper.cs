@@ -24,7 +24,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private CommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -68,17 +68,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the DriveHelper class.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект для взаимодействия с головой робота.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public DriveHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        public DriveHelper(CommunicationHelper communicationHelper, ControlSettings controlSettings)
         {
-            if (robotHelper == null)
+            if (communicationHelper == null)
             {
-                throw new ArgumentNullException("robotHelper");
+                throw new ArgumentNullException("communicationHelper");
             }
 
             if (controlSettings == null)
@@ -86,7 +86,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
             this.controlSettings = controlSettings;
 
             this.speedForKeyboardControl = controlSettings.Speed3;
@@ -383,10 +383,10 @@ namespace RoboControl
         /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
-        public void Initialize(RobotHelper robotHelper)
+        /// <param name="communicationHelper">Уже проинициализированный экземпляр.</param>
+        public void Initialize(CommunicationHelper communicationHelper)
         {
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
         }
 
         /// <summary>
@@ -396,14 +396,14 @@ namespace RoboControl
         /// <param name="y">Координата y джойстика в интервале [-1, 1].</param>
         public void Drive(double x, double y)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             int leftSpeed;
             int rightSpeed;
             this.CalculateMotorsSpeed(x, y, out leftSpeed, out rightSpeed);
             this.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
-            this.robotHelper.SendMessageToRobot(this.leftMotorCommand);
-            this.robotHelper.SendMessageToRobot(this.rightMotorCommand);
+            this.communicationHelper.SendMessageToRobot(this.leftMotorCommand);
+            this.communicationHelper.SendMessageToRobot(this.rightMotorCommand);
         }
 
         /// <summary>
@@ -415,14 +415,14 @@ namespace RoboControl
         /// <param name="rightPressed">Нажата клавиша "Вправо".</param>
         public void Drive(bool forwardPressed, bool backwardPressed, bool leftPressed, bool rightPressed)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             int leftSpeed;
             int rightSpeed;
             this.CalculateMotorsSpeed(forwardPressed, backwardPressed, leftPressed, rightPressed, out leftSpeed, out rightSpeed);
             this.GenerateMotorCommands(leftSpeed, rightSpeed, out this.leftMotorCommand, out this.rightMotorCommand);
-            this.robotHelper.SendMessageToRobot(this.leftMotorCommand);
-            this.robotHelper.SendMessageToRobot(this.rightMotorCommand);
+            this.communicationHelper.SendMessageToRobot(this.leftMotorCommand);
+            this.communicationHelper.SendMessageToRobot(this.rightMotorCommand);
         }
 
         /// <summary>
@@ -444,9 +444,9 @@ namespace RoboControl
         /// <summary>
         /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        private void CheckRobotHelper()
+        private void CheckCommunicationHelper()
         {
-            if (this.robotHelper == null)
+            if (this.communicationHelper == null)
             {
                 throw new NullReferenceException("DriveHelper не инициализирован.");
             }

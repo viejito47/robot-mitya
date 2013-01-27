@@ -26,7 +26,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private CommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -41,17 +41,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the GunHelper class.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект для взаимодействия с головой робота.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public GunHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        public GunHelper(CommunicationHelper communicationHelper, ControlSettings controlSettings)
         {
-            if (robotHelper == null)
+            if (communicationHelper == null)
             {
-                throw new ArgumentNullException("robotHelper");
+                throw new ArgumentNullException("communicationHelper");
             }
 
             if (controlSettings == null)
@@ -59,7 +59,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
             this.controlSettings = controlSettings;
         }
 
@@ -96,18 +96,18 @@ namespace RoboControl
             // Сброс нужен из-за алгоритма приёма сообщений в голове робота. Там есть хэш-таблица команд роботу,
             // и одинаковые команды с повторяющимися значениями игнорируются. Поэтому чтобы выстрел обрабатывался
             // в следующий раз, значение "0001" для команды "h" надо сменить на "0000" в этой хэш-таблице.
-            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.communicationHelper.NonrecurrentMessageRepetitions; i++)
             {
-                this.robotHelper.SendMessageToRobot("s0001");
-                this.robotHelper.SendMessageToRobot("s0001");
-                this.robotHelper.SendMessageToRobot("s0001");
+                this.communicationHelper.SendMessageToRobot("s0001");
+                this.communicationHelper.SendMessageToRobot("s0001");
+                this.communicationHelper.SendMessageToRobot("s0001");
             }
 
-            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.communicationHelper.NonrecurrentMessageRepetitions; i++)
             {
-                this.robotHelper.SendMessageToRobot("s0000");
-                this.robotHelper.SendMessageToRobot("s0000");
-                this.robotHelper.SendMessageToRobot("s0000");
+                this.communicationHelper.SendMessageToRobot("s0000");
+                this.communicationHelper.SendMessageToRobot("s0000");
+                this.communicationHelper.SendMessageToRobot("s0000");
             }
             
             this.chargeStartTime = DateTime.Now;

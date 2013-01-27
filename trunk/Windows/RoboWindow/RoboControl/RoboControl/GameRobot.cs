@@ -132,11 +132,6 @@ namespace RoboControl
         private static Vector2 debugStringPosition8 = new Vector2(20, debugStringPosition7.Y + debugStringInterval);
 
         /// <summary>
-        /// Опции соединения с роботом.
-        /// </summary>
-        private ConnectSettings connectSettings;
-
-        /// <summary>
         /// Опции управления роботом.
         /// </summary>
         private ControlSettings controlSettings;
@@ -144,7 +139,7 @@ namespace RoboControl
         /// <summary>
         /// Объект для взаимодействия с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private UdpCommunicationHelper communicationHelper;
 
         /// <summary>
         /// Объект для работы с фарами робота.
@@ -247,19 +242,18 @@ namespace RoboControl
             this.controlSettings = new ControlSettings();
             this.LoadControlSettingsFromFile();
 
-            this.connectSettings = new ConnectSettings(
+            this.communicationHelper = new UdpCommunicationHelper(
                 Properties.Settings.Default.RoboHeadAddress,
                 Properties.Settings.Default.MessagePort);
-            this.connectSettings.SingleMessageRepetitionsCount = Properties.Settings.Default.SingleMessageRepetitionsCount;
+            this.communicationHelper.NonrecurrentMessageRepetitions = Properties.Settings.Default.SingleMessageRepetitionsCount;
 
-            this.robotHelper = new RobotHelper(this.connectSettings);
-            this.flashlightHelper = new FlashlightHelper(this.robotHelper);
-            this.driveHelper = new DriveHelper(this.robotHelper, this.controlSettings);
-            this.lookHelper = new LookHelper(this.robotHelper, this.controlSettings);
-            this.moodHelper = new MoodHelper(this.robotHelper, this.controlSettings);
-            this.gunHelper = new GunHelper(this.robotHelper, this.controlSettings);
-            this.videoHelper = new VideoHelper(this.robotHelper, this.controlSettings);
-            this.audioHelper = new AudioHelper(this.robotHelper, this.controlSettings);
+            this.flashlightHelper = new FlashlightHelper(this.communicationHelper);
+            this.driveHelper = new DriveHelper(this.communicationHelper, this.controlSettings);
+            this.lookHelper = new LookHelper(this.communicationHelper, this.controlSettings);
+            this.moodHelper = new MoodHelper(this.communicationHelper, this.controlSettings);
+            this.gunHelper = new GunHelper(this.communicationHelper, this.controlSettings);
+            this.videoHelper = new VideoHelper(this.communicationHelper, this.controlSettings);
+            this.audioHelper = new AudioHelper(this.communicationHelper, this.controlSettings);
         }
 
         /// <summary>
@@ -610,11 +604,11 @@ namespace RoboControl
             {
                 if (!roboScriptItem.WasSent)
                 {
-                    this.robotHelper.SendRoboScriptToRobot(roboScriptItem.RoboScript);
+                    this.communicationHelper.SendRoboScriptToRobot(roboScriptItem.RoboScript);
                     roboScriptItem.WasSent = true;
                 }
 
-                this.robotHelper.SendMessageToRobot(roboScriptItem.PlayCommand);
+                this.communicationHelper.SendMessageToRobot(roboScriptItem.PlayCommand);
             }
         }
 
@@ -914,7 +908,7 @@ namespace RoboControl
 
             this.spriteBatch.DrawString(this.debugFont, this.PercentToText(this.gunHelper.GetChargePercent()), debugStringPosition7, Color.White);
 
-            this.spriteBatch.DrawString(this.debugFont, this.robotHelper.LastErrorMessage, debugStringPosition8, Color.Orange);
+            this.spriteBatch.DrawString(this.debugFont, this.communicationHelper.LastErrorMessage, debugStringPosition8, Color.Orange);
 
             this.spriteBatch.End();
         }
