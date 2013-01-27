@@ -82,13 +82,13 @@ namespace RoboControl
             // Текст любого РобоСкрипта начинается с сообщения r01xx. Где хх это номер РобоСкрипта.
             // В результате ошибки, в опциях приложения номер может стоять неверный.
             // Поэтому подправляем номер в соответствии с номером this.roboScriptNumber.
-            if (roboScript.Length >= ConnectSettings.MessageLength)
+            if (roboScript.Length >= CommunicationHelper.MessageLength)
             {
                 string numberHex = this.roboScriptNumber.ToString("X2");
 
                 this.RoboScript = roboScript;
-                this.RoboScript = this.RoboScript.Insert(ConnectSettings.MessageLength - 2, numberHex);
-                this.RoboScript = this.RoboScript.Remove(ConnectSettings.MessageLength, 2);
+                this.RoboScript = this.RoboScript.Insert(CommunicationHelper.MessageLength - 2, numberHex);
+                this.RoboScript = this.RoboScript.Remove(CommunicationHelper.MessageLength, 2);
 
                 this.PlayCommand = "r00" + numberHex;
             }

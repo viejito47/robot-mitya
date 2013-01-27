@@ -37,7 +37,7 @@ namespace RoboConsoleTest
 
             var outputTextBox = new TextBox();
 
-            var mock = new Mock<IRobotHelper>();
+            var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(true);
             mock.Setup(x => x.LastSentMessage).Returns("I0001");
 
@@ -59,7 +59,7 @@ namespace RoboConsoleTest
 
             var outputTextBox = new TextBox();
 
-            var mock = new Mock<IRobotHelper>();
+            var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(false);
 
             SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
@@ -80,7 +80,7 @@ namespace RoboConsoleTest
 
             var outputTextBox = new TextBox();
 
-            var mock = new Mock<IRobotHelper>();
+            var mock = new Mock<ICommunicationHelper>();
             
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(true);
@@ -112,7 +112,7 @@ namespace RoboConsoleTest
 
             var outputTextBox = new TextBox();
 
-            var mock = new Mock<IRobotHelper>();            
+            var mock = new Mock<ICommunicationHelper>();            
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns((string command) => !command.Equals("I0000"));
             mock.Setup(x => x.LastSentMessage)
@@ -138,7 +138,7 @@ namespace RoboConsoleTest
 
             var outputTextBox = new TextBox();
 
-            var mock = new Mock<IRobotHelper>();
+            var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(false);
 
@@ -159,7 +159,7 @@ namespace RoboConsoleTest
 
             var outputTextBox = new TextBox();
 
-            var mock = new Mock<IRobotHelper>();
+            var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(false);
 

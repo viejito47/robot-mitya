@@ -25,7 +25,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private CommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -83,17 +83,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the LookHelper class.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект для взаимодействия с головой робота.
         /// </param>
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public LookHelper(RobotHelper robotHelper, ControlSettings controlSettings)
+        public LookHelper(CommunicationHelper communicationHelper, ControlSettings controlSettings)
         {
-            if (robotHelper == null)
+            if (communicationHelper == null)
             {
-                throw new ArgumentNullException("robotHelper");
+                throw new ArgumentNullException("communicationHelper");
             }
 
             if (controlSettings == null)
@@ -101,7 +101,7 @@ namespace RoboControl
                 throw new ArgumentNullException("controlSettings");
             }
 
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
             this.controlSettings = controlSettings;
 
             this.fixedLookX = this.controlSettings.HorizontalForwardDegree;
@@ -253,10 +253,10 @@ namespace RoboControl
         /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
-        public void Initialize(RobotHelper robotHelper)
+        /// <param name="communicationHelper">Уже проинициализированный экземпляр.</param>
+        public void Initialize(CommunicationHelper communicationHelper)
         {
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace RoboControl
         /// <param name="y">y-координата ThumbStick-джойстика.</param>
         public void Look(float x, float y)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             if (!this.controlSettings.ReverseHeadTangage)
             {
@@ -294,12 +294,12 @@ namespace RoboControl
             {
                 // x = f(x)...
                 this.GenerateHorizontalServoCommand(x, out this.horizontalServoCommand);
-                this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+                this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
                 this.lookX = x;
 
                 // y = f(y)...
                 this.GenerateVerticalServoCommand(y, out this.verticalServoCommand);
-                this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
+                this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
                 this.lookY = y;
             }
         }
@@ -311,7 +311,7 @@ namespace RoboControl
         /// <param name="fixedY">Фиксированный угол по вертикали.</param>
         public void FixedLook(float fixedX, float fixedY)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             this.horizontalFixedControl = true;
             this.verticalFixedControl = true;
@@ -321,10 +321,10 @@ namespace RoboControl
             this.lookY = 0;
 
             this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
 
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace RoboControl
         /// </summary>
         public void LookForward()
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             this.fixedLookX = this.controlSettings.HorizontalForwardDegree;
             this.fixedLookY = this.controlSettings.VerticalForwardDegree;
@@ -340,8 +340,8 @@ namespace RoboControl
             this.lookY = 0;
             
             this.GenerateServoCommand(0, 0, out this.horizontalServoCommand, out this.verticalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
         }
         
         /// <summary>
@@ -354,7 +354,7 @@ namespace RoboControl
         /// </remarks>
         public void FixedLookLeft(GameTime gameTime)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             if (this.horizontalFixedControl == false)
             {
@@ -365,7 +365,7 @@ namespace RoboControl
             this.IncrementHorizontalDegree(ref this.fixedLookX, gameTime);
 
             this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
         }
 
         /// <summary>
@@ -378,7 +378,7 @@ namespace RoboControl
         /// </remarks>
         public void FixedLookRight(GameTime gameTime)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             if (this.horizontalFixedControl == false)
             {
@@ -388,7 +388,7 @@ namespace RoboControl
 
             this.DecrementHorizontalDegree(ref this.fixedLookX, gameTime);
             this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.horizontalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ namespace RoboControl
         /// </remarks>
         public void FixedLookUp(GameTime gameTime)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             if (this.verticalFixedControl == false)
             {
@@ -419,7 +419,7 @@ namespace RoboControl
             }
 
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
         }
 
         /// <summary>
@@ -432,7 +432,7 @@ namespace RoboControl
         /// </remarks>
         public void FixedLookDown(GameTime gameTime)
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
 
             if (this.verticalFixedControl == false)
             {
@@ -450,7 +450,7 @@ namespace RoboControl
             }
 
             this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
-            this.robotHelper.SendMessageToRobot(this.verticalServoCommand);
+            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
         }
 
         /// <summary>
@@ -628,9 +628,9 @@ namespace RoboControl
         /// <summary>
         /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        private void CheckRobotHelper()
+        private void CheckCommunicationHelper()
         {
-            if (this.robotHelper == null)
+            if (this.communicationHelper == null)
             {
                 throw new NullReferenceException("LookHelper не инициализирован.");
             }

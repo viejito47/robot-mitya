@@ -28,7 +28,7 @@ namespace RoboConsole
         /// <summary>
         /// Объект для взаимодействия с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private CommunicationHelper communicationHelper;
 
         /// <summary>
         /// Initializes a new instance of the FormMain class.
@@ -37,11 +37,10 @@ namespace RoboConsole
         {
             this.InitializeComponent();
 
-            ConnectSettings connectSettings = new ConnectSettings(
+            this.communicationHelper = new UdpCommunicationHelper(
                 Properties.Settings.Default.RoboHeadAddress,
                 Properties.Settings.Default.MessagePort);
-            connectSettings.SingleMessageRepetitionsCount = Properties.Settings.Default.SingleMessageRepetitionsCount;
-            this.robotHelper = new RobotHelper(connectSettings);
+            this.communicationHelper.NonrecurrentMessageRepetitions = Properties.Settings.Default.SingleMessageRepetitionsCount;
         }
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace RoboConsole
         /// <param name="e">Аргументы события.</param>
         private void ButtonSend_Click(object sender, EventArgs e)
         {
-            SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.robotHelper);
+            SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.communicationHelper);
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace RoboConsole
             switch (e.KeyCode)
             {
                 case Keys.Enter:
-                    SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.robotHelper);
+                    SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.communicationHelper);
                     break;
                 case Keys.Up:
                     SendHelper.SelectPreviousCommand(this.textBoxSend);

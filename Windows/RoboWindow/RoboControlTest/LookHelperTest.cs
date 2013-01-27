@@ -167,7 +167,7 @@ namespace RoboControlTest
         /// </returns>
         private LookHelper CreateLookHelper()
         {
-            var result = new LookHelper(new RobotHelper(new ConnectSettings("0.0.0.1", 51974)), this.controlSettings);
+            var result = new LookHelper(new UdpCommunicationHelper("0.0.0.1", 51974), this.controlSettings);
             return result;
         }
     }

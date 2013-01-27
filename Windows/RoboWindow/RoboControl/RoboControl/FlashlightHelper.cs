@@ -24,7 +24,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private RobotHelper robotHelper;
+        private CommunicationHelper communicationHelper;
 
         /// <summary>
         /// Признак включённости фонаря.
@@ -39,17 +39,17 @@ namespace RoboControl
         /// <summary>
         /// Initializes a new instance of the FlashlightHelper class.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Класс для взаимодействия с головой робота.
         /// </param>
-        public FlashlightHelper(RobotHelper robotHelper)
+        public FlashlightHelper(CommunicationHelper communicationHelper)
         {
-            if (robotHelper == null)
+            if (communicationHelper == null)
             {
-                throw new ArgumentNullException("robotHelper");
+                throw new ArgumentNullException("communicationHelper");
             }
 
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
         }
 
         /// <summary>
@@ -77,10 +77,10 @@ namespace RoboControl
         /// <summary>
         /// Инициализация экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        /// <param name="robotHelper">Уже проинициализированный экземпляр.</param>
-        public void Initialize(RobotHelper robotHelper)
+        /// <param name="communicationHelper">Уже проинициализированный экземпляр.</param>
+        public void Initialize(CommunicationHelper communicationHelper)
         {
-            this.robotHelper = robotHelper;
+            this.communicationHelper = communicationHelper;
         }
 
         /// <summary>
@@ -88,15 +88,15 @@ namespace RoboControl
         /// </summary>
         public void TurnOn()
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
             this.GenerateFlashlightTurnOnCommand();
             this.flashlightTurnedOn = true;
 
-            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.communicationHelper.NonrecurrentMessageRepetitions; i++)
             {
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
             }
         }
 
@@ -105,15 +105,15 @@ namespace RoboControl
         /// </summary>
         public void TurnOff()
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
             this.GenerateFlashlightTurnOffCommand();
             this.flashlightTurnedOn = false;
 
-            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.communicationHelper.NonrecurrentMessageRepetitions; i++)
             {
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
             }
         }
 
@@ -122,24 +122,24 @@ namespace RoboControl
         /// </summary>
         public void Switch()
         {
-            this.CheckRobotHelper();
+            this.CheckCommunicationHelper();
             this.GenerateSwitchFlashlightCommand();
             this.flashlightTurnedOn = !this.flashlightTurnedOn;
 
-            for (int i = 0; i < this.robotHelper.ConnectSettings.SingleMessageRepetitionsCount; i++)
+            for (int i = 0; i < this.communicationHelper.NonrecurrentMessageRepetitions; i++)
             {
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
-                this.robotHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
+                this.communicationHelper.SendMessageToRobot(this.FlashlightCommand);
             }
         }
 
         /// <summary>
         /// Проверка инициализации экземпляра класса для взаимодействия с роботом.
         /// </summary>
-        private void CheckRobotHelper()
+        private void CheckCommunicationHelper()
         {
-            if (this.robotHelper == null)
+            if (this.communicationHelper == null)
             {
                 throw new NullReferenceException("FlashlightHelper не инициализирован.");
             }

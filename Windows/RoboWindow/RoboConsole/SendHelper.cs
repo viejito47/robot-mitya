@@ -36,14 +36,14 @@ namespace RoboConsole
         /// <param name="outputTextBox">
         /// Поле вывода результатов.
         /// </param>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект, реализующий взаимодействие с роботом.
         /// </param>
-        public static void CommandLineProcessor(TextBox commandLineTextBox, TextBox outputTextBox, IRobotHelper robotHelper)
+        public static void CommandLineProcessor(TextBox commandLineTextBox, TextBox outputTextBox, ICommunicationHelper communicationHelper)
         {
             commandHistory.Add(commandLineTextBox.Text);
             
-            IEnumerable<string> commands = RobotHelper.ParseRoboScript(commandLineTextBox.Text);
+            IEnumerable<string> commands = CommunicationHelper.ParseRoboScript(commandLineTextBox.Text);
 
             var notSentCommands = new List<string>();
             foreach (string command in commands)
@@ -61,14 +61,14 @@ namespace RoboConsole
                 }
                 else
                 {
-                    bool sendResult = SendMessageToRobot(robotHelper, false, command);
+                    bool sendResult = SendMessageToRobot(communicationHelper, false, command);
                     if (sendResult)
                     {
-                        outputTextBox.AppendText(robotHelper.LastSentMessage);
+                        outputTextBox.AppendText(communicationHelper.LastSentMessage);
                     }
                     else
                     {
-                        outputTextBox.AppendText(string.Format("Ошибка в {0}: {1}", command, robotHelper.LastErrorMessage));
+                        outputTextBox.AppendText(string.Format("Ошибка в {0}: {1}", command, communicationHelper.LastErrorMessage));
                         notSentCommands.Add(command);
                     }
 
@@ -112,7 +112,7 @@ namespace RoboConsole
         /// <summary>
         /// Отправляет команду роботу. Или по Wi-Fi или по COM.
         /// </summary>
-        /// <param name="robotHelper">
+        /// <param name="communicationHelper">
         /// Объект, реализующий взаимодействие с роботом.
         /// </param>
         /// <param name="throughCom">
@@ -124,9 +124,9 @@ namespace RoboConsole
         /// <returns>
         /// false, если ошибка.
         /// </returns>
-        private static bool SendMessageToRobot(IRobotHelper robotHelper, bool throughCom, string command)
+        private static bool SendMessageToRobot(ICommunicationHelper communicationHelper, bool throughCom, string command)
         {
-            return robotHelper.SendMessageToRobot(command);
+            return communicationHelper.SendMessageToRobot(command);
         }
 
         /// <summary>

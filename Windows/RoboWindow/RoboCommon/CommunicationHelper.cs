@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RobotHelper.cs" company="Dzakhov's jag">
+// <copyright file="CommunicationHelper.cs" company="Dzakhov's jag">
 //   Copyright © Dmitry Dzakhov 2011
 // </copyright>
 // <summary>
@@ -20,32 +20,44 @@ namespace RoboCommon
     using System.Text;
 
     /// <summary>
-    /// Класс для взаимодействия с головой робота.
+    /// Abstract class for communicating with the robot.
     /// </summary>
-    public sealed class RobotHelper : IRobotHelper
+    public abstract class CommunicationHelper : ICommunicationHelper
     {
         /// <summary>
-        /// Опции управления роботом.
+        /// Constant length of message in our language.
         /// </summary>
-        private ConnectSettings connectSettings;
+        private static byte messageLength = 5;
 
         /// <summary>
-        /// Initializes a new instance of the RobotHelper class.
+        /// Initializes a new instance of the CommunicationHelper class.
         /// </summary>
-        /// <param name="connectSettings">
-        /// Опции соединения с роботом.
-        /// </param>
-        public RobotHelper(ConnectSettings connectSettings)
+        public CommunicationHelper()
         {
-            if (connectSettings == null)
-            {
-                throw new ArgumentNullException("connectSettings");
-            }
-
-            this.connectSettings = connectSettings;
+            this.NonrecurrentMessageRepetitions = 3;
             this.LastErrorMessage = string.Empty;
             this.LastSentMessage = string.Empty;
         }
+
+        /// <summary>
+        /// Gets the length of message in our language.
+        /// </summary>
+        public static byte MessageLength
+        {
+            get
+            {
+                return messageLength;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets number of repetitions we send nonrecurrent messages to the robot.
+        /// </summary>
+        /// <remarks>
+        /// Nonrecurrent messages (such as M, t, y, n) can be lost while transferring.
+        /// That's why they we send them nonrecurrentMessageRepetitions times. Three times by default.
+        /// </remarks>
+        public int NonrecurrentMessageRepetitions { get; set; }
 
         /// <summary>
         /// Gets or sets Текст последней ошибки.
@@ -53,23 +65,12 @@ namespace RoboCommon
         public string LastErrorMessage { get; set; }
 
         /// <summary>
-        /// Gets Последнее успешно отправленное роботу сообщение.
+        /// Gets or sets Последнее успешно отправленное роботу сообщение.
         /// Сообщение, передаваемое методу SendMessageToRobot, может быть представлено в краткой форме.
         /// Числовое значение может отсутствовать или не содержать лидирующих нулей. После успешной отправки
         /// свойство LastSentMessage будет содержать это сообщение, представленное в полной форме.
         /// </summary>  
-        public string LastSentMessage { get; private set; }
-
-        /// <summary>
-        /// Gets Опции соединения с роботом.
-        /// </summary>
-        public ConnectSettings ConnectSettings
-        {
-            get
-            {
-                return this.connectSettings;
-            }
-        }
+        public string LastSentMessage { get; protected set; }
 
         /// <summary>
         /// Получение списка команд из строки на РобоСкрипте с разделителями-запятыми.
@@ -100,16 +101,7 @@ namespace RoboCommon
                     return false;
                 }
 
-                byte[] messageBytes = Encoding.ASCII.GetBytes(correctedMessage + (char)13 + (char)10);
-
-                UdpClient udpClient = new UdpClient();
-                IPEndPoint endPoint = new IPEndPoint(this.connectSettings.RoboHeadAddress, this.connectSettings.MessagePort);
-                int bytesSent = udpClient.Send(messageBytes, messageBytes.Length, endPoint);
-                if (bytesSent != messageBytes.Length)
-                {
-                    this.LastErrorMessage = "Нет связи с роботом";
-                    return false;
-                }
+                this.TransmitMessage(correctedMessage);
             }
             catch (Exception e)
             {
@@ -142,7 +134,7 @@ namespace RoboCommon
         /// </remarks>
         public bool SendNonrecurrentMessageToRobot(string message, string voidMessage)
         {
-            int repetitions = this.connectSettings.SingleMessageRepetitionsCount;
+            int repetitions = this.NonrecurrentMessageRepetitions;
 
             for (int i = 0; i < repetitions; i++)
             {
@@ -191,7 +183,7 @@ namespace RoboCommon
         /// <param name="message">Исходное значение. В значении могут отсутствовать лидирующие нули.</param>
         /// <param name="correctedMessage">Скорректированное пятисимвольное сообщение.</param>
         /// <returns>true, если удалось, false и LastErrorMessage если нет.</returns>
-        private bool CorrectMessage(string message, out string correctedMessage)
+        protected bool CorrectMessage(string message, out string correctedMessage)
         {
             const int IdentifierLength = 1;
             const int ValueLength = 4;
@@ -228,5 +220,14 @@ namespace RoboCommon
             correctedMessage = message[0] + valueText;
             return true;
         }
+
+        /// <summary>
+        /// Internal method for message transmition. Should be overridden in subclasses for UDP or COM serial transmission.
+        /// Doesn't correct message. Doesn't handle errors, just generate exceptions.
+        /// </summary>
+        /// <param name="message">
+        /// Message to transmit.
+        /// </param>
+        protected abstract void TransmitMessage(string message);
     } // class
 } // namespace
