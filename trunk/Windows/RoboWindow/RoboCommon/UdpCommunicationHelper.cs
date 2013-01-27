@@ -27,7 +27,9 @@ namespace RoboCommon
         /// </summary>
         /// <param name="roboHeadAddress">Phone's IP-address string.</param>
         /// <param name="messagePort">Port for socket.</param>
-        public UdpCommunicationHelper(string roboHeadAddress, int messagePort)
+        /// <param name="nonrecurrentMessageRepetitions">Number of repetitions we send nonrecurrent messages to the robot.</param>
+        public UdpCommunicationHelper(string roboHeadAddress, int messagePort, int nonrecurrentMessageRepetitions)
+            : base(nonrecurrentMessageRepetitions)
         {
             this.RoboHeadAddress = IPAddress.Parse(roboHeadAddress);
             this.MessagePort = messagePort;
@@ -44,7 +46,7 @@ namespace RoboCommon
         public int MessagePort { get; private set; }
 
         /// <summary>
-        /// Internal method for message transmition. Should be overridden in subclasses for UDP or COM serial transmission.
+        /// Internal method for message transmition throught UDP socket.
         /// Doesn't correct message. Doesn't handle errors, just generate exceptions.
         /// </summary>
         /// <param name="message">
@@ -60,6 +62,13 @@ namespace RoboCommon
             {
                 throw new IOException("Нет связи с роботом");
             }
+        }
+
+        /// <summary>
+        /// Communication finalization.
+        /// </summary>
+        protected override void FinalizePort()
+        {
         }
     }
 }

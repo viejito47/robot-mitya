@@ -39,8 +39,8 @@ namespace RoboConsole
 
             this.communicationHelper = new UdpCommunicationHelper(
                 Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.MessagePort);
-            this.communicationHelper.NonrecurrentMessageRepetitions = Properties.Settings.Default.SingleMessageRepetitionsCount;
+                Properties.Settings.Default.MessagePort,
+                Properties.Settings.Default.SingleMessageRepetitionsCount);
         }
 
         /// <summary>
@@ -78,6 +78,31 @@ namespace RoboConsole
                     SendHelper.SelectNextCommand(this.textBoxSend);
                     e.Handled = true;
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Radio button checked changed event handler.
+        /// </summary>
+        /// <param name="sender">Sender control.</param>
+        /// <param name="e">Event arguments.</param>
+        private void RadioButtonComPortCheckedChanged(object sender, EventArgs e)
+        {
+            this.communicationHelper.Dispose();
+
+            if (this.radioButtonComPort.Checked)
+            {
+                this.communicationHelper = new ComPortCommunicationHelper(
+                    Properties.Settings.Default.ComPort,
+                    Properties.Settings.Default.BaudRate,
+                    Properties.Settings.Default.SingleMessageRepetitionsCount);
+            }
+            else
+            {
+                this.communicationHelper = new UdpCommunicationHelper(
+                    Properties.Settings.Default.RoboHeadAddress,
+                    Properties.Settings.Default.MessagePort,
+                    Properties.Settings.Default.SingleMessageRepetitionsCount);
             }
         }
     }

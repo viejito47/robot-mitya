@@ -22,7 +22,7 @@ namespace RoboCommon
     /// <summary>
     /// Abstract class for communicating with the robot.
     /// </summary>
-    public abstract class CommunicationHelper : ICommunicationHelper
+    public abstract class CommunicationHelper : ICommunicationHelper, IDisposable
     {
         /// <summary>
         /// Constant length of message in our language.
@@ -32,11 +32,22 @@ namespace RoboCommon
         /// <summary>
         /// Initializes a new instance of the CommunicationHelper class.
         /// </summary>
-        public CommunicationHelper()
+        /// <param name="nonrecurrentMessageRepetitions">
+        /// Number of repetitions we send nonrecurrent messages to the robot.
+        /// </param>
+        protected CommunicationHelper(int nonrecurrentMessageRepetitions)
         {
-            this.NonrecurrentMessageRepetitions = 3;
+            this.NonrecurrentMessageRepetitions = nonrecurrentMessageRepetitions;
             this.LastErrorMessage = string.Empty;
             this.LastSentMessage = string.Empty;
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="CommunicationHelper" /> class.
+        /// </summary>
+        ~CommunicationHelper()
+        {
+            this.FinalizePort();
         }
 
         /// <summary>
@@ -80,6 +91,14 @@ namespace RoboCommon
         public static IEnumerable<string> ParseRoboScript(string roboScript)
         {
             return roboScript.Split(',').Select(x => x.Trim()).ToArray();
+        }
+
+        /// <summary>
+        /// Releases communication resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.FinalizePort();
         }
 
         /// <summary>
@@ -229,5 +248,10 @@ namespace RoboCommon
         /// Message to transmit.
         /// </param>
         protected abstract void TransmitMessage(string message);
+
+        /// <summary>
+        /// Communication finalization. Called in Dispose method.
+        /// </summary>
+        protected abstract void FinalizePort();
     } // class
 } // namespace

@@ -244,8 +244,8 @@ namespace RoboControl
 
             this.communicationHelper = new UdpCommunicationHelper(
                 Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.MessagePort);
-            this.communicationHelper.NonrecurrentMessageRepetitions = Properties.Settings.Default.SingleMessageRepetitionsCount;
+                Properties.Settings.Default.MessagePort,
+                Properties.Settings.Default.SingleMessageRepetitionsCount);
 
             this.flashlightHelper = new FlashlightHelper(this.communicationHelper);
             this.driveHelper = new DriveHelper(this.communicationHelper, this.controlSettings);
