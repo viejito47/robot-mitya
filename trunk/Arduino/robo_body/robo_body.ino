@@ -125,10 +125,9 @@ void setup()
   musicReflexInitialize();  
 }
 
-// Функция главного цикла:
-void loop()
+void processEvents()
 {
-  // Проверка ИК-попадания в робота:
+   // Проверка ИК-попадания в робота:
   if (checkIrHit())
   {
     // Шлю сообщения Android-приложению об ИК-попадании в нас:
@@ -140,8 +139,6 @@ void loop()
     Serial.print("h0001");
     Serial.print("h0000");
   }
-  
-  processMessageBuffer();
 
   wagTail();
   showNo(); 
@@ -153,7 +150,14 @@ void loop()
   showMusic();
   musicReflexRun();
   
-  customRoboScriptRun();
+ customRoboScriptRun();
+}
+
+// Функция главного цикла:
+void loop()
+{
+  processMessageBuffer(); // Receive all messages and process them
+  processEvents();        
 }
 
 // Проверка ИК-попадания в робота:
@@ -370,6 +374,28 @@ void addActionToRoboScript(String command, unsigned int value)
   }
 }
 
+// Function reads battery VCC, using bandgap reference. 
+// Return value is VCC x 100 in HEX format
+// To make it work, you should fix Arduino library (allow to read from pins > 7 ):
+// \hardware\arduino\cores\arduino\wiring_analog.c   (path given for Arduino 1.0.3)
+// Find string: ADMUX = (analog_reference << 6) | (pin & 0x07); 
+// And replace with ADMUX = (analog_reference << 6) | (pin & 0x0f);
+
+// For my board Freeduino bandgap reference is 2,56 V. If in your is different usually 1,1 or 1,05 for better resualts
+#define BANDGAP_REF 256   // For 2,56 V.   TODO: Move this to settings.h which will be excluded from the SVN sync, because every device have different values for it.   (Also move pin defs to settings.h)
+unsigned int VCCRead()
+{
+  uint16_t raw_bandgap = 0;      // internal bandgap value
+  float volt_battery = 0.0;  
+    // Чтение напряжения батареи
+  analogReference(DEFAULT);                   // Use Vcc as AREF
+  raw_bandgap = analogRead(14);               // idle reading after changing AREF (manual ref: 23.5.2)
+  raw_bandgap = analogRead(14);               // Get internal bandgap
+  if(raw_bandgap==0) return 0; // We don't wont to receive devision by zero error in any case. 
+  volt_battery = (BANDGAP_REF * 1024) / raw_bandgap;  // calculate Vcc   // TODO: Make with out float volt_battery. (if make long volt_battery  - return value is 0)
+  return volt_battery*100;
+}
+
 void executeAction(String command, unsigned int value, boolean inPlaybackMode)
 {
   switch(command[0]) {  // Сейчас у нас односимвольные команды, но на случай развития команда определена как String
@@ -505,6 +531,11 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       // Команда выстрела пушке:
       irsend.sendSony(0xABC0, 16);
       irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
+      break;
+    }
+    case '-':  // '-' = Check the battery status, voltage will be send back as "~" command, and voltage*100. i.e. for 5.02V the command will be "~01F6"  
+    {
+      sendMessageToRobot("~",VCCRead());
       break;
     }
     default:
