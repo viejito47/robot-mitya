@@ -11,7 +11,7 @@
 #include <IRremote.h>
 #include <Swinger.h>
 #include <RoboScript.h>
-
+  
 // Эхо-режим. Возврат всех полученных сообщений.
 const boolean ECHO_MODE = false;
 
@@ -24,6 +24,8 @@ String MessageBuffer = "";
 int gunPin = 3;
 // Пин, использующийся для фиксации попаданий (аналоговый вход).
 int targetPin = A0;
+// Pin for measuring battery voltage (analog in).
+int batterySensorPin = A5;
 
 // Пины контроллера для управления двигателями робота (цифровые выходы).
 int motorLeftSpeedPin = 5;
@@ -48,8 +50,8 @@ int servoHeadHorizontalMinDegree = 0;
 int servoHeadHorizontalMaxDegree = 180;
 int servoHeadVerticalMinDegree = 0;
 int servoHeadVerticalMaxDegree = 90;
-int servoTailMinDegree = 10;
-int servoTailMaxDegree = 170;
+int servoTailMinDegree = 10;   // Not ZERO, because in the boundary position servo is vibrating a lot
+int servoTailMaxDegree = 170;   // Not 180, because in the boundary position servo is vibrating a lot
 
 int servoHeadCurrentHorizontalDegree;
 int servoHeadCurrentVerticalDegree;
@@ -87,6 +89,18 @@ signed int currentRoboScriptIndex = -1;
 boolean actionStarted = false;
 // Текущее записываемое действие в РобоСкрипт.
 RoboAction recordedAction;
+
+// Varibles for Timer to send VCC Battery data
+boolean useVCCTimer = false;
+unsigned long VCCTimerInterval=0;
+unsigned long timerTimeOld;  // Store previous timer value
+const long MINIMAL_INTERVAL_VALUE = 1000; // Minimum interval in milliseconds for Timer
+
+// Constants for Voltage Devidor
+const float voltPerUnit = 0.004883; // 5V/1024 values = 0,004883 V/value
+const float dividerRatio = 2; // (R1+R2)/R2
+const float voltRatio = voltPerUnit * dividerRatio*100; // This coefficient we will use
+
 
 // Функция инициализации скетча:
 void setup()
@@ -139,6 +153,8 @@ void processEvents()
     Serial.print("h0001");
     Serial.print("h0000");
   }
+  
+  CheckVCCTimer();
 
   wagTail();
   showNo(); 
@@ -374,26 +390,44 @@ void addActionToRoboScript(String command, unsigned int value)
   }
 }
 
-// Function reads battery VCC, using bandgap reference. 
-// Return value is VCC x 100 in HEX format
-// To make it work, you should fix Arduino library (allow to read from pins > 7 ):
-// \hardware\arduino\cores\arduino\wiring_analog.c   (path given for Arduino 1.0.3)
-// Find string: ADMUX = (analog_reference << 6) | (pin & 0x07); 
-// And replace with ADMUX = (analog_reference << 6) | (pin & 0x0f);
-
-// For my board Freeduino bandgap reference is 2,56 V. If in your is different usually 1,1 or 1,05 for better resualts
-#define BANDGAP_REF 256   // For 2,56 V.   TODO: Move this to settings.h which will be excluded from the SVN sync, because every device have different values for it.   (Also move pin defs to settings.h)
+// Function reads battery VCC, using Voltage divider.
+// I used R1 = R2 = 10 kOhm
+// Return value is VCC x 100 in HEX format (voltRatio have *100)
 unsigned int VCCRead()
 {
-  uint16_t raw_bandgap = 0;      // internal bandgap value
-  float volt_battery = 0.0;  
-    // Чтение напряжения батареи
-  analogReference(DEFAULT);                   // Use Vcc as AREF
-  raw_bandgap = analogRead(14);               // idle reading after changing AREF (manual ref: 23.5.2)
-  raw_bandgap = analogRead(14);               // Get internal bandgap
-  if(raw_bandgap==0) return 0; // We don't wont to receive devision by zero error in any case. 
-  volt_battery = (BANDGAP_REF * 1024) / raw_bandgap;  // calculate Vcc   // TODO: Make with out float volt_battery. (if make long volt_battery  - return value is 0)
-  return volt_battery*100;
+  return voltRatio*analogRead(batterySensorPin);
+}
+
+
+// Check if it's time for timer to send VCC of the Battery;
+void CheckVCCTimer()
+{
+  if(!useVCCTimer){return;}
+  
+  unsigned int time = millis();
+  if(timerTimeOld>time){timerTimeOld=time;} // millis() will overflow (go back to zero), after approximately 50 days.
+  if(time-timerTimeOld>VCCTimerInterval)
+  {
+    sendMessageToRobot("~",VCCRead());
+    timerTimeOld=time; //Start timer again
+  }
+}
+
+// Starts the timer for every 'time' miliseconds to send VCC of the Battery to Serial.
+// TO switch off the timer call SetVCCTimer(0);
+void SetVCCTimer(unsigned int time)
+{
+  if(time==0) // Stop Timer
+  {
+    useVCCTimer=false;
+    return;
+  }
+
+  if(time<MINIMAL_INTERVAL_VALUE){time=MINIMAL_INTERVAL_VALUE;} // Set Minimum Interval Value 1 second.
+  
+  VCCTimerInterval = time;
+  useVCCTimer = true;
+  timerTimeOld = millis();
 }
 
 void executeAction(String command, unsigned int value, boolean inPlaybackMode)
@@ -533,9 +567,10 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
       break;
     }
-    case '-':  // '-' = Check the battery status, voltage will be send back as "~" command, and voltage*100. i.e. for 5.02V the command will be "~01F6"  
-    {
+    case '-':  // '-' = Check the battery status, voltage will be send back as "~" command, and voltage*100. i.e. for 5.02V the command will be "~01F6". 
+    {          // You can use value to set timer to receive battery status. i.e. "-1000" will send battery status every 4096 millisecons. "-0000" will send battery status only once and will switch off the timer is it was set before.
       sendMessageToRobot("~",VCCRead());
+      SetVCCTimer(value);
       break;
     }
     default:
