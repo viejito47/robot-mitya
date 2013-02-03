@@ -11,6 +11,7 @@
 #include <IRremote.h>
 #include <Swinger.h>
 #include <RoboScript.h>
+#include <EEPROM.h>
   
 // Эхо-режим. Возврат всех полученных сообщений.
 const boolean ECHO_MODE = false;
@@ -101,6 +102,26 @@ const float voltPerUnit = 0.004883; // 5V/1024 values = 0,004883 V/value
 const float dividerRatio = 2; // (R1+R2)/R2
 const float voltRatio = voltPerUnit * dividerRatio*100; // This coefficient we will use
 
+const int IR_MOVE_SPEED = 255; // Speed set to maximum, when control from IR remote
+const int IR_SERVO_STEP_DEFAULT = 5; // Step for changing servo head (Horizontal and Vertical) position, when controling from IR remote
+const int IR_SERVO_STEP_PROGRAM_MODE = 180; // Step for changing servo head (Horizontal and Vertical) position, when in programm mode. (Set to Maximum, so that user will 100% notice it.
+int IrServoStep = IR_SERVO_STEP_DEFAULT; // Step for rotating head from remote
+const int IR_TOTAL_COMMANDS = 17; // Total Number of commands, that can be send by IR control
+unsigned long IrCommands[IR_TOTAL_COMMANDS]; // All command from remote control
+
+unsigned long IrRemoteLastCommand = 0; // Last command received by IR receiver (except IR_COMMAND_SEPARATOR)
+const unsigned long IR_COMMAND_SEPARATOR = 0xFFFFFFFF;
+byte IrRemoteButtonState = 0; // 0 = Boot state. No buttons were ever pressed,
+                              // 1 = Button pressed, we only received the code of the button - very short press.
+                              // 2 = Button pressed for short time, we received first IR_COMMAND_SEPARATOR for the first time after IrRemoteLastCommand received.
+                              // 3 = Button pressed for long time, we received IR_COMMAND_SEPARATOR for more then one time after IrRemoteLastCommand received.
+
+const int IR_LAST_COMMANDS_BUFFER_SIZE = 4; // Last commands and their state to determine when to enter Programmator mode
+byte IrLastCommandsState[IR_LAST_COMMANDS_BUFFER_SIZE]={0}; // Last command state (LONG, SHORT or VERY SHORT press)
+unsigned long IrLastCommandsValue[IR_LAST_COMMANDS_BUFFER_SIZE]={0}; // Last command value
+
+boolean IsInIrProgrammMode = false; // Are we in IR command programm mode?
+byte IrProgrammatorStep = 0; // Number of command we're processing now
 
 // Функция инициализации скетча:
 void setup()
@@ -137,36 +158,28 @@ void setup()
   readyToPlayReflexInitialize();
   angryReflexInitialize();
   musicReflexInitialize();  
+  
+// Read all IR commands from EEPROM 
+  for(int i=0; i<sizeof(IrCommands); i++)
+  {
+     *((byte*)&IrCommands + i) = EEPROM.read(i);
+  }
+
 }
 
 void processEvents()
 {
-   // Проверка ИК-попадания в робота:
-  if (checkIrHit())
-  {
-    // Шлю сообщения Android-приложению об ИК-попадании в нас:
-    // один раз 'h0001' и один раз 'h0000' (hit - попадание).
-    // 'h0000' нужно чтобы сбросить значение в хэш-таблице 
-    // сообщений Android-приложения. Там используется хэш-таблица
-    // сообщений для исключения из обработки повторяющихся команд
-    // с одинаковыми значениями.
-    Serial.print("h0001");
-    Serial.print("h0000");
-  }
+  CheckIrCommands();
   
   CheckVCCTimer();
 
-  wagTail();
-  showNo(); 
-  showYes();
-  showBlue();
-  showReadyToPlay();
+  ProcessSwingers();
+
   readyToPlayReflexRun();
   angryReflexRun();
-  showMusic();
   musicReflexRun();
   
- customRoboScriptRun();
+  customRoboScriptRun();
 }
 
 // Функция главного цикла:
@@ -176,24 +189,185 @@ void loop()
   processEvents();        
 }
 
+
 // Проверка ИК-попадания в робота:
 boolean checkIrHit()
 {
-  boolean result = false;
-  if (irrecv.decode(&results)) {
-    unsigned long hitValue;
-/*    if (debugMode) {
-      hitValue = 0xA90;
+    unsigned long hitValue =  0xA90;
+//    if (debugMode) {
+//      hitValue = 0xA90;
+//    }
+//    else {
+//      hitValue = 0xABC1;
+//    }
+    if((results.decode_type == SONY) && (results.value == hitValue))
+    {
+          // Шлю сообщения Android-приложению об ИК-попадании в нас:
+      // один раз 'h0001' и один раз 'h0000' (hit - попадание).
+      // 'h0000' нужно чтобы сбросить значение в хэш-таблице 
+      // сообщений Android-приложения. Там используется хэш-таблица
+      // сообщений для исключения из обработки повторяющихся команд
+      // с одинаковыми значениями.
+      Serial.print("h0001");
+      Serial.print("h0000");
     }
-    else {
-      hitValue = 0xABC1;
-    }*/
-    hitValue = 0xA90;
-    result = (results.decode_type == SONY) && (results.value == hitValue);
+}
+
+
+void executeIrCommand(int cmd)
+{
+  switch(cmd)
+  {
+    case 0: // move forward
+      moveMotor( "G", IR_MOVE_SPEED );
+      break;
+    case 1: // move backwards
+      moveMotor( "G", -IR_MOVE_SPEED );
+      break;        
+    case 2: // turn left
+      moveMotor( "L", -IR_MOVE_SPEED );
+      moveMotor( "R", IR_MOVE_SPEED );
+      break;
+    case 3: // turn right
+      moveMotor( "L", IR_MOVE_SPEED );      
+      moveMotor( "R", -IR_MOVE_SPEED );
+      break;   
+    case 4: //stop
+      moveMotor( "G", 0 );
+      break;
+      
+    case 5: // Move Horizontal Head Left
+      moveHead( "H", servoHeadHorizontal.read()-IrServoStep );
+      break;
+    case 6: // Move Horizontal Head Right
+      moveHead( "H", servoHeadHorizontal.read()+IrServoStep );
+      break;
+    case 7: // Move Vertical Head Up
+      moveHead( "V", servoHeadVertical.read()-IrServoStep );
+      break;        
+    case 8: // Move Vertical Head Down
+      moveHead( "V", servoHeadVertical.read()+IrServoStep );
+      break;
+    case 9: //no
+      noSwinger.startSwing(90, 1, 400, 2.5, 60, 0.75, true);      
+      break;
+    case 10: //yes
+      yesSwinger.startSwing(60, 1, 400, 2.5, 30, 0.8, true);
+      break;
+    case 11: //tail
+      tailSwinger.startSwing(90, 1, 250, 6, 70, 0.9, true);
+      break;
+    case 12: // Mood 
+      executeAction("M", 0x0102, true );
+      break;
+    case 13: // Mood 
+      executeAction("M", 0x0103, true );
+      break;
+    case 14: // Mood 
+      executeAction("M", 0x0104, true );
+      break;
+    case 15: // Mood 
+      executeAction("M", 0x0105, true );
+      break;
+    case 16: // Mood 
+      executeAction("M", 0x0102, true );
+      break;
+  }
+}
+
+void IrProgrammatorProcess()
+{
+  if (irrecv.decode(&results))
+  {
+      if((results.value!=IR_COMMAND_SEPARATOR)&&(results.value!=0)&&(results.value!=IrLastCommandsValue[0]))
+      {
+        IrCommands[IrProgrammatorStep]=results.value;
+        if(IrProgrammatorStep==IR_TOTAL_COMMANDS-1) // Was it the last command?
+        {
+          // Save all IR commands to EEPROM 
+          for(int i=0; i<sizeof(IrCommands); i++)
+          {
+             EEPROM.write(i, *((byte*)&IrCommands + i) );
+          }
+          IsInIrProgrammMode = false;
+          IrServoStep = IR_SERVO_STEP_DEFAULT;
+          executeIrCommand(2); // Tell the user that we finished programm mode
+        }else
+        {
+          executeIrCommand(++IrProgrammatorStep);
+        }
+
+      }            
+      irrecv.resume();        
+  }
+}
+
+void ProcessIrCommands()
+{
+  if(IrRemoteLastCommand==0) return; // The signal was not good enough to get the signal data
+  
+  // Check for known commands and executing them
+  for(int i=0; i<IR_TOTAL_COMMANDS; i++)
+  {
+    if(IrCommands[i]==IrRemoteLastCommand)
+    {
+      executeIrCommand(i);
+      return;
+    }
+  }
+  // We recieved unknown command. Let's check if we need to enter in programmator mode. (Same button should be pressed in the following order: LONG->SHORT->LONG->SHORT
+  if((IrLastCommandsValue[0]==IrLastCommandsValue[1])&&(IrLastCommandsValue[0]==IrLastCommandsValue[2])&&(IrLastCommandsValue[0]==IrLastCommandsValue[3])
+    &&(IrLastCommandsState[0]==2)&&(IrLastCommandsState[1]==3)&&(IrLastCommandsState[2]==2)&&(IrLastCommandsState[1]==3))
+  {
+    // Starting Programmator mode.
+    IrServoStep = IR_SERVO_STEP_PROGRAM_MODE; // Maximun step for Programm mode, so that user will notice servo movement
+    IsInIrProgrammMode = true;
+    IrProgrammatorStep = 0;
+    executeIrCommand(0); //  Executing command and waiting for user to press the button to save it.
+  }
+}
+
+// Check if any IR remote buttons pressed
+void CheckIrCommands()
+{
+// If we're in programm mode, jusst go 
+  if(IsInIrProgrammMode)
+  {
+    IrProgrammatorProcess();
+    return;
+  }
+  
+  if (irrecv.decode(&results)) {
+    // Button was pressed for LONG or SHORT time, but not VERY SHORT )
+    if(results.value==IR_COMMAND_SEPARATOR)
+    {
+      if(IrRemoteButtonState<3)
+      { // Set the IR remote button state
+        IrRemoteButtonState++;
+      }
+      // Update last pressed button state
+      IrLastCommandsState[0] = IrRemoteButtonState;
+    }else
+    {
+      IrRemoteLastCommand = results.value;
+      IrRemoteButtonState = 1;
+       // Saving last pressed buttons and their state - we will use it to determine when to start IR programmator.
+      for(int i=IR_LAST_COMMANDS_BUFFER_SIZE-1; i>0; i--)
+      {
+        IrLastCommandsState[i] = IrLastCommandsState[i-1];
+        IrLastCommandsValue[i] = IrLastCommandsValue[i-1];
+      }
+      IrLastCommandsValue[0] = IrRemoteLastCommand;  
+      IrLastCommandsState[0] = 2; // For programmator mode short and very short press of the button is equal.
+
+      checkIrHit(); // Check if robot was hit by another robot
+    }
+    ProcessIrCommands(); 
+
     irrecv.resume();
   }
-  return result;
 }
+
 
 
 // Извлечение и обработка команд из входного буфера:
@@ -669,36 +843,26 @@ void setHeadlightState(int value)
 }
 
 // Виляние хвостом.
-void wagTail()
+void ProcessSwingers()
 {
   int degree;
+  // Tail swinger
   if (tailSwinger.swing(degree))
   {
     moveTail(degree);
   }
-}
-
-void showNo()
-{
-  int degree;
+  // No swinger
   if (noSwinger.swing(degree))
   {
     moveHead("H", degree);
   }
-}
-
-void showYes()
-{
-  int degree;
+  // Yes swinger
   if (yesSwinger.swing(degree))
   {
     moveHead("V", degree);
   }
-}
-
-void showBlue()
-{
-  int degree;
+  
+  // Blue swinger
   if (blueVerticalSwinger.swing(degree))
   {
     moveHead("V", degree);
@@ -707,11 +871,7 @@ void showBlue()
   {
     moveHead("H", degree);
   }
-}
-
-void showReadyToPlay()
-{
-  int degree;
+// ReadyToPlay()
   if (readyToPlayVerticalSwinger.swing(degree))
   {
     moveHead("V", degree);
@@ -720,15 +880,7 @@ void showReadyToPlay()
   {
     moveHead("H", degree);
   }
-  if (tailSwinger.swing(degree))
-  {
-    moveTail(degree);
-  }
-}
-
-void showMusic()
-{
-  int degree;
+// Music
   if (musicVerticalSwinger.swing(degree))
   {
     moveHead("V", degree);
@@ -737,6 +889,7 @@ void showMusic()
   {
     moveHead("H", degree);
   }
+
 }
 
 signed long sign(double value)
