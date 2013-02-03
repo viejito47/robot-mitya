@@ -717,7 +717,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
           }*/
           break;
        }
-      }
+      } // (M-command's switch)
+      break;
     }
     case 'I':    
     {
