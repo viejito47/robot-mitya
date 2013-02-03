@@ -42,7 +42,7 @@ int servoTailPin = 11;
 // Пин управления фарами.
 int lightPin = 13;
 
-// Объекты для управления сервоприводами.
+// Objects to control servodrives.
 Servo servoHeadHorizontal;
 Servo servoHeadVertical;
 Servo servoTail;
@@ -58,15 +58,9 @@ int servoHeadCurrentHorizontalDegree;
 int servoHeadCurrentVerticalDegree;
 int servoTailCurrentDegree;
 
-Swinger tailSwinger; // объект для виляния хвостом
-Swinger yesSwinger; // объект для кивания "да"
-Swinger noSwinger; // объект для мотания "нет"
-Swinger blueVerticalSwinger;
-Swinger blueHorizontalSwinger;
-Swinger readyToPlayVerticalSwinger;
-Swinger readyToPlayHorizontalSwinger;
-Swinger musicVerticalSwinger;
-Swinger musicHorizontalSwinger;
+Swinger tailSwinger; // object to control tail swinging
+Swinger headVerticalSwinger; // object to control head vertical swinging
+Swinger headHorizontalSwinger; // object to control head horizontal swinging
 const int musicPeriod = 535;
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
@@ -164,7 +158,6 @@ void setup()
   {
      *((byte*)&IrCommands + i) = EEPROM.read(i);
   }
-
 }
 
 void processEvents()
@@ -173,7 +166,7 @@ void processEvents()
   
   CheckVCCTimer();
 
-  ProcessSwingers();
+  ProcessSwinging();
 
   readyToPlayReflexRun();
   angryReflexRun();
@@ -213,7 +206,6 @@ boolean checkIrHit()
     }
 }
 
-
 void executeIrCommand(int cmd)
 {
   switch(cmd)
@@ -249,10 +241,10 @@ void executeIrCommand(int cmd)
       moveHead( "V", servoHeadVertical.read()+IrServoStep );
       break;
     case 9: //no
-      noSwinger.startSwing(90, 1, 400, 2.5, 60, 0.75, true);      
+      headHorizontalSwinger.startSwing(90, 1, 400, 2.5, 60, 0.75, true);      
       break;
     case 10: //yes
-      yesSwinger.startSwing(60, 1, 400, 2.5, 30, 0.8, true);
+      headVerticalSwinger.startSwing(60, 1, 400, 2.5, 30, 0.8, true);
       break;
     case 11: //tail
       tailSwinger.startSwing(90, 1, 250, 6, 70, 0.9, true);
@@ -369,7 +361,6 @@ void CheckIrCommands()
 }
 
 
-
 // Извлечение и обработка команд из входного буфера:
 void processMessageBuffer()
 {
@@ -410,7 +401,6 @@ void processMessageBuffer()
   }
   MessageBuffer = MessageBuffer.substring(i, bufferLength); 
 //  Serial.println("NewMessageBuffer: " + MessageBuffer);
- 
 }
 
 boolean parseMessage(String message, String &command, int &value)
@@ -663,7 +653,7 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     {
       if (value != 0)
       {
-        noSwinger.startSwing(servoHeadCurrentHorizontalDegree, value, 400, 2.5, 60, 0.75, true);
+        headHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, value, 400, 2.5, 60, 0.75, true);
       }
       break;
     }
@@ -671,7 +661,7 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     {
       if (value != 0)
       {
-        yesSwinger.startSwing(servoHeadCurrentVerticalDegree, value, 400, 2.5, 30, 0.8, true);
+        headVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, value, 400, 2.5, 30, 0.8, true);
       }
       break;
     }
@@ -684,8 +674,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
           const int ReadyToPlayVerticalDegree = 70;
           int verticalAmplitude = abs((ReadyToPlayVerticalDegree - servoHeadCurrentVerticalDegree) * 2);
           boolean swingDirection = ReadyToPlayVerticalDegree > servoHeadCurrentVerticalDegree;
-          readyToPlayVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
-          readyToPlayHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
+          headVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
+          headHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
           tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
           readyToPlayReflexStart();
           if (inPlaybackMode)
@@ -697,8 +687,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
        case 0x0103:
        {
           int verticalAmplitude = (servoHeadCurrentVerticalDegree - servoHeadVerticalMinDegree) * 2;
-          blueVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
-          blueHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
+          headVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
+          headHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
           if (inPlaybackMode)
           {
             sendMessageToRobot(command, value);
@@ -717,8 +707,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
        case 0x0105:  
        {
           int musicTacts = 12;
-          musicVerticalSwinger.startSwing(45, 1, musicPeriod, musicTacts, 30, 1, true);
-          musicHorizontalSwinger.startSwing(90, 2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
+          headVerticalSwinger.startSwing(45, 1, musicPeriod, musicTacts, 30, 1, true);
+          headHorizontalSwinger.startSwing(90, 2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
           tailSwinger.startSwing(servoTailCurrentDegree, value, musicPeriod, musicTacts, 70, 1, true);
           musicReflexStart();
           /*if (inPlaybackMode)
@@ -842,54 +832,27 @@ void setHeadlightState(int value)
   }
 }
 
-// Виляние хвостом.
-void ProcessSwingers()
+// Process swinging on three servodrives.
+void ProcessSwinging()
 {
   int degree;
-  // Tail swinger
+  // Tail swinging.
   if (tailSwinger.swing(degree))
   {
     moveTail(degree);
   }
-  // No swinger
-  if (noSwinger.swing(degree))
-  {
-    moveHead("H", degree);
-  }
-  // Yes swinger
-  if (yesSwinger.swing(degree))
-  {
-    moveHead("V", degree);
-  }
   
-  // Blue swinger
-  if (blueVerticalSwinger.swing(degree))
-  {
-    moveHead("V", degree);
-  }
-  if (blueHorizontalSwinger.swing(degree))
-  {
-    moveHead("H", degree);
-  }
-// ReadyToPlay()
-  if (readyToPlayVerticalSwinger.swing(degree))
-  {
-    moveHead("V", degree);
-  }
-  if (readyToPlayHorizontalSwinger.swing(degree))
-  {
-    moveHead("H", degree);
-  }
-// Music
-  if (musicVerticalSwinger.swing(degree))
-  {
-    moveHead("V", degree);
-  }
-  if (musicHorizontalSwinger.swing(degree))
+  // Swinging head in horizontal plane.
+  if (headHorizontalSwinger.swing(degree))
   {
     moveHead("H", degree);
   }
 
+  // Swinging head in vertical plane.
+  if (headVerticalSwinger.swing(degree))
+  {
+    moveHead("V", degree);
+  }
 }
 
 signed long sign(double value)
