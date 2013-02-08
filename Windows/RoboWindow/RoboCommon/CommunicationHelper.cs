@@ -20,6 +20,13 @@ namespace RoboCommon
     using System.Text;
 
     /// <summary>
+    /// The delegate for the event after receiving data through COM-port or UDP-communication.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments that contains received text.</param>
+    public delegate void TextReceivedEventHandler(object sender, TextReceivedEventArgs e);
+
+    /// <summary>
     /// Abstract class for communicating with the robot.
     /// </summary>
     public abstract class CommunicationHelper : ICommunicationHelper, IDisposable
@@ -49,6 +56,11 @@ namespace RoboCommon
         {
             this.FinalizePort();
         }
+
+        /// <summary>
+        /// The event after receiving data through COM-port or UDP-communication.
+        /// </summary>
+        public event TextReceivedEventHandler TextReceived;
 
         /// <summary>
         /// Gets the length of message in our language.
@@ -193,6 +205,18 @@ namespace RoboCommon
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Generates the text received event.
+        /// </summary>
+        /// <param name="e">Event arguments that contains received text.</param>
+        protected virtual void OnTextReceived(TextReceivedEventArgs e)
+        {
+            if (this.TextReceived != null)
+            {
+                this.TextReceived(this, e);
+            }
         }
 
         /// <summary>

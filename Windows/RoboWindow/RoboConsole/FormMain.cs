@@ -96,6 +96,7 @@ namespace RoboConsole
                     Properties.Settings.Default.ComPort,
                     Properties.Settings.Default.BaudRate,
                     Properties.Settings.Default.SingleMessageRepetitionsCount);
+                this.communicationHelper.TextReceived += this.OnTextReceived;
             }
             else
             {
@@ -104,6 +105,25 @@ namespace RoboConsole
                     Properties.Settings.Default.MessagePort,
                     Properties.Settings.Default.SingleMessageRepetitionsCount);
             }
+        }
+
+        /// <summary>
+        /// The event handler to process received data through COM-port or UDP communication.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments that contains received text.</param>
+        private void OnTextReceived(object sender, TextReceivedEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                // Using this.Invoke causes deadlock when closing serial port, and BeginInvoke is good practice anyway.                
+                this.BeginInvoke(new EventHandler<TextReceivedEventArgs>(this.OnTextReceived), new object[] { sender, e });
+                return;
+            }
+
+            //todo: I should add one more level to recognize robot-commands. Each command should be ended by "\n".
+            // I can't end this "e.Text" by the "\n" because it can appear in the middle of a command.
+            this.textBoxReceive.AppendText(e.Text);
         }
     }
 }

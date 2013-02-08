@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TextReceivedEventArgs.cs" />
     <Compile Include="ComPortCommunicationHelper.cs" />
     <Compile Include="ICommunicationHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
