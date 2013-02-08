@@ -42,6 +42,7 @@ namespace RoboCommon
             this.BaudRate = baudRate;
 
             this.serialPort = new SerialPort(this.PortName, this.BaudRate);
+            this.serialPort.DataReceived += new SerialDataReceivedEventHandler(this.DataReceivedHandler);
             this.serialPort.Open();
         }
 
@@ -90,9 +91,30 @@ namespace RoboCommon
 
             if (this.serialPort.IsOpen)
             {
+                this.serialPort.DataReceived -= this.DataReceivedHandler;
                 this.serialPort.Close();
                 this.serialPort = null;
             }
+        }
+
+        /// <summary>
+        /// Low level COM-communication handler. It is called when data is received from COM-port.
+        /// It generates high level event that contain received text.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments that contains received text.</param>
+        private void DataReceivedHandler(
+                    object sender,
+                    SerialDataReceivedEventArgs e)
+        {
+            SerialPort serialPort = (SerialPort)sender;
+            string receivedText = serialPort.ReadExisting();
+            if (receivedText == string.Empty)
+            {
+                return;
+            }
+
+            this.OnTextReceived(new TextReceivedEventArgs(receivedText));
         }
     }
 }
