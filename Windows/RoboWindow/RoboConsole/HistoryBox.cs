@@ -11,6 +11,7 @@ namespace RoboConsole
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
     using System.Text;
     using System.Windows.Forms;
@@ -23,7 +24,7 @@ namespace RoboConsole
         /// <summary>
         /// Incapsulated text area to display commands and messages.
         /// </summary>
-        private readonly TextBox textBox;
+        private readonly RichTextBox textBox;
 
         /// <summary>
         /// Initializes a new instance of the HistoryBox class.
@@ -31,7 +32,7 @@ namespace RoboConsole
         /// <param name="textBox">
         /// Text area for history commands and messages.
         /// </param>
-        public HistoryBox(TextBox textBox)
+        public HistoryBox(RichTextBox textBox)
         {
             this.textBox = textBox;
         }
@@ -44,6 +45,8 @@ namespace RoboConsole
         /// </param>
         public void AppendTextSentToRobot(string text)
         {
+            this.textBox.SelectionColor = SystemColors.WindowText;
+
             int linesCount = this.textBox.Lines.Length;
             if (linesCount > 0)
             {
@@ -55,6 +58,7 @@ namespace RoboConsole
 
             this.textBox.AppendText(text);
             this.textBox.AppendText(Environment.NewLine);
+            this.textBox.ScrollToCaret();
         }
 
         /// <summary>
@@ -65,7 +69,9 @@ namespace RoboConsole
         /// </param>
         public void AppendTextReceivedFromRobot(string text)
         {
+            this.textBox.SelectionColor = Color.DarkBlue;
             this.textBox.AppendText(text);
+            this.textBox.ScrollToCaret();
         }
     }
 }

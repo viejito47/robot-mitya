@@ -35,14 +35,13 @@ namespace RoboConsoleTest
             var commandLineTextBox = new TextBox();
             commandLineTextBox.Text = "I0001";
 
-            var outputTextBox = new TextBox();
-
             var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(true);
             mock.Setup(x => x.LastSentMessage).Returns("I0001");
 
+            var outputTextBox = new RichTextBox();
             var historyBox = new HistoryBox(outputTextBox);
-            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object, new CommandHistory());
             commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
@@ -62,9 +61,9 @@ namespace RoboConsoleTest
             var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(false);
 
-            var outputTextBox = new TextBox();
+            var outputTextBox = new RichTextBox();
             var historyBox = new HistoryBox(outputTextBox);
-            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object, new CommandHistory());
             commandProcessor.ProcessCommand();
 
             Assert.AreEqual("I0001", commandLineTextBox.Text);
@@ -92,9 +91,9 @@ namespace RoboConsoleTest
             mock.Setup(x => x.LastSentMessage)
                 .Returns(() => sentMessages[sentMessageIndex++]);
 
-            var outputTextBox = new TextBox();
+            var outputTextBox = new RichTextBox();
             var historyBox = new HistoryBox(outputTextBox);
-            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object, new CommandHistory());
             commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
@@ -120,9 +119,9 @@ namespace RoboConsoleTest
             mock.Setup(x => x.LastSentMessage)
                 .Returns("I0001");
 
-            var outputTextBox = new TextBox();
+            var outputTextBox = new RichTextBox();
             var historyBox = new HistoryBox(outputTextBox);
-            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object, new CommandHistory());
             commandProcessor.ProcessCommand();
 
             Assert.AreEqual("I0000, F0102", commandLineTextBox.Text);
@@ -145,9 +144,9 @@ namespace RoboConsoleTest
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(false);
 
-            var outputTextBox = new TextBox();
+            var outputTextBox = new RichTextBox();
             var historyBox = new HistoryBox(outputTextBox);
-            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object, new CommandHistory());
             commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
@@ -167,9 +166,9 @@ namespace RoboConsoleTest
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(false);
 
-            var outputTextBox = new TextBox();
+            var outputTextBox = new RichTextBox();
             var historyBox = new HistoryBox(outputTextBox);
-            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object, new CommandHistory());
             commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
