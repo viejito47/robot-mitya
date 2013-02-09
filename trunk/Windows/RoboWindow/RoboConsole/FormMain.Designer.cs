@@ -38,7 +38,7 @@ namespace RoboConsole
         /// <summary>
         /// Поле вывода сообщений.
         /// </summary>
-        private System.Windows.Forms.TextBox textBoxReceive;
+        private System.Windows.Forms.TextBox textBoxHistory;
 
         /// <summary>
         /// Освободить все используемые ресурсы.
@@ -66,7 +66,7 @@ namespace RoboConsole
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.textBoxSend = new System.Windows.Forms.TextBox();
             this.buttonSend = new System.Windows.Forms.Button();
-            this.textBoxReceive = new System.Windows.Forms.TextBox();
+            this.textBoxHistory = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBoxCommunicationType = new System.Windows.Forms.GroupBox();
             this.radioButtonComPort = new System.Windows.Forms.RadioButton();
@@ -86,7 +86,7 @@ namespace RoboConsole
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 6F));
             this.tableLayoutPanel.Controls.Add(this.textBoxSend, 1, 4);
             this.tableLayoutPanel.Controls.Add(this.buttonSend, 3, 4);
-            this.tableLayoutPanel.Controls.Add(this.textBoxReceive, 1, 1);
+            this.tableLayoutPanel.Controls.Add(this.textBoxHistory, 1, 1);
             this.tableLayoutPanel.Controls.Add(this.pictureBox1, 3, 1);
             this.tableLayoutPanel.Controls.Add(this.groupBoxCommunicationType, 3, 2);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -126,19 +126,19 @@ namespace RoboConsole
             this.buttonSend.UseVisualStyleBackColor = true;
             this.buttonSend.Click += new System.EventHandler(this.ButtonSend_Click);
             // 
-            // textBoxReceive
+            // textBoxHistory
             // 
-            this.textBoxReceive.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxReceive.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBoxReceive.Location = new System.Drawing.Point(9, 9);
-            this.textBoxReceive.Multiline = true;
-            this.textBoxReceive.Name = "textBoxReceive";
-            this.textBoxReceive.ReadOnly = true;
-            this.tableLayoutPanel.SetRowSpan(this.textBoxReceive, 2);
-            this.textBoxReceive.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxReceive.Size = new System.Drawing.Size(504, 271);
-            this.textBoxReceive.TabIndex = 2;
-            this.textBoxReceive.TabStop = false;
+            this.textBoxHistory.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxHistory.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBoxHistory.Location = new System.Drawing.Point(9, 9);
+            this.textBoxHistory.Multiline = true;
+            this.textBoxHistory.Name = "textBoxHistory";
+            this.textBoxHistory.ReadOnly = true;
+            this.tableLayoutPanel.SetRowSpan(this.textBoxHistory, 2);
+            this.textBoxHistory.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxHistory.Size = new System.Drawing.Size(504, 271);
+            this.textBoxHistory.TabIndex = 2;
+            this.textBoxHistory.TabStop = false;
             // 
             // pictureBox1
             // 
