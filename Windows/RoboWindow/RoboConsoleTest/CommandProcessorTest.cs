@@ -1,8 +1,8 @@
-﻿// <copyright file="SendHelperTest.cs" company="Dzakhov's jag">
+﻿// <copyright file="CommandProcessorTest.cs" company="Dzakhov's jag">
 //   Copyright © Dmitry Dzakhov 2012
 // </copyright>
 // <summary>
-//   Класс, тестирующий класс SendHelper.
+//   Class to test CommandProcessor.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,10 +21,10 @@ namespace RoboConsoleTest
     using RoboConsole;
 
     /// <summary>
-    /// Класс, тестирующий класс SendHelper.
+    /// Class to test CommandProcessor.
     /// </summary>
     [TestFixture]
-    public sealed class SendHelperTest
+    public sealed class CommandProcessorTest
     {
         /// <summary>
         /// Тест метода CommandLineProcessor.
@@ -41,7 +41,9 @@ namespace RoboConsoleTest
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(true);
             mock.Setup(x => x.LastSentMessage).Returns("I0001");
 
-            SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
+            var historyBox = new HistoryBox(outputTextBox);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
             Assert.AreEqual(2, outputTextBox.Lines.Length);
@@ -57,12 +59,13 @@ namespace RoboConsoleTest
             var commandLineTextBox = new TextBox();
             commandLineTextBox.Text = "I0001";
 
-            var outputTextBox = new TextBox();
-
             var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(false);
 
-            SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
+            var outputTextBox = new TextBox();
+            var historyBox = new HistoryBox(outputTextBox);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            commandProcessor.ProcessCommand();
 
             Assert.AreEqual("I0001", commandLineTextBox.Text);
             Assert.AreEqual(2, outputTextBox.Lines.Length);
@@ -78,8 +81,6 @@ namespace RoboConsoleTest
             var commandLineTextBox = new TextBox();
             commandLineTextBox.Text = "I0001, , ,, I0000,  F0102, ";
 
-            var outputTextBox = new TextBox();
-
             var mock = new Mock<ICommunicationHelper>();
             
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
@@ -91,7 +92,10 @@ namespace RoboConsoleTest
             mock.Setup(x => x.LastSentMessage)
                 .Returns(() => sentMessages[sentMessageIndex++]);
 
-            SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
+            var outputTextBox = new TextBox();
+            var historyBox = new HistoryBox(outputTextBox);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
             Assert.AreEqual(4, outputTextBox.Lines.Length);
@@ -110,15 +114,16 @@ namespace RoboConsoleTest
             var commandLineTextBox = new TextBox();
             commandLineTextBox.Text = "I0001, , ,, I0000,  F0102, ";
 
-            var outputTextBox = new TextBox();
-
             var mock = new Mock<ICommunicationHelper>();            
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns((string command) => !command.Equals("I0000"));
             mock.Setup(x => x.LastSentMessage)
                 .Returns("I0001");
 
-            SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
+            var outputTextBox = new TextBox();
+            var historyBox = new HistoryBox(outputTextBox);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            commandProcessor.ProcessCommand();
 
             Assert.AreEqual("I0000, F0102", commandLineTextBox.Text);
             Assert.AreEqual(3, outputTextBox.Lines.Length);
@@ -136,13 +141,14 @@ namespace RoboConsoleTest
             var commandLineTextBox = new TextBox();
             commandLineTextBox.Text = string.Empty;
 
-            var outputTextBox = new TextBox();
-
             var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(false);
 
-            SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
+            var outputTextBox = new TextBox();
+            var historyBox = new HistoryBox(outputTextBox);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
             Assert.AreEqual(string.Empty, outputTextBox.Text);
@@ -157,13 +163,14 @@ namespace RoboConsoleTest
             var commandLineTextBox = new TextBox();
             commandLineTextBox.Text = ",,,";
 
-            var outputTextBox = new TextBox();
-
             var mock = new Mock<ICommunicationHelper>();
             mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>()))
                 .Returns(false);
 
-            SendHelper.CommandLineProcessor(commandLineTextBox, outputTextBox, mock.Object);
+            var outputTextBox = new TextBox();
+            var historyBox = new HistoryBox(outputTextBox);
+            var commandProcessor = new CommandProcessor(commandLineTextBox, historyBox, mock.Object);
+            commandProcessor.ProcessCommand();
 
             Assert.AreEqual(string.Empty, commandLineTextBox.Text);
             Assert.AreEqual(string.Empty, outputTextBox.Text);

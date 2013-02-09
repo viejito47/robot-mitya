@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="CommandHistoryTest.cs" />
     <Compile Include="Runner.cs" />
-    <Compile Include="SendHelperTest.cs" />
+    <Compile Include="CommandProcessorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

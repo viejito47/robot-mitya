@@ -26,9 +26,19 @@ namespace RoboConsole
     public partial class FormMain : Form
     {
         /// <summary>
-        /// Объект для взаимодействия с роботом.
+        /// Object that contains text area to display history of commands and messages and its functionality.
+        /// </summary>
+        private readonly HistoryBox historyBox;
+
+        /// <summary>
+        /// Object that provide communication with robot.
         /// </summary>
         private CommunicationHelper communicationHelper;
+
+        /// <summary>
+        /// Object that provides command's processing: navigation in history list, redrawing text boxes, command line processing.
+        /// </summary>
+        private CommandProcessor commandProcessor;
 
         /// <summary>
         /// Initializes a new instance of the FormMain class.
@@ -36,11 +46,8 @@ namespace RoboConsole
         public FormMain()
         {
             this.InitializeComponent();
-
-            this.communicationHelper = new UdpCommunicationHelper(
-                Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.MessagePort,
-                Properties.Settings.Default.SingleMessageRepetitionsCount);
+            this.InitializeUdpCommunication();
+            this.historyBox = new HistoryBox(this.textBoxHistory);
         }
 
         /// <summary>
@@ -50,7 +57,7 @@ namespace RoboConsole
         /// <param name="e">Аргументы события.</param>
         private void ButtonSend_Click(object sender, EventArgs e)
         {
-            SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.communicationHelper);
+            this.commandProcessor.ProcessCommand();
         }
 
         /// <summary>
@@ -68,14 +75,14 @@ namespace RoboConsole
             switch (e.KeyCode)
             {
                 case Keys.Enter:
-                    SendHelper.CommandLineProcessor(this.textBoxSend, this.textBoxReceive, this.communicationHelper);
+                    this.commandProcessor.ProcessCommand();
                     break;
                 case Keys.Up:
-                    SendHelper.SelectPreviousCommand(this.textBoxSend);
+                    this.commandProcessor.SelectPreviousCommand();
                     e.Handled = true;
                     break;
                 case Keys.Down:
-                    SendHelper.SelectNextCommand(this.textBoxSend);
+                    this.commandProcessor.SelectNextCommand();
                     e.Handled = true;
                     break;
             }
@@ -92,19 +99,39 @@ namespace RoboConsole
 
             if (this.radioButtonComPort.Checked)
             {
-                this.communicationHelper = new ComPortCommunicationHelper(
-                    Properties.Settings.Default.ComPort,
-                    Properties.Settings.Default.BaudRate,
-                    Properties.Settings.Default.SingleMessageRepetitionsCount);
-                this.communicationHelper.TextReceived += this.OnTextReceived;
+                this.InitializeComPortCommunication();
             }
             else
             {
-                this.communicationHelper = new UdpCommunicationHelper(
-                    Properties.Settings.Default.RoboHeadAddress,
-                    Properties.Settings.Default.MessagePort,
-                    Properties.Settings.Default.SingleMessageRepetitionsCount);
+                this.InitializeUdpCommunication();
             }
+        }
+
+        /// <summary>
+        /// Initialization of communication with robot through UDP-socket.
+        /// </summary>
+        private void InitializeUdpCommunication()
+        {
+            this.communicationHelper = new UdpCommunicationHelper(
+                Properties.Settings.Default.RoboHeadAddress,
+                Properties.Settings.Default.MessagePort,
+                Properties.Settings.Default.SingleMessageRepetitionsCount);
+
+            this.commandProcessor = new CommandProcessor(this.textBoxSend, this.historyBox, this.communicationHelper);
+        }
+
+        /// <summary>
+        /// Initialization of communication with robot through COM-port.
+        /// </summary>
+        private void InitializeComPortCommunication()
+        {
+            this.communicationHelper = new ComPortCommunicationHelper(
+                Properties.Settings.Default.ComPort,
+                Properties.Settings.Default.BaudRate,
+                Properties.Settings.Default.SingleMessageRepetitionsCount);
+            this.communicationHelper.TextReceived += this.OnTextReceived;
+
+            this.commandProcessor = new CommandProcessor(this.textBoxSend, this.historyBox, this.communicationHelper);
         }
 
         /// <summary>
@@ -121,7 +148,7 @@ namespace RoboConsole
                 return;
             }
 
-            this.textBoxReceive.AppendText(e.Text);
+            this.historyBox.AppendTextReceivedFromRobot(e.Text);
         }
     }
 }
