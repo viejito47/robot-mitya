@@ -25,7 +25,7 @@ namespace RoboConsole
         /// <summary>
         /// Commands' history.
         /// </summary>
-        private readonly CommandHistory commandHistory = new CommandHistory();
+        private readonly CommandHistory commandHistory;
 
         /// <summary>
         /// Text box to input commands.
@@ -54,11 +54,19 @@ namespace RoboConsole
         /// <param name="communicationHelper">
         /// Class that communicates with robot.
         /// </param>
-        public CommandProcessor(TextBox commandLineTextBox, HistoryBox historyBox, ICommunicationHelper communicationHelper)
+        /// <param name="commandHistory">
+        /// Class that containts command history.
+        /// </param>
+        public CommandProcessor(
+            TextBox commandLineTextBox, 
+            HistoryBox historyBox, 
+            ICommunicationHelper communicationHelper, 
+            CommandHistory commandHistory)
         {
             this.commandLineTextBox = commandLineTextBox;
             this.historyBox = historyBox;
             this.communicationHelper = communicationHelper;
+            this.commandHistory = commandHistory;
         }
 
         /// <summary>
@@ -118,6 +126,7 @@ namespace RoboConsole
         public void SelectPreviousCommand()
         {
             this.commandLineTextBox.Text = this.commandHistory.GetPreviousCommand();
+            this.commandLineTextBox.SelectionStart = this.commandLineTextBox.Text.Length;
         }
 
         /// <summary>
@@ -127,6 +136,7 @@ namespace RoboConsole
         public void SelectNextCommand()
         {
             this.commandLineTextBox.Text = this.commandHistory.GetNextCommand();
+            this.commandLineTextBox.SelectionStart = this.commandLineTextBox.Text.Length;
         }
 
         /// <summary>

@@ -26,6 +26,11 @@ namespace RoboConsole
     public partial class FormMain : Form
     {
         /// <summary>
+        /// History of inputed commands.
+        /// </summary>
+        private readonly CommandHistory commandHistory = new CommandHistory();
+
+        /// <summary>
         /// Object that contains text area to display history of commands and messages and its functionality.
         /// </summary>
         private readonly HistoryBox historyBox;
@@ -46,8 +51,9 @@ namespace RoboConsole
         public FormMain()
         {
             this.InitializeComponent();
-            this.InitializeUdpCommunication();
+
             this.historyBox = new HistoryBox(this.textBoxHistory);
+            this.InitializeUdpCommunication();
         }
 
         /// <summary>
@@ -67,24 +73,36 @@ namespace RoboConsole
         /// <param name="e">Аргументы события.</param>
         private void TextBoxSend_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Alt || e.Control || e.Shift)
+            if (!e.Alt && !e.Shift && !e.Control) // nothing
             {
-                return;
+                switch (e.KeyCode)
+                {
+                    case Keys.Enter:
+                        this.commandProcessor.ProcessCommand();
+                        break;
+                    case Keys.Up:
+                        this.commandProcessor.SelectPreviousCommand();
+                        e.Handled = true;
+                        break;
+                    case Keys.Down:
+                        this.commandProcessor.SelectNextCommand();
+                        e.Handled = true;
+                        break;
+                }
             }
-
-            switch (e.KeyCode)
+            else if (!e.Alt && !e.Shift && e.Control) // ctrl is pressed
             {
-                case Keys.Enter:
-                    this.commandProcessor.ProcessCommand();
-                    break;
-                case Keys.Up:
-                    this.commandProcessor.SelectPreviousCommand();
-                    e.Handled = true;
-                    break;
-                case Keys.Down:
-                    this.commandProcessor.SelectNextCommand();
-                    e.Handled = true;
-                    break;
+                switch (e.KeyCode)
+                {
+                    case Keys.Up:
+                        this.radioButtonUdpSocket.Checked = true;
+                        e.Handled = true;
+                        break;
+                    case Keys.Down:
+                        this.radioButtonComPort.Checked = true;
+                        e.Handled = true;
+                        break;
+                }
             }
         }
 
@@ -117,7 +135,11 @@ namespace RoboConsole
                 Properties.Settings.Default.MessagePort,
                 Properties.Settings.Default.SingleMessageRepetitionsCount);
 
-            this.commandProcessor = new CommandProcessor(this.textBoxSend, this.historyBox, this.communicationHelper);
+            this.commandProcessor = new CommandProcessor(
+                this.textBoxSend, 
+                this.historyBox, 
+                this.communicationHelper,
+                this.commandHistory);
         }
 
         /// <summary>
@@ -131,7 +153,11 @@ namespace RoboConsole
                 Properties.Settings.Default.SingleMessageRepetitionsCount);
             this.communicationHelper.TextReceived += this.OnTextReceived;
 
-            this.commandProcessor = new CommandProcessor(this.textBoxSend, this.historyBox, this.communicationHelper);
+            this.commandProcessor = new CommandProcessor(
+                this.textBoxSend, 
+                this.historyBox, 
+                this.communicationHelper,
+                this.commandHistory);
         }
 
         /// <summary>
