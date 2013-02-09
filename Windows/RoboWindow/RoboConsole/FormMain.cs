@@ -121,8 +121,6 @@ namespace RoboConsole
                 return;
             }
 
-            //todo: I should add one more level to recognize robot-commands. Each command should be ended by "\n".
-            // I can't end this "e.Text" by the "\n" because it can appear in the middle of a command.
             this.textBoxReceive.AppendText(e.Text);
         }
     }

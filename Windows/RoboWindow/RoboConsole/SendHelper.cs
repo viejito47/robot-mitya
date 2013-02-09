@@ -62,6 +62,9 @@ namespace RoboConsole
                 else
                 {
                     bool sendResult = SendMessageToRobot(communicationHelper, false, command);
+
+                    outputTextBox.AppendText(Environment.NewLine);
+                    
                     if (sendResult)
                     {
                         outputTextBox.AppendText(communicationHelper.LastSentMessage);
