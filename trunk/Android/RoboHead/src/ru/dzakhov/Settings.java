@@ -42,11 +42,6 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	private static boolean mUdpSendBroadcastLocal;
 	
 	/**
-	 * Flag that indicates peer-to-peer data sending.
-	 */
-	//private static boolean mUdpSendP2P;
-	
-	/**
 	 * Remote PC address - data recpient. This option is enabled when peer-to-peer flag is set.
 	 */
 	private static String mUdpRecipientIp;
@@ -122,14 +117,6 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	public static boolean getUdpSendBroadcastLocal() {
 		return mUdpSendBroadcastLocal;
 	}
-	
-	/**
-	 * mUdpSendP2P field accessor.
-	 * @return the flag that indicates peer-to-peer data sending.
-	 */
-//	public static boolean getUdpSendP2P() {
-//		return mUdpSendP2P;
-//	}
 	
 	/**
 	 * mUdpRecipientIp field accessor.
@@ -242,10 +229,6 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 		defaultValue = context.getString(R.string.option_udp_sendtype_broadcast_local_default_value);
 		mUdpSendBroadcastLocal = settings.getBoolean(key, Boolean.parseBoolean(defaultValue));
 
-//		key = context.getString(R.string.option_udp_sendtype_p2p_key);
-//		defaultValue = context.getString(R.string.option_udp_sendtype_p2p_default_value);
-//		mUdpSendP2P = settings.getBoolean(key, Boolean.parseBoolean(defaultValue));
-
 		key = context.getString(R.string.option_udp_recipient_ip_key);
 		defaultValue = context.getString(R.string.option_udp_recipient_ip_default_value);
 		mUdpRecipientIp = settings.getString(key, defaultValue);
@@ -290,7 +273,6 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 			return true;
 		} else if (preference == mCheckBoxPreferenceUdpSendBroadcast) {
 			mUdpSendBroadcast = (Boolean) newValue;
-//			mUdpSendP2P = !mUdpSendBroadcast;
 			mCheckBoxPreferenceUdpSendBroadcast.setChecked(mUdpSendBroadcast);
 			mCheckBoxPreferenceUdpSendP2P.setChecked(!mUdpSendBroadcast);
 		} else if (preference == mCheckBoxPreferenceUdpSendP2P) {
