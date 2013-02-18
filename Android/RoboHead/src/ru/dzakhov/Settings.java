@@ -44,7 +44,7 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	/**
 	 * Flag that indicates peer-to-peer data sending.
 	 */
-	private static boolean mUdpSendP2P;
+	//private static boolean mUdpSendP2P;
 	
 	/**
 	 * Remote PC address - data recpient. This option is enabled when peer-to-peer flag is set.
@@ -127,9 +127,9 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	 * mUdpSendP2P field accessor.
 	 * @return the flag that indicates peer-to-peer data sending.
 	 */
-	public static boolean getUdpSendP2P() {
-		return mUdpSendP2P;
-	}
+//	public static boolean getUdpSendP2P() {
+//		return mUdpSendP2P;
+//	}
 	
 	/**
 	 * mUdpRecipientIp field accessor.
@@ -242,9 +242,9 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 		defaultValue = context.getString(R.string.option_udp_sendtype_broadcast_local_default_value);
 		mUdpSendBroadcastLocal = settings.getBoolean(key, Boolean.parseBoolean(defaultValue));
 
-		key = context.getString(R.string.option_udp_sendtype_p2p_key);
-		defaultValue = context.getString(R.string.option_udp_sendtype_p2p_default_value);
-		mUdpSendP2P = settings.getBoolean(key, Boolean.parseBoolean(defaultValue));
+//		key = context.getString(R.string.option_udp_sendtype_p2p_key);
+//		defaultValue = context.getString(R.string.option_udp_sendtype_p2p_default_value);
+//		mUdpSendP2P = settings.getBoolean(key, Boolean.parseBoolean(defaultValue));
 
 		key = context.getString(R.string.option_udp_recipient_ip_key);
 		defaultValue = context.getString(R.string.option_udp_recipient_ip_default_value);
@@ -290,14 +290,14 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 			return true;
 		} else if (preference == mCheckBoxPreferenceUdpSendBroadcast) {
 			mUdpSendBroadcast = (Boolean) newValue;
-			mUdpSendP2P = !mUdpSendBroadcast;
+//			mUdpSendP2P = !mUdpSendBroadcast;
 			mCheckBoxPreferenceUdpSendBroadcast.setChecked(mUdpSendBroadcast);
-			mCheckBoxPreferenceUdpSendP2P.setChecked(mUdpSendP2P);
+			mCheckBoxPreferenceUdpSendP2P.setChecked(!mUdpSendBroadcast);
 		} else if (preference == mCheckBoxPreferenceUdpSendP2P) {
-			mUdpSendP2P = (Boolean) newValue;
-			mUdpSendBroadcast = !mUdpSendP2P;
+			boolean udpSendP2P = (Boolean) newValue;
+			mUdpSendBroadcast = !udpSendP2P;
 			mCheckBoxPreferenceUdpSendBroadcast.setChecked(mUdpSendBroadcast);
-			mCheckBoxPreferenceUdpSendP2P.setChecked(mUdpSendP2P);
+			mCheckBoxPreferenceUdpSendP2P.setChecked(udpSendP2P);
 		} else if (preference == mCheckBoxPreferenceUdpSendBroadcastLocal) {
 			mUdpSendBroadcastLocal = (Boolean) newValue;
 			mCheckBoxPreferenceUdpSendBroadcastLocal.setChecked(mUdpSendBroadcastLocal);
