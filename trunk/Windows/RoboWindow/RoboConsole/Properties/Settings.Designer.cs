@@ -35,9 +35,9 @@ namespace RoboConsole.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("51974")]
-        public int MessagePort {
+        public int UdpSendPort {
             get {
-                return ((int)(this["MessagePort"]));
+                return ((int)(this["UdpSendPort"]));
             }
         }
         
@@ -65,6 +65,15 @@ namespace RoboConsole.Properties {
         public int BaudRate {
             get {
                 return ((int)(this["BaudRate"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("51973")]
+        public int UdpReceivePort {
+            get {
+                return ((int)(this["UdpReceivePort"]));
             }
         }
     }

@@ -21,9 +21,14 @@ import android.widget.Toast;
  */
 public class RoboHeadActivity extends Activity {
 	/**
-	 * Runnable объект, для нити, взаимодействующей с уровнем Windows-приложения.
+	 * Runnable object for message receiving. Used in the thread that interacts with windows-application level.
 	 */
 	private UdpMessageReceiver mUdpMessageReceiver = null;
+	
+	/**
+	 * Runnable object for message sending. Used in the thread that interacts with windows-application level.
+	 */
+	private UdpMessageSender mUdpMessageSender = null;
 	
 	/**
 	 * Объект Handler, с помощью которого передаются команды от уровня Windows-приложения
@@ -88,14 +93,19 @@ public class RoboHeadActivity extends Activity {
 					if (!mRecordingRoboScriptMode) {
 						if (message.equals(MessageConstant.FACETYPE_OK)) {
 					        mFaceHelper.setFace(FaceType.ftOk);
+					        mUdpMessageSender.send(message);
 						} else if (message.equals(MessageConstant.FACETYPE_HAPPY)) {
 					        mFaceHelper.setFace(FaceType.ftHappy);
+					        mUdpMessageSender.send(message);
 						} else if (message.equals(MessageConstant.FACETYPE_BLUE)) {
 					        mFaceHelper.setFace(FaceType.ftBlue);
+					        mUdpMessageSender.send(message);
 						} else if (message.equals(MessageConstant.FACETYPE_ANGRY)) {
 					        mFaceHelper.setFace(FaceType.ftAngry);
+					        mUdpMessageSender.send(message);
 						} else if (message.equals(MessageConstant.FACETYPE_ILL)) {
 					        mFaceHelper.setFace(FaceType.ftIll);
+					        mUdpMessageSender.send(message);
 						} else if (message.equals(MessageConstant.FACETYPE_READY_TO_PLAY)) {
 					        mFaceHelper.setFace(FaceType.ftReadyToPlay);
 							sendMessageToRobot(message);
@@ -110,8 +120,12 @@ public class RoboHeadActivity extends Activity {
 					} else {
 						sendMessageToRobot(message);
 					}
+				} else if (command.equals("I")) { // I [illumination] – фары
+			        mUdpMessageSender.send(message);
+					sendMessageToRobot(message);
 				} else if (command.equals("h")) { // h [hit] – попадание
 					if (message.equals(MessageConstant.HIT)) {
+				        mUdpMessageSender.send(message);
 		                new Thread() {
 		                    public void run() {
 								SoundManager.playSound(SoundManager.SCREAM, 1);
@@ -139,11 +153,16 @@ public class RoboHeadActivity extends Activity {
 					// Конец записи РобоСкрипта.
 					mRecordingRoboScriptMode = false;
 					MessageUniqueFilter.setActive(true);
+			        mUdpMessageSender.send(message);
 					sendMessageToRobot(message);
 				} else if (message.equals("#0000")) {
 					// Ничего не делаем.
 					Logger.d("OK");
 				} else if (command.equals("#")) {
+					if (!message.equals("#0000")) {
+						// В ПК отправляем только ошибки.
+						mUdpMessageSender.send(message);
+					}
 					String errorMessage = "Ошибка: ";
 					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
 						errorMessage += "неверное сообщение";
@@ -166,6 +185,7 @@ public class RoboHeadActivity extends Activity {
 					if (!mRecordingRoboScriptMode) {
 						if (command.equals("s")) { // s [shoot] – выстрел
 							if (message.equals(MessageConstant.FIRE)) {
+						        mUdpMessageSender.send(message);
 				                new Thread() {
 				                    public void run() {
 										SoundManager.playSound(SoundManager.GUN, 1);
@@ -182,8 +202,6 @@ public class RoboHeadActivity extends Activity {
   		};
 
   		BluetoothHelper.initialize(this, mHandler);
-  		
-    	startUdpReceiver(mHandler);
     	
 		// mOrientationHelper = new OrientationHelper(this);
 	}
@@ -194,8 +212,6 @@ public class RoboHeadActivity extends Activity {
 	@Override
 	protected final void onDestroy() {
 		super.onDestroy();
-		
-		stopUdpReceiver();
 		SoundManager.cleanup();
 	}
 
@@ -206,7 +222,10 @@ public class RoboHeadActivity extends Activity {
 	protected final void onResume() {
 		super.onResume();
 
-		// mOrientationHelper.registerListner();
+    	startUdpReceiver(mHandler);
+    	startUdpSender();
+
+    	// mOrientationHelper.registerListner();
 		BluetoothHelper.connect();
 	}
 
@@ -219,6 +238,10 @@ public class RoboHeadActivity extends Activity {
 		
 		sendBroadcast(new Intent("com.pas.webcam.CONTROL").putExtra("action", "stop"));
 		// mOrientationHelper.unregisterListner();
+
+		stopUdpReceiver();
+		stopUdpSender();
+		
 		BluetoothHelper.disconnect();
 	}
 
@@ -349,7 +372,7 @@ public class RoboHeadActivity extends Activity {
 	}
 	
 	/**
-	 * Запуск нити с серверным сокетом.
+	 * Start message receiving thread.
 	 * @param handler для передачи команд от уровня Windows-приложения и 
 	 * сообщений от робота.
 	 */
@@ -358,8 +381,7 @@ public class RoboHeadActivity extends Activity {
 			return;
 		}
 		mUdpMessageReceiver = new UdpMessageReceiver(handler);
-		Thread thread = new Thread(mUdpMessageReceiver);
-		thread.start();
+		mUdpMessageReceiver.start();
 	}	
 	
 	/**
@@ -367,8 +389,29 @@ public class RoboHeadActivity extends Activity {
 	 */
 	private void stopUdpReceiver() {
 		if (mUdpMessageReceiver != null) {
-			mUdpMessageReceiver.stopRunning();
+			mUdpMessageReceiver.interrupt();
 			mUdpMessageReceiver = null;
+		}
+	}
+	
+	/**
+	 * Start message sending thread.
+	 */
+	private void startUdpSender() {
+		if (mUdpMessageSender != null) {
+			return;
+		}
+		mUdpMessageSender = new UdpMessageSender(this);
+		mUdpMessageSender.start();
+	}	
+	
+	/**
+	 * Stop message sending thread.
+	 */
+	private void stopUdpSender() {
+		if (mUdpMessageSender != null) {
+			mUdpMessageSender.interrupt();
+			mUdpMessageSender = null;
 		}
 	}
 }

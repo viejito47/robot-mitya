@@ -244,7 +244,8 @@ namespace RoboControl
 
             this.communicationHelper = new UdpCommunicationHelper(
                 Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.MessagePort,
+                Properties.Settings.Default.UdpSendPort,
+                Properties.Settings.Default.UdpReceivePort,
                 Properties.Settings.Default.SingleMessageRepetitionsCount);
 
             this.flashlightHelper = new FlashlightHelper(this.communicationHelper);

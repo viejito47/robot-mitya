@@ -44,9 +44,9 @@ namespace RoboControl.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("51974")]
-        public int MessagePort {
+        public int UdpSendPort {
             get {
-                return ((int)(this["MessagePort"]));
+                return ((int)(this["UdpSendPort"]));
             }
         }
         
@@ -237,6 +237,15 @@ namespace RoboControl.Properties {
         public string RoboScript1 {
             get {
                 return ((string)(this["RoboScript1"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("51973")]
+        public int UdpReceivePort {
+            get {
+                return ((int)(this["UdpReceivePort"]));
             }
         }
     }

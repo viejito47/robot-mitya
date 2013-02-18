@@ -50,7 +50,7 @@ namespace RoboControlTest
         /// </summary>
         public DriveHelperTest()
         {
-            this.communicationHelper = new UdpCommunicationHelper("192.168.1.1", 51974, 3);
+            this.communicationHelper = new UdpCommunicationHelper("192.168.1.1", 51974, 51973, 3);
             this.controlSettings = new ControlSettings();
 
             // Специально для тестов переопределяю максимальные скорости нормального и турбо режимов моторов.

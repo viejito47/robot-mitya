@@ -8,7 +8,7 @@
     <Setting Name="IpWebcamPort" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">8080</Value>
     </Setting>
-    <Setting Name="MessagePort" Type="System.Int32" Scope="Application">
+    <Setting Name="UdpSendPort" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">51974</Value>
     </Setting>
     <Setting Name="DriveModeNormalMaxSpeed" Type="System.Byte" Scope="Application">
@@ -73,6 +73,9 @@
     </Setting>
     <Setting Name="RoboScript1" Type="System.String" Scope="Application">
       <Value Profile="(Default)">r0101, Z0001, M0105, W0000, Z0000</Value>
+    </Setting>
+    <Setting Name="UdpReceivePort" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">51973</Value>
     </Setting>
   </Settings>
 </SettingsFile>
