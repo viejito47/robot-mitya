@@ -38,7 +38,6 @@ public final class MainActivity extends Activity {
 	 * Установка обработчика кнопки "Запуск".
 	 */
 	private void setRunClickHandler() {
-		Logger.d("MainActivity.setRunClickHandler");
 		final Button button = (Button) findViewById(R.id.buttonRun);
 		button.setOnClickListener(new OnClickListener() {
     		

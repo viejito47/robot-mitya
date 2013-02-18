@@ -73,8 +73,9 @@ namespace RoboConsole
         /// <param name="e">Аргументы события.</param>
         private void TextBoxSend_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!e.Alt && !e.Shift && !e.Control) // nothing
+            if (!e.Alt && !e.Shift && !e.Control) 
             {
+                // nothing
                 switch (e.KeyCode)
                 {
                     case Keys.Enter:
@@ -90,8 +91,9 @@ namespace RoboConsole
                         break;
                 }
             }
-            else if (!e.Alt && !e.Shift && e.Control) // ctrl is pressed
+            else if (!e.Alt && !e.Shift && e.Control) 
             {
+                // ctrl is pressed
                 switch (e.KeyCode)
                 {
                     case Keys.Up:
@@ -132,8 +134,10 @@ namespace RoboConsole
         {
             this.communicationHelper = new UdpCommunicationHelper(
                 Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.MessagePort,
+                Properties.Settings.Default.UdpSendPort,
+                Properties.Settings.Default.UdpReceivePort,
                 Properties.Settings.Default.SingleMessageRepetitionsCount);
+            this.communicationHelper.TextReceived += this.OnTextReceived;
 
             this.commandProcessor = new CommandProcessor(
                 this.textBoxSend, 
