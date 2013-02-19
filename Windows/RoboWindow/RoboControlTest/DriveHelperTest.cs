@@ -14,6 +14,7 @@ namespace RoboControlTest
     using System.Linq;
     using System.Text;
 
+    using Moq;
     using NUnit.Framework;
 
     using RoboCommon;
@@ -28,7 +29,7 @@ namespace RoboControlTest
         /// <summary>
         /// Объект для взаимодействия с роботом.
         /// </summary>
-        private CommunicationHelper communicationHelper;
+        private ICommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -50,7 +51,10 @@ namespace RoboControlTest
         /// </summary>
         public DriveHelperTest()
         {
-            this.communicationHelper = new UdpCommunicationHelper("192.168.1.1", 51974, 51973, 3);
+            var mock = new Mock<ICommunicationHelper>();
+            mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(true);
+            this.communicationHelper = mock.Object;
+
             this.controlSettings = new ControlSettings();
 
             // Специально для тестов переопределяю максимальные скорости нормального и турбо режимов моторов.

@@ -14,6 +14,7 @@ namespace RoboControlTest
     using System.Linq;
     using System.Text;
 
+    using Moq;
     using NUnit.Framework;
 
     using RoboCommon;
@@ -167,7 +168,10 @@ namespace RoboControlTest
         /// </returns>
         private LookHelper CreateLookHelper()
         {
-            var result = new LookHelper(new UdpCommunicationHelper("0.0.0.1", 51974, 51973, 3), this.controlSettings);
+            var mock = new Mock<ICommunicationHelper>();
+            mock.Setup(x => x.SendMessageToRobot(It.IsAny<string>())).Returns(true);
+
+            var result = new LookHelper(mock.Object, this.controlSettings);
             return result;
         }
     }
