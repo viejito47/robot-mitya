@@ -22,6 +22,9 @@ namespace RoboCommon
     /// </summary>
     public sealed class UdpCommunicationHelper : CommunicationHelper
     {
+        /// <summary>
+        /// UDP client.
+        /// </summary>
         private UdpClient udpReceiveClient;
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace RoboCommon
             this.udpReceiveClient = new UdpClient(udpReceivePort);
             try
             {
-                this.udpReceiveClient.BeginReceive(new AsyncCallback(this.receiveCallback), null);
+                this.udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
             }
             catch (Exception e)
             {
@@ -73,8 +76,7 @@ namespace RoboCommon
         /// </param>
         protected override void TransmitMessage(string message)
         {
-            //13, 10 (?)
-            byte[] messageBytes = Encoding.ASCII.GetBytes(message + (char)13 + (char)10);
+            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
             UdpClient udpClient = new UdpClient();
             IPEndPoint endPoint = new IPEndPoint(this.RoboHeadAddress, this.UdpSendPort);
             int bytesSent = udpClient.Send(messageBytes, messageBytes.Length, endPoint);
@@ -91,14 +93,18 @@ namespace RoboCommon
         {
         }
 
-        private void receiveCallback(IAsyncResult res)
+        /// <summary>
+        /// This method is called automatically when UDP packet is received.
+        /// </summary>
+        /// <param name="result">Callback result</param>
+        private void ReceiveCallback(IAsyncResult result)
         {
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, this.UdpReceivePort);
-            byte[] received = this.udpReceiveClient.EndReceive(res, ref RemoteIpEndPoint);
+            IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Any, this.UdpReceivePort);
+            byte[] received = this.udpReceiveClient.EndReceive(result, ref remoteIpEndPoint);
 
             this.OnTextReceived(new TextReceivedEventArgs(Encoding.UTF8.GetString(received)));
 
-            this.udpReceiveClient.BeginReceive(new AsyncCallback(this.receiveCallback), null);
+            this.udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace RoboControl
         /// <summary>
         /// Объект, упращающий взаимодействие с роботом.
         /// </summary>
-        private CommunicationHelper communicationHelper;
+        private ICommunicationHelper communicationHelper;
 
         /// <summary>
         /// Опции управления роботом.
@@ -89,7 +89,7 @@ namespace RoboControl
         /// <param name="controlSettings">
         /// Опции управления роботом.
         /// </param>
-        public LookHelper(CommunicationHelper communicationHelper, ControlSettings controlSettings)
+        public LookHelper(ICommunicationHelper communicationHelper, ControlSettings controlSettings)
         {
             if (communicationHelper == null)
             {
