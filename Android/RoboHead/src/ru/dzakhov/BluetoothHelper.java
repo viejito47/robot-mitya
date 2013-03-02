@@ -87,6 +87,11 @@ public final class BluetoothHelper {
 	private static String mPreviousMessagesRest = "";
 	
 	/**
+	 * Thread that implements connection and data receiving.
+	 */
+	private static Thread mReceiveThread = null;
+	
+	/**
 	 * Класс будет статическим, поэтому конструктор закрываю.
 	 */
 	private BluetoothHelper() {		
@@ -95,11 +100,9 @@ public final class BluetoothHelper {
 	/**
 	 * Начальная инициализация bluetooth-адаптера телефона. Должно вызываться только один раз, например, в onCreate главной активити.
 	 * @param parentActivity родительское активити.
-	 * @param messageHandler handler, обрабатывающий все сообщения робота.
 	 */
-	public static void initialize(final Activity parentActivity, final Handler messageHandler) {
-		mMessageHandler = messageHandler;
-		
+	public static void initialize(final Activity parentActivity) {
+		mBluetoothAdapterIsEnabled = false;
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
 			Toast.makeText(parentActivity, "В устройстве отсутствует Bluetooth-адаптер", Toast.LENGTH_LONG).show();
@@ -116,77 +119,80 @@ public final class BluetoothHelper {
 	
 	/**
 	 * Соединение с bluetooth-модулем робота. Приём от контроллера робота и передача на обработку сообщений.
+	 * @param messageHandler handler, обрабатывающий все сообщения робота.
 	 * @return true, если соединение выполнено.
 	 */
-	public static boolean connect() {
-		if (!mBluetoothAdapterIsEnabled) {
-			if (mBluetoothAdapter.isEnabled()) {
-				mBluetoothAdapterIsEnabled = true;
-			} else {
-				return false;
-			}
+	public static boolean start(final Handler messageHandler) {
+		mMessageHandler = messageHandler;
+		
+		if (mBluetoothAdapter == null) {
+			Logger.e("В устройстве отсутствует Bluetooth-адаптер");
+			return false;
 		}
 		
-	    new Thread(new Runnable() {
+		if (!mBluetoothAdapterIsEnabled) {
+			Logger.e("Не включен Bluetooth-адаптер");
+			return false;
+		}
+		
+	    mReceiveThread = new Thread(new Runnable() {
 	        public void run() {
-	        	//mBluetoothAdapter.cancelDiscovery();
-	        	
+	        	boolean isInterrupted = false;
 				while (true) {
+					isInterrupted = isInterrupted || Thread.currentThread().isInterrupted();
+					if (isInterrupted) {
+						break;
+					}
+					
 	    			if (!mConnected) { 
 	    			    // Это - единственный метод подключиться напрямую, не используя поиска всех устройств в округе.
 	    				// createRfcommSocketToServiceRecord(), к сожалению, не работает
 	    				try {
-	    					mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(Settings.getRoboBodyMac());
-	    					Method m = mBluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
-	    					mBluetoothSocket = (BluetoothSocket) m.invoke(mBluetoothDevice, Integer.valueOf(1));
-	    					
-	    					// Если контроллер робота недоступен, connect() вызывает исключение и тормозит работу 
-	    					// приложения, несмотря на отдельный поток!
-	    					mBluetoothSocket.connect();
-	    					
-	    					mInputStream = mBluetoothSocket.getInputStream();
-	    					mOutputStream = mBluetoothSocket.getOutputStream();
-	    					mConnected = true;
+	    					connect();
+	    					Logger.d("BluetoothHelper: started");
 	    				} catch (Exception e) {
-	    					Logger.e("Bluetooth connection error: " + e.getMessage());
-//	    					try {
-//								Thread.sleep(10000);
-//							} catch (InterruptedException e1) {
-//								e1.printStackTrace();
-//							}
-	    					//mControllerIsTurnedOff = true;
-	    					
-	    					//continue;
+	    					Logger.e("BluetoothHelper connection error: " + e.getMessage());
 	    					break;
 	    				}
 	    			}
 	    			
-	    			try {
-		    			if (mConnected) {
-		    				while (true) {
+	    			if (mConnected) {
+	    				while (true) {
+	    					isInterrupted = Thread.currentThread().isInterrupted();
+	    					if (isInterrupted) {
+	    						break;
+	    					}
+	    					
+	    					List<String> messageList = null;
+	    	    			try {
 		    					// Получить список принятых на данный момент команд:
-		    					List<String> messageList = getMessagesFromStream(mInputStream, Settings.MESSAGE_LENGTH);
-		    					
-		    					if (mMessageHandler != null) {		    					
-			    					// Выполнить каждую принятую команду:
-			    					for (int i = 0; i < messageList.size(); i++) {
-			    						String messageText = messageList.get(i);
-			    						
-			    						// Команды передаются в RoboHeadActivity:
-			    						Message message = new Message();
-			    						message.obj = messageText;
-			    						mMessageHandler.sendMessage(message);
-			    					}
+		    					messageList = getMessagesFromStream(mInputStream, Settings.MESSAGE_LENGTH);
+	    	    			} catch (Exception e) {
+	    	    				Logger.e("BluetoothHelper input error: " + e.getMessage());
+	    	    				disconnect();
+	    	    			}
+
+	    					if ((messageList != null) && (mMessageHandler != null)) {		    					
+		    					// Выполнить каждую принятую команду:
+		    					for (int i = 0; i < messageList.size(); i++) {
+		    						String messageText = messageList.get(i);
+		    						
+		    						// Команды передаются в RoboHeadActivity:
+		    						Message message = new Message();
+		    						message.obj = messageText;
+		    						mMessageHandler.sendMessage(message);
 		    					}
-		    				}
-		    			}
-	    			} catch (Exception e) {
-	    				Logger.e(e.getMessage());
-	    				disconnect();
+	    					}
+
+	    				}
 	    			}
 	    		} // while
+
+				disconnect();
+				Logger.d("BluetoothHelper: stopped");
 	        }
-	    }).start();	    
+	    });
+	    mReceiveThread.start();	    
 			
 		return true;
 	}
@@ -194,7 +200,33 @@ public final class BluetoothHelper {
 	/**
 	 * Разрыв bluetooth-соединения.
 	 */
-	public static void disconnect() {
+	public static void stop() {
+		mReceiveThread.interrupt();
+		mReceiveThread = null;
+	}
+	
+	/**
+	 * Bluetooth connection.
+	 * @throws Exception on Bluetooth connection error. 
+	 */
+	private static void connect() throws Exception {
+		mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(Settings.getRoboBodyMac());
+		Method m = mBluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
+		mBluetoothSocket = (BluetoothSocket) m.invoke(mBluetoothDevice, Integer.valueOf(1));
+		
+		// Если контроллер робота недоступен, connect() вызывает исключение и тормозит работу 
+		// приложения, несмотря на отдельный поток!
+		mBluetoothSocket.connect();
+		
+		mInputStream = mBluetoothSocket.getInputStream();
+		mOutputStream = mBluetoothSocket.getOutputStream();
+		mConnected = true;
+	}
+	
+	/**
+	 * Closing Bluetooth connection.
+	 */
+	private static void disconnect() {
 		if (mConnected) {
 			try {
 				if (mBluetoothSocket != null) {
@@ -260,5 +292,13 @@ public final class BluetoothHelper {
 		mPreviousMessagesRest = messages;
 		
 		return result;
+	}
+	
+	/**
+	 * Gets bluetooth adapter's state.
+	 * @return true if bluetooth adapter is active.
+	 */
+	public static boolean getBluetoothAdapterIsEnabled() {
+		return mBluetoothAdapterIsEnabled;
 	}
 }
