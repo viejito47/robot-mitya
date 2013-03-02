@@ -201,7 +201,7 @@ public class RoboHeadActivity extends Activity {
 			}
   		};
 
-  		BluetoothHelper.initialize(this, mHandler);
+//  		BluetoothHelper.initialize(this, mHandler);
     	
 		// mOrientationHelper = new OrientationHelper(this);
 	}
@@ -226,7 +226,8 @@ public class RoboHeadActivity extends Activity {
     	startUdpSender();
 
     	// mOrientationHelper.registerListner();
-		BluetoothHelper.connect();
+  		BluetoothHelper.initialize(this);
+		BluetoothHelper.start(mHandler);
 	}
 
 	/**
@@ -242,7 +243,7 @@ public class RoboHeadActivity extends Activity {
 		stopUdpReceiver();
 		stopUdpSender();
 		
-		BluetoothHelper.disconnect();
+		BluetoothHelper.stop();
 	}
 
 	@Override

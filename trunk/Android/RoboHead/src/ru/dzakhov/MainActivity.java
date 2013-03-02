@@ -42,6 +42,11 @@ public final class MainActivity extends Activity {
 		button.setOnClickListener(new OnClickListener() {
     		
     		public void onClick(final View v) {
+    			BluetoothHelper.initialize(MainActivity.this);
+    			if (!BluetoothHelper.getBluetoothAdapterIsEnabled()) {
+    				return;
+    			}
+    			
     			Intent ipwebcam = 
     					new Intent()
     					.setClassName("com.pas.webcam", "com.pas.webcam.Rolling")
