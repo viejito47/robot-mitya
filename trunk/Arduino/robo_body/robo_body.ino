@@ -732,8 +732,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
       break;
     }
-    case '-':  // '-' = Check the battery status, voltage will be send back as "~" command, and voltage*100. i.e. for 5.02V the command will be "~01F6". 
-    {          // You can use value to set timer to receive battery status. i.e. "-1000" will send battery status every 4096 millisecons. "-0000" will send battery status only once and will switch off the timer is it was set before.
+    case '=':  // '=' checks the battery status, voltage will be send back as "~" command and voltage*100. i.e. for 5.02V the command will be "~01F6". 
+    {          // You can use value to set timer to receive battery status. i.e. "=1000" will send battery status every 4096 millisecons. "=0000" will send battery status only once and will switch off the timer is it was set before.
       sendMessageToRobot("~",VCCRead());
       SetVCCTimer(value);
       break;
