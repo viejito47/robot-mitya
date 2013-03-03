@@ -644,11 +644,19 @@ namespace RoboControl
                 this.driveHelper.SwitchTurboMode();
             }
 
-            if (this.IsKeyChangedToDown(keyboardState, Keys.CapsLock) && nothingIsPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.PageUp) && nothingIsPressed)
             {
                 // В прогулочном режиме центральное направление взгляда по вертикали - строго горизонтально.
                 // Так проще целиться управлять движением. В режиме общения (не прогулочный) - чуть вверх.
-                this.lookHelper.WalkModeOn = !this.lookHelper.WalkModeOn;
+                this.lookHelper.WalkModeOn = false;
+                this.lookHelper.LookForward();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.PageDown) && nothingIsPressed)
+            {
+                // В прогулочном режиме центральное направление взгляда по вертикали - строго горизонтально.
+                // Так проще целиться управлять движением. В режиме общения (не прогулочный) - чуть вверх.
+                this.lookHelper.WalkModeOn = true;
                 this.lookHelper.LookForward();
             }
 
