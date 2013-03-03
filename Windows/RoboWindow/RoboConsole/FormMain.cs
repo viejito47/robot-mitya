@@ -125,6 +125,9 @@ namespace RoboConsole
             {
                 this.InitializeUdpCommunication();
             }
+
+            this.textBoxSend.SelectAll();
+            this.textBoxSend.Focus();
         }
 
         /// <summary>

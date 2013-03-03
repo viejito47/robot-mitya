@@ -91,6 +91,13 @@ namespace RoboCommon
         /// </summary>
         protected override void FinalizePort()
         {
+            if (this.udpReceiveClient == null)
+            {
+                return;
+            }
+
+            this.udpReceiveClient.Close();
+            this.udpReceiveClient = null;
         }
 
         /// <summary>
@@ -99,12 +106,24 @@ namespace RoboCommon
         /// <param name="result">Callback result</param>
         private void ReceiveCallback(IAsyncResult result)
         {
-            IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Any, this.UdpReceivePort);
-            byte[] received = this.udpReceiveClient.EndReceive(result, ref remoteIpEndPoint);
+            if (this.udpReceiveClient == null)
+            {
+                return;
+            }
 
-            this.OnTextReceived(new TextReceivedEventArgs(Encoding.UTF8.GetString(received)));
+            try
+            {
+                IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Any, this.UdpReceivePort);
+                byte[] received = this.udpReceiveClient.EndReceive(result, ref remoteIpEndPoint);
 
-            this.udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
+                this.OnTextReceived(new TextReceivedEventArgs(Encoding.UTF8.GetString(received)));
+
+                this.udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
+            }
+            catch (Exception)
+            {
+                // todo: log error to file
+            }
         }
     }
 }
