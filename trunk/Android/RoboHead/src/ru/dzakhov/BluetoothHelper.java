@@ -284,10 +284,12 @@ public final class BluetoothHelper {
 			messages = mPreviousMessagesRest + messages;
 		}
 
+		messages = MessageHelper.skipFirstBrokenMessage(messages);
 		while (messages.length() >= messageLength) {
 			String newMessage = messages.substring(0, messageLength);
 			result.add(newMessage);
 			messages = messages.substring(messageLength);
+			messages = MessageHelper.skipFirstBrokenMessage(messages);
 		}
 		mPreviousMessagesRest = messages;
 		
