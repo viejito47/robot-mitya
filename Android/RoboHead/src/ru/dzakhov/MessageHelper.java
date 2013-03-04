@@ -87,4 +87,39 @@ public final class MessageHelper {
 		result = correctLength(result, Settings.MESSAGE_VALUE_LENGTH, VALUE_PREFIX);
 		return result;
 	}
+
+	/**
+	 * Input stream can have broken messages. Some bytes could be lost. So the goal is to find and execute first message.
+	 * Theoretically it should start with 0 position. But if first message is broken
+	 * it can start with a hex digit (not command char). This function returns message stream without this broken prefix. 
+	 * @param messages - input message stream.
+	 * @return input message stream without first broken message (if exists).
+	 */
+	public static String skipFirstBrokenMessage(final String messages) {
+		int firstMessagePosition = getFirstMessagePosition(messages);
+		if (firstMessagePosition < 0) {
+			return "";
+		}
+		return messages.substring(firstMessagePosition);
+	}
+	
+	/**
+	 * Finds the position of the first message in input message stream.
+	 * @param messages - input message stream.
+	 * @return the position of first message in input stream or -1 if it is not found.
+	 */
+	public static int getFirstMessagePosition(final String messages) {
+		int result = -1;
+		for (int i = 0; i < messages.length(); i++) {
+			char c = messages.charAt(i);
+			if (((c >= '0') && (c <= '9'))
+					|| ((c >= 'A') && (c <= 'F'))
+					|| ((c >= 'a') && (c <= 'f'))) {
+				continue;
+			}
+			result = i;
+			break;
+		}
+		return result;
+	}
 }

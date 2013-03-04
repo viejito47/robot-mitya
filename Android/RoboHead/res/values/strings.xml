@@ -4,6 +4,9 @@
     
     <string name="main_title">- RoboHead -</string>
 
+    
+    <string name="error_no_ipwebcam">Установите IP Webcam.</string>
+    
  
     <string name="menu_test_control_label">Тест управления</string>
     <string name="menu_test_animation_label">Тест анимации</string>

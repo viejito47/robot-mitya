@@ -1,12 +1,17 @@
 package ru.dzakhov;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * Главная активити приложения.
@@ -46,11 +51,17 @@ public final class MainActivity extends Activity {
     			if (!BluetoothHelper.getBluetoothAdapterIsEnabled()) {
     				return;
     			}
-    			
-    			Intent ipwebcam = 
-    					new Intent()
-    					.setClassName("com.pas.webcam", "com.pas.webcam.Rolling")
-    					.putExtra("hidebtn1", true);
+    		
+    			Intent ipwebcam = new Intent().setClassName("com.pas.webcam", "com.pas.webcam.Rolling");
+    			final PackageManager packageManager = getPackageManager();
+    			List<ResolveInfo> list = packageManager.queryIntentActivities(ipwebcam, PackageManager.MATCH_DEFAULT_ONLY);
+    			if (list.size() == 0) {
+    				String errorMessage = MainActivity.this.getResources().getString(R.string.error_no_ipwebcam);
+    				Logger.e(errorMessage);
+    				Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+    				return;
+    			}
+    			ipwebcam.putExtra("hidebtn1", true);
     			
     			// Запуск активити с мордочкой:
     			mHandler.post(new Runnable() {

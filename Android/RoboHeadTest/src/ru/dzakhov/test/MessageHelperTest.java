@@ -55,19 +55,71 @@ public final class MessageHelperTest extends TestCase {
 	 * Тест метода getMessageValue.
 	 */
 	public void testGetMessageValue() {
-		String value = MessageHelper.getMessageValue("D1234");
+		String value = MessageHelper.getMessageValue("G1234");
 		assertEquals("1234", value);
 		
-		value = MessageHelper.getMessageValue("D123");
+		value = MessageHelper.getMessageValue("G123");
 		assertEquals("0123", value);
 		
-		value = MessageHelper.getMessageValue("D");
+		value = MessageHelper.getMessageValue("G");
 		assertEquals("0000", value);
 		
 		value = MessageHelper.getMessageValue("");
 		assertEquals("0000", value);
 		
-		value = MessageHelper.getMessageValue("D12345");
+		value = MessageHelper.getMessageValue("G12345");
 		assertEquals("1234", value);
+	}
+	
+	/**
+	 * Тест метода skipFirstBrokenMessage.
+	 */
+	public void testSkipFirstBrokenMessage() {
+		String value = MessageHelper.skipFirstBrokenMessage("G1234I00");
+		assertEquals("G1234I00", value);
+		
+		value = MessageHelper.skipFirstBrokenMessage("1234I00");
+		assertEquals("I00", value);
+		
+		value = MessageHelper.skipFirstBrokenMessage("1234I");
+		assertEquals("I", value);
+		
+		value = MessageHelper.skipFirstBrokenMessage("1234");
+		assertEquals("", value);
+		
+		value = MessageHelper.skipFirstBrokenMessage("");
+		assertEquals("", value);
+		
+		value = MessageHelper.skipFirstBrokenMessage("I");
+		assertEquals("I", value);
+		
+		value = MessageHelper.skipFirstBrokenMessage("A");
+		assertEquals("", value);
+	}
+
+	/**
+	 * Тест метода getFirstMessagePosition.
+	 */
+	public void testGetFirstMessagePosition() {
+		int value = MessageHelper.getFirstMessagePosition("G1234I00");
+		assertEquals(0, value);
+		
+		value = MessageHelper.getFirstMessagePosition("1234I00");
+		assertEquals(4, value);
+		
+		value = MessageHelper.getFirstMessagePosition("1234I");
+		assertEquals(4, value);
+		
+		value = MessageHelper.getFirstMessagePosition("1234");
+		assertEquals(-1, value);
+		
+		value = MessageHelper.getFirstMessagePosition("");
+		assertEquals(-1, value);
+		
+		value = MessageHelper.getFirstMessagePosition("I");
+		assertEquals(0, value);
+		
+		value = MessageHelper.getFirstMessagePosition("A");
+		assertEquals(-1, value);
 	}
 }
