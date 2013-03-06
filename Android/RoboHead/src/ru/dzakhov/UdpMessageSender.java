@@ -73,6 +73,7 @@ public final class UdpMessageSender extends Thread {
 			}
 		} catch (Exception e) {
 			Logger.e("UdpMessageSender error: " + e.getLocalizedMessage());
+			return;
 		}
 
 		Logger.d("UdpMessageSender: started");
