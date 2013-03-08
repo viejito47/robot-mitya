@@ -9,41 +9,41 @@ import android.hardware.SensorManager;
 // import android.widget.TextView;
 
 /**
- * Класс для определения ориентации головы робота.
- * @author Дзахов Дмитрий
+ * РљР»Р°СЃСЃ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РѕСЂРёРµРЅС‚Р°С†РёРё РіРѕР»РѕРІС‹ СЂРѕР±РѕС‚Р°.
+ * @author Р”Р·Р°С…РѕРІ Р”РјРёС‚СЂРёР№
  *
  */
 public final class OrientationHelper implements SensorEventListener {
 	// private Context mContext;
 	
 	/**
-	 * Менеджер сенсоров телефона.
+	 * РњРµРЅРµРґР¶РµСЂ СЃРµРЅСЃРѕСЂРѕРІ С‚РµР»РµС„РѕРЅР°.
 	 */
 	private SensorManager mSensorManager;
 	
 	/**
-	 * Датчик ориентации телефона.
+	 * Р”Р°С‚С‡РёРє РѕСЂРёРµРЅС‚Р°С†РёРё С‚РµР»РµС„РѕРЅР°.
 	 */
 	private Sensor mOrientationSensor;
 	
 	/**
-	 * Азимут?
+	 * РђР·РёРјСѓС‚?
 	 */
 	private float mAzimuthAngle;
 	
 	/**
-	 * Наклон?
+	 * РќР°РєР»РѕРЅ?
 	 */
 	private float mPitchAngle;
 	
 	/**
-	 * Поворот?
+	 * РџРѕРІРѕСЂРѕС‚?
 	 */
 	private float mRollAngle;
 
 	/**
-	 * Конструктор класса.
-	 * @param context контекст ативити.
+	 * РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєР»Р°СЃСЃР°.
+	 * @param context РєРѕРЅС‚РµРєСЃС‚ Р°С‚РёРІРёС‚Рё.
 	 */
 	public OrientationHelper(final Context context) {
 		// mContext = context;
@@ -52,30 +52,30 @@ public final class OrientationHelper implements SensorEventListener {
 	}
 	
 	/**
-	 * Регистрация листнера. Для onResume активити.
+	 * Р РµРіРёСЃС‚СЂР°С†РёСЏ Р»РёСЃС‚РЅРµСЂР°. Р”Р»СЏ onResume Р°РєС‚РёРІРёС‚Рё.
 	 */
 	public void registerListner() {
 	    mSensorManager.registerListener(this, mOrientationSensor, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	
 	/**
-	 * Удаление регистрации листнера. Для onPause активити.
+	 * РЈРґР°Р»РµРЅРёРµ СЂРµРіРёСЃС‚СЂР°С†РёРё Р»РёСЃС‚РЅРµСЂР°. Р”Р»СЏ onPause Р°РєС‚РёРІРёС‚Рё.
 	 */
 	public void unregisterListner() {
 		mSensorManager.unregisterListener(this);
 	}
 
 	/**
-	 * Вызывается когда меняется точность сенсора.
-	 * @param sensor сенсор.
-	 * @param accuracy точность сенсора.
+	 * Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєРѕРіРґР° РјРµРЅСЏРµС‚СЃСЏ С‚РѕС‡РЅРѕСЃС‚СЊ СЃРµРЅСЃРѕСЂР°.
+	 * @param sensor СЃРµРЅСЃРѕСЂ.
+	 * @param accuracy С‚РѕС‡РЅРѕСЃС‚СЊ СЃРµРЅСЃРѕСЂР°.
 	 */
 	public void onAccuracyChanged(final Sensor sensor, final int accuracy) {
 	}
 
 	/**
-	 * Вызывается когда меняются показания сенсора.
-	 * @param event событие с информацией об изменениях в показаниях сенсора.
+	 * Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєРѕРіРґР° РјРµРЅСЏСЋС‚СЃСЏ РїРѕРєР°Р·Р°РЅРёСЏ СЃРµРЅСЃРѕСЂР°.
+	 * @param event СЃРѕР±С‹С‚РёРµ СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ РѕР± РёР·РјРµРЅРµРЅРёСЏС… РІ РїРѕРєР°Р·Р°РЅРёСЏС… СЃРµРЅСЃРѕСЂР°.
 	 */
 	public void onSensorChanged(final SensorEvent event) {
 		mAzimuthAngle = event.values[0];
@@ -95,24 +95,24 @@ public final class OrientationHelper implements SensorEventListener {
 	}
 
 	/**
-	 * Азимут?
-	 * @return значение угла в градусах.
+	 * РђР·РёРјСѓС‚?
+	 * @return Р·РЅР°С‡РµРЅРёРµ СѓРіР»Р° РІ РіСЂР°РґСѓСЃР°С….
 	 */
 	public float getAzimuthAngle() {
 		return mAzimuthAngle;
 	}
 	
 	/**
-	 * Наклон?
-	 * @return значение угла в градусах.
+	 * РќР°РєР»РѕРЅ?
+	 * @return Р·РЅР°С‡РµРЅРёРµ СѓРіР»Р° РІ РіСЂР°РґСѓСЃР°С….
 	 */
 	public float getPitchAngle() {
 		return mPitchAngle;
 	}
 	
 	/**
-	 * Поворот?
-	 * @return значение угла в градусах.
+	 * РџРѕРІРѕСЂРѕС‚?
+	 * @return Р·РЅР°С‡РµРЅРёРµ СѓРіР»Р° РІ РіСЂР°РґСѓСЃР°С….
 	 */
 	public float getRollAngle() {
 		return mRollAngle;

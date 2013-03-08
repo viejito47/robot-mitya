@@ -1,4 +1,4 @@
 /**
- * Чтобы Checkstyle плагин отстал!
+ * Р§С‚РѕР±С‹ Checkstyle РїР»Р°РіРёРЅ РѕС‚СЃС‚Р°Р»!
  */
 package ru.dzakhov;

@@ -3,29 +3,29 @@ package ru.dzakhov;
 import android.util.Log;
 
 /**
- * Класс для вывода в журнал трассировочных данных.
- * @author Дмитрий
+ * РљР»Р°СЃСЃ РґР»СЏ РІС‹РІРѕРґР° РІ Р¶СѓСЂРЅР°Р» С‚СЂР°СЃСЃРёСЂРѕРІРѕС‡РЅС‹С… РґР°РЅРЅС‹С….
+ * @author Р”РјРёС‚СЂРёР№
  *
  */
 public final class Logger {
 	/**
-	 * Признак вывода трассировочных данных в журнал.
+	 * РџСЂРёР·РЅР°Рє РІС‹РІРѕРґР° С‚СЂР°СЃСЃРёСЂРѕРІРѕС‡РЅС‹С… РґР°РЅРЅС‹С… РІ Р¶СѓСЂРЅР°Р».
 	 */
 	static final boolean ENABLE_LOG = true;
 	
 	/**
-	 * Тег для фильтрации в журнале.
+	 * РўРµРі РґР»СЏ С„РёР»СЊС‚СЂР°С†РёРё РІ Р¶СѓСЂРЅР°Р»Рµ.
 	 */
 	static final String LOG_TAG = "RoboHead";
 	
 	/**
-	 * Закрытый конструктор.
+	 * Р—Р°РєСЂС‹С‚С‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ.
 	 */
 	private Logger() { }
 	
 	/**
-	 * Вывод подробностей.
-	 * @param msg текст сообщения.
+	 * Р’С‹РІРѕРґ РїРѕРґСЂРѕР±РЅРѕСЃС‚РµР№.
+	 * @param msg С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ.
 	 */
 	public static void v(final String msg) {
 		if (ENABLE_LOG) {
@@ -34,8 +34,8 @@ public final class Logger {
 	}
 	
 	/**
-	 * Вывод предупреждения.
-	 * @param msg текст предупреждения.
+	 * Р’С‹РІРѕРґ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ.
+	 * @param msg С‚РµРєСЃС‚ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ.
 	 */
 	public static void w(final String msg) {
 		if (ENABLE_LOG) {
@@ -44,8 +44,8 @@ public final class Logger {
 	}
 	
 	/**
-	 * Вывод информации.
-	 * @param msg информационное сообщение.
+	 * Р’С‹РІРѕРґ РёРЅС„РѕСЂРјР°С†РёРё.
+	 * @param msg РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ.
 	 */
 	public static void i(final String msg) {
 		if (ENABLE_LOG) {
@@ -54,8 +54,8 @@ public final class Logger {
 	}
 	
 	/**
-	 * Вывод отладочной информации.
-	 * @param msg текст ссобщения.
+	 * Р’С‹РІРѕРґ РѕС‚Р»Р°РґРѕС‡РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё.
+	 * @param msg С‚РµРєСЃС‚ СЃСЃРѕР±С‰РµРЅРёСЏ.
 	 */
 	public static void d(final String msg) {
 		if (ENABLE_LOG) {
@@ -64,8 +64,8 @@ public final class Logger {
 	}
 	
 	/**
-	 * Фиксация ошибки.
-	 * @param msg текст ошибки.
+	 * Р¤РёРєСЃР°С†РёСЏ РѕС€РёР±РєРё.
+	 * @param msg С‚РµРєСЃС‚ РѕС€РёР±РєРё.
 	 */
 	public static void e(final String msg) {
 		Log.e(LOG_TAG, msg);

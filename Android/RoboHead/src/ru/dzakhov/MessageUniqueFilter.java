@@ -15,7 +15,7 @@ public final class MessageUniqueFilter {
 	private static HashMap<String, String> messageHash = new HashMap<String, String>();
 	
 	/**
-	 * Активность фильтра.
+	 * РђРєС‚РёРІРЅРѕСЃС‚СЊ С„РёР»СЊС‚СЂР°.
 	 */
 	private static boolean mActive = true;
 	

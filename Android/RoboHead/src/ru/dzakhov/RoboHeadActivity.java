@@ -15,8 +15,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 /**
- * Главная активити приложения.
- * @author Дмитрий Дзахов
+ * Р“Р»Р°РІРЅР°СЏ Р°РєС‚РёРІРёС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ.
+ * @author Р”РјРёС‚СЂРёР№ Р”Р·Р°С…РѕРІ
  *
  */
 public class RoboHeadActivity extends Activity {
@@ -31,39 +31,39 @@ public class RoboHeadActivity extends Activity {
 	private UdpMessageSender mUdpMessageSender = null;
 	
 	/**
-	 * Объект Handler, с помощью которого передаются команды от уровня Windows-приложения
-	 * и сообщения от уровня Arduino-скетча.
+	 * РћР±СЉРµРєС‚ Handler, СЃ РїРѕРјРѕС‰СЊСЋ РєРѕС‚РѕСЂРѕРіРѕ РїРµСЂРµРґР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РѕС‚ СѓСЂРѕРІРЅСЏ Windows-РїСЂРёР»РѕР¶РµРЅРёСЏ
+	 * Рё СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ СѓСЂРѕРІРЅСЏ Arduino-СЃРєРµС‚С‡Р°.
 	 */
 	private Handler mHandler;
 	
 	// private OrientationHelper mOrientationHelper;
 	
 	/**
-	 * Класс-контроллер для управления лицом робота.
+	 * РљР»Р°СЃСЃ-РєРѕРЅС‚СЂРѕР»Р»РµСЂ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ Р»РёС†РѕРј СЂРѕР±РѕС‚Р°.
 	 */
 	private FaceHelper mFaceHelper;
 
 	/**
-	 * Главный ImageView - лицо.
+	 * Р“Р»Р°РІРЅС‹Р№ ImageView - Р»РёС†Рѕ.
 	 */
 	private ImageView mFaceImageView;
 	
 	/**
-	 * Текущая мордочка для тестирования.
+	 * РўРµРєСѓС‰Р°СЏ РјРѕСЂРґРѕС‡РєР° РґР»СЏ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ.
 	 */
 	private FaceType testFace = FaceType.ftOk;
 	
 	/**
-	 * Режим записи РобоСкрипта. В этом режиме команды, выполняемые на уровне RoboHead
-	 * (мимика, воспроизведение звука) не выполняются, а просто передаются на уровень robo_body.
-	 * Выполняться они будут когда будет запущено воспроизведение РобоСкрипта на уровне robo_body
-	 * и команды начнут поступать в RoboHead из robo_body.
+	 * Р РµР¶РёРј Р·Р°РїРёСЃРё Р РѕР±РѕРЎРєСЂРёРїС‚Р°. Р’ СЌС‚РѕРј СЂРµР¶РёРјРµ РєРѕРјР°РЅРґС‹, РІС‹РїРѕР»РЅСЏРµРјС‹Рµ РЅР° СѓСЂРѕРІРЅРµ RoboHead
+	 * (РјРёРјРёРєР°, РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ Р·РІСѓРєР°) РЅРµ РІС‹РїРѕР»РЅСЏСЋС‚СЃСЏ, Р° РїСЂРѕСЃС‚Рѕ РїРµСЂРµРґР°СЋС‚СЃСЏ РЅР° СѓСЂРѕРІРµРЅСЊ robo_body.
+	 * Р’С‹РїРѕР»РЅСЏС‚СЊСЃСЏ РѕРЅРё Р±СѓРґСѓС‚ РєРѕРіРґР° Р±СѓРґРµС‚ Р·Р°РїСѓС‰РµРЅРѕ РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ Р РѕР±РѕРЎРєСЂРёРїС‚Р° РЅР° СѓСЂРѕРІРЅРµ robo_body
+	 * Рё РєРѕРјР°РЅРґС‹ РЅР°С‡РЅСѓС‚ РїРѕСЃС‚СѓРїР°С‚СЊ РІ RoboHead РёР· robo_body.
 	 */
 	private boolean mRecordingRoboScriptMode = false;
 	
 	/**
-	 * Метод, вызывающийся при создании активити.
-	 * @param savedInstanceState ранее сохранённое состояние экземпляра.
+	 * РњРµС‚РѕРґ, РІС‹Р·С‹РІР°СЋС‰РёР№СЃСЏ РїСЂРё СЃРѕР·РґР°РЅРёРё Р°РєС‚РёРІРёС‚Рё.
+	 * @param savedInstanceState СЂР°РЅРµРµ СЃРѕС…СЂР°РЅС‘РЅРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°.
 	 */
 	@Override
 	public final void onCreate(final Bundle savedInstanceState) {
@@ -89,7 +89,7 @@ public class RoboHeadActivity extends Activity {
 				String message = (String) msg.obj;				
 				String command = MessageHelper.getMessageIdentifier(message);
 
-				if (command.equals("M")) { // M [mood] – смена мордочки
+				if (command.equals("M")) { // M [mood] вЂ“ СЃРјРµРЅР° РјРѕСЂРґРѕС‡РєРё
 					if (!mRecordingRoboScriptMode) {
 						if (message.equals(MessageConstant.FACETYPE_OK)) {
 					        mFaceHelper.setFace(FaceType.ftOk);
@@ -120,10 +120,10 @@ public class RoboHeadActivity extends Activity {
 					} else {
 						sendMessageToRobot(message);
 					}
-				} else if (command.equals("I")) { // I [illumination] – фары
+				} else if (command.equals("I")) { // I [illumination] вЂ“ С„Р°СЂС‹
 			        mUdpMessageSender.send(message);
 					sendMessageToRobot(message);
-				} else if (command.equals("h")) { // h [hit] – попадание
+				} else if (command.equals("h")) { // h [hit] вЂ“ РїРѕРїР°РґР°РЅРёРµ
 					if (message.equals(MessageConstant.HIT)) {
 				        mUdpMessageSender.send(message);
 		                new Thread() {
@@ -132,58 +132,58 @@ public class RoboHeadActivity extends Activity {
 		                    }
 		                } .start();
 					}
-					// Осознано ничего не делаем для значения 0000. Это сообщение используется для
-					// фиксации в хэш-таблице последних принятых сообщений значения, отличного от 0001.
+					// РћСЃРѕР·РЅР°РЅРѕ РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ 0000. Р­С‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ
+					// С„РёРєСЃР°С†РёРё РІ С…СЌС€-С‚Р°Р±Р»РёС†Рµ РїРѕСЃР»РµРґРЅРёС… РїСЂРёРЅСЏС‚С‹С… СЃРѕРѕР±С‰РµРЅРёР№ Р·РЅР°С‡РµРЅРёСЏ, РѕС‚Р»РёС‡РЅРѕРіРѕ РѕС‚ 0001.
 				} else if (command.equals("r")) {
 					if (message.startsWith(MessageConstant.ROBOSCRIPT_REC_STARTED)) {
-						// Начало записи РобоСкрипта. Сообщение приходит от ПК.
+						// РќР°С‡Р°Р»Рѕ Р·Р°РїРёСЃРё Р РѕР±РѕРЎРєСЂРёРїС‚Р°. РЎРѕРѕР±С‰РµРЅРёРµ РїСЂРёС…РѕРґРёС‚ РѕС‚ РџРљ.
 						mRecordingRoboScriptMode = true;
 						MessageUniqueFilter.setActive(false);
 						sendMessageToRobot(message);
 					} else if (message.startsWith(MessageConstant.ROBOSCRIPT_REC_STOPPED)) {
-						// Конец записи РобоСкрипта. Сообщение приходит от робота. 
-						// При ошибках в РобоСкрипте тоже приходит.
+						// РљРѕРЅРµС† Р·Р°РїРёСЃРё Р РѕР±РѕРЎРєСЂРёРїС‚Р°. РЎРѕРѕР±С‰РµРЅРёРµ РїСЂРёС…РѕРґРёС‚ РѕС‚ СЂРѕР±РѕС‚Р°. 
+						// РџСЂРё РѕС€РёР±РєР°С… РІ Р РѕР±РѕРЎРєСЂРёРїС‚Рµ С‚РѕР¶Рµ РїСЂРёС…РѕРґРёС‚.
 						mRecordingRoboScriptMode = false;
 						MessageUniqueFilter.setActive(true);
 					} else {
-						// Запуск РобоСкрипта на выполнение. Сообщение приходит от ПК.
+						// Р—Р°РїСѓСЃРє Р РѕР±РѕРЎРєСЂРёРїС‚Р° РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ. РЎРѕРѕР±С‰РµРЅРёРµ РїСЂРёС…РѕРґРёС‚ РѕС‚ РџРљ.
 						sendMessageToRobot(message);
 					}
 				} else if (message.equals("Z0000")) {
-					// Конец записи РобоСкрипта.
+					// РљРѕРЅРµС† Р·Р°РїРёСЃРё Р РѕР±РѕРЎРєСЂРёРїС‚Р°.
 					mRecordingRoboScriptMode = false;
 					MessageUniqueFilter.setActive(true);
 			        mUdpMessageSender.send(message);
 					sendMessageToRobot(message);
 				} else if (message.equals("#0000")) {
-					// Ничего не делаем.
+					// РќРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј.
 					Logger.d("OK");
 				} else if (command.equals("#")) {
 					if (!message.equals("#0000")) {
-						// В ПК отправляем только ошибки.
+						// Р’ РџРљ РѕС‚РїСЂР°РІР»СЏРµРј С‚РѕР»СЊРєРѕ РѕС€РёР±РєРё.
 						mUdpMessageSender.send(message);
 					}
-					String errorMessage = "Ошибка: ";
+					String errorMessage = "РћС€РёР±РєР°: ";
 					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
-						errorMessage += "неверное сообщение";
+						errorMessage += "РЅРµРІРµСЂРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ";
 					} else if (message.equals(MessageConstant.UNKNOWN_COMMAND)) {
-						errorMessage += "неизвестная команда";
+						errorMessage += "РЅРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР°";
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_ILLEGAL_COMMAND)) {
-						errorMessage += "недопустимая команда в РобоСкрипт";
+						errorMessage += "РЅРµРґРѕРїСѓСЃС‚РёРјР°СЏ РєРѕРјР°РЅРґР° РІ Р РѕР±РѕРЎРєСЂРёРїС‚";
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_ILLEGAL_COMMAND_SEQUENCE)) {
-						errorMessage += "неверная последовательность команд в РобоСкрипт";
+						errorMessage += "РЅРµРІРµСЂРЅР°СЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РєРѕРјР°РЅРґ РІ Р РѕР±РѕРЎРєСЂРёРїС‚";
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_NO_MEMORY)) {
-						errorMessage += "невозможно выделить необходимый объём памяти для РобоСкрипта";
+						errorMessage += "РЅРµРІРѕР·РјРѕР¶РЅРѕ РІС‹РґРµР»РёС‚СЊ РЅРµРѕР±С…РѕРґРёРјС‹Р№ РѕР±СЉС‘Рј РїР°РјСЏС‚Рё РґР»СЏ Р РѕР±РѕРЎРєСЂРёРїС‚Р°";
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_OUT_OF_BOUNDS)) {
-						errorMessage += "попытка выхода за границы выделенной для РобоСкрипт памяти";
+						errorMessage += "РїРѕРїС‹С‚РєР° РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†С‹ РІС‹РґРµР»РµРЅРЅРѕР№ РґР»СЏ Р РѕР±РѕРЎРєСЂРёРїС‚ РїР°РјСЏС‚Рё";
 					} else if (message.equals(MessageConstant.ILLEGAL_COMMAND)) {
-						errorMessage += "недопустимая команда вне РобоСкрипт";
+						errorMessage += "РЅРµРґРѕРїСѓСЃС‚РёРјР°СЏ РєРѕРјР°РЅРґР° РІРЅРµ Р РѕР±РѕРЎРєСЂРёРїС‚";
 					}
 					Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
 					Logger.e(errorMessage);
 				} else {
 					if (!mRecordingRoboScriptMode) {
-						if (command.equals("s")) { // s [shoot] – выстрел
+						if (command.equals("s")) { // s [shoot] вЂ“ РІС‹СЃС‚СЂРµР»
 							if (message.equals(MessageConstant.FIRE)) {
 						        mUdpMessageSender.send(message);
 				                new Thread() {
@@ -192,8 +192,8 @@ public class RoboHeadActivity extends Activity {
 				                    }
 				                } .start();
 							}
-							// Осознано ничего не делаем для значения 0000. Это сообщение используется для
-							// фиксации в хэш-таблице последних принятых сообщений значения, отличного от 0001.
+							// РћСЃРѕР·РЅР°РЅРѕ РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ 0000. Р­С‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ
+							// С„РёРєСЃР°С†РёРё РІ С…СЌС€-С‚Р°Р±Р»РёС†Рµ РїРѕСЃР»РµРґРЅРёС… РїСЂРёРЅСЏС‚С‹С… СЃРѕРѕР±С‰РµРЅРёР№ Р·РЅР°С‡РµРЅРёСЏ, РѕС‚Р»РёС‡РЅРѕРіРѕ РѕС‚ 0001.
 						}
 					}
 					sendMessageToRobot(message);
@@ -207,7 +207,7 @@ public class RoboHeadActivity extends Activity {
 	}
 	
 	/**
-	 * Метод вызывается при закрытии активити.
+	 * РњРµС‚РѕРґ РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё Р·Р°РєСЂС‹С‚РёРё Р°РєС‚РёРІРёС‚Рё.
 	 */
 	@Override
 	protected final void onDestroy() {
@@ -216,7 +216,7 @@ public class RoboHeadActivity extends Activity {
 	}
 
 	/**
-	 * Метод вызывается при восстановлении активити.
+	 * РњРµС‚РѕРґ РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРё Р°РєС‚РёРІРёС‚Рё.
 	 */
 	@Override
 	protected final void onResume() {
@@ -231,7 +231,7 @@ public class RoboHeadActivity extends Activity {
 	}
 
 	/**
-	 * Метод вызывается при переходе активити в состояние паузы.
+	 * РњРµС‚РѕРґ РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РїРµСЂРµС…РѕРґРµ Р°РєС‚РёРІРёС‚Рё РІ СЃРѕСЃС‚РѕСЏРЅРёРµ РїР°СѓР·С‹.
 	 */
 	@Override
 	protected final void onPause() {
@@ -284,24 +284,24 @@ public class RoboHeadActivity extends Activity {
 	}
 	
 	/**
-	 * Выбор команды для выполнения в тесте.
+	 * Р’С‹Р±РѕСЂ РєРѕРјР°РЅРґС‹ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РІ С‚РµСЃС‚Рµ.
 	 */
 	private void selectCommand() {
 		final CharSequence[] items = {
-				"Стоп моторы",
-				"Фары вкл.",
-				"Фары выкл.",
-				"Выстрел",
-				"Левый и правый моторы вперёд 100%", 
-				"Левый и правый моторы назад 40%", 
-				"Левый и правый моторы в разные стороны 50%", 
-				"Голова на 45 градусов влево", 
-				"Голова на 45 градусов вправо", 
-				"Голова на 30 градусов вверх", 
-				"Голова на 30 градусов вниз"};
+				"РЎС‚РѕРї РјРѕС‚РѕСЂС‹",
+				"Р¤Р°СЂС‹ РІРєР».",
+				"Р¤Р°СЂС‹ РІС‹РєР».",
+				"Р’С‹СЃС‚СЂРµР»",
+				"Р›РµРІС‹Р№ Рё РїСЂР°РІС‹Р№ РјРѕС‚РѕСЂС‹ РІРїРµСЂС‘Рґ 100%", 
+				"Р›РµРІС‹Р№ Рё РїСЂР°РІС‹Р№ РјРѕС‚РѕСЂС‹ РЅР°Р·Р°Рґ 40%", 
+				"Р›РµРІС‹Р№ Рё РїСЂР°РІС‹Р№ РјРѕС‚РѕСЂС‹ РІ СЂР°Р·РЅС‹Рµ СЃС‚РѕСЂРѕРЅС‹ 50%", 
+				"Р“РѕР»РѕРІР° РЅР° 45 РіСЂР°РґСѓСЃРѕРІ РІР»РµРІРѕ", 
+				"Р“РѕР»РѕРІР° РЅР° 45 РіСЂР°РґСѓСЃРѕРІ РІРїСЂР°РІРѕ", 
+				"Р“РѕР»РѕРІР° РЅР° 30 РіСЂР°РґСѓСЃРѕРІ РІРІРµСЂС…", 
+				"Р“РѕР»РѕРІР° РЅР° 30 РіСЂР°РґСѓСЃРѕРІ РІРЅРёР·"};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Действие:");
+		builder.setTitle("Р”РµР№СЃС‚РІРёРµ:");
 		builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 		    public void onClick(final DialogInterface dialog, final int item) {
 		    	final int cStop = 0;
@@ -364,8 +364,8 @@ public class RoboHeadActivity extends Activity {
 	}
 	
 	/**
-	 * Отправить сообщение роботу.
-	 * @param message текст сообщения.
+	 * РћС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ СЂРѕР±РѕС‚Сѓ.
+	 * @param message С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ.
 	 */
 	private void sendMessageToRobot(final String message) {
 		Logger.d("Sent to robot: " + message);
@@ -374,8 +374,8 @@ public class RoboHeadActivity extends Activity {
 	
 	/**
 	 * Start message receiving thread.
-	 * @param handler для передачи команд от уровня Windows-приложения и 
-	 * сообщений от робота.
+	 * @param handler РґР»СЏ РїРµСЂРµРґР°С‡Рё РєРѕРјР°РЅРґ РѕС‚ СѓСЂРѕРІРЅСЏ Windows-РїСЂРёР»РѕР¶РµРЅРёСЏ Рё 
+	 * СЃРѕРѕР±С‰РµРЅРёР№ РѕС‚ СЂРѕР±РѕС‚Р°.
 	 */
 	private void startUdpReceiver(final Handler handler) {
 		if (mUdpMessageReceiver != null) {
@@ -386,7 +386,7 @@ public class RoboHeadActivity extends Activity {
 	}	
 	
 	/**
-	 * Остановка нити с серверным сокетом.
+	 * РћСЃС‚Р°РЅРѕРІРєР° РЅРёС‚Рё СЃ СЃРµСЂРІРµСЂРЅС‹Рј СЃРѕРєРµС‚РѕРј.
 	 */
 	private void stopUdpReceiver() {
 		if (mUdpMessageReceiver != null) {

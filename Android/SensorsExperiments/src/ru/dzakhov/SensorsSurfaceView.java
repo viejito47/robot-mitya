@@ -36,7 +36,7 @@ public class SensorsSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d("RoboHead", "SensorsSurfaceView.surfaceDestroyed() started");
 		boolean retry = true;
-		// завершаем работу потока
+		// Р·Р°РІРµСЂС€Р°РµРј СЂР°Р±РѕС‚Сѓ РїРѕС‚РѕРєР°
 		mDrawThread.pauseThread();
 		mDrawThread.setRunning(false);
 		while (retry) {
@@ -44,7 +44,7 @@ public class SensorsSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 		        mDrawThread.join();
 		        retry = false;
 		    } catch (InterruptedException e) {
-		        // если не получилось, то будем пытаться еще и еще
+		        // РµСЃР»Рё РЅРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ, С‚Рѕ Р±СѓРґРµРј РїС‹С‚Р°С‚СЊСЃСЏ РµС‰Рµ Рё РµС‰Рµ
 		    }
 		}
 		mDrawThread = null;

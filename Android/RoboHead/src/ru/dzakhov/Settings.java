@@ -127,30 +127,30 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	}
 
 	/**
-	 * Аксессор поля mRoboBodyMac.
-	 * @return MAC-адрес Bluetooth-адаптера контроллера робота.
+	 * РђРєСЃРµСЃСЃРѕСЂ РїРѕР»СЏ mRoboBodyMac.
+	 * @return MAC-Р°РґСЂРµСЃ Bluetooth-Р°РґР°РїС‚РµСЂР° РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЂРѕР±РѕС‚Р°.
 	 */
 	public static String getRoboBodyMac() {
 		return mRoboBodyMac;
 	}
 	
 	/**
-	 * Длина сообщений, между уровнями ПК, телефон, контроллер.
+	 * Р”Р»РёРЅР° СЃРѕРѕР±С‰РµРЅРёР№, РјРµР¶РґСѓ СѓСЂРѕРІРЅСЏРјРё РџРљ, С‚РµР»РµС„РѕРЅ, РєРѕРЅС‚СЂРѕР»Р»РµСЂ.
 	 */
 	public static final int MESSAGE_LENGTH = 5;
 	
 	/**
-	 * Длина идентификатора в сообщении.
+	 * Р”Р»РёРЅР° РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РІ СЃРѕРѕР±С‰РµРЅРёРё.
 	 */
 	public static final int MESSAGE_IDENTIFIER_LENGTH = 1;
 	
 	/**
-	 * Длина значения в сообщении.
+	 * Р”Р»РёРЅР° Р·РЅР°С‡РµРЅРёСЏ РІ СЃРѕРѕР±С‰РµРЅРёРё.
 	 */
 	public static final int MESSAGE_VALUE_LENGTH = 4;
 	
 	/**
-	 * Длительность задержки при смене кадров при изменении выражения лица.
+	 * Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р·Р°РґРµСЂР¶РєРё РїСЂРё СЃРјРµРЅРµ РєР°РґСЂРѕРІ РїСЂРё РёР·РјРµРЅРµРЅРёРё РІС‹СЂР°Р¶РµРЅРёСЏ Р»РёС†Р°.
 	 */
 	public static final int FACE_FRAME_DELAY = 80;
 
@@ -200,8 +200,8 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	}
 	
 	/**
-	 * Инициализация некоторых установок.
-	 * @param context контекст приложения.
+	 * РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РЅРµРєРѕС‚РѕСЂС‹С… СѓСЃС‚Р°РЅРѕРІРѕРє.
+	 * @param context РєРѕРЅС‚РµРєСЃС‚ РїСЂРёР»РѕР¶РµРЅРёСЏ.
 	 */
 	public static void initialize(final Context context) {
 		if (context == null) {
@@ -239,10 +239,10 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCh
 	}
 
 	/**
-	 * Обработчик листнера изенений настроек.
-	 * @param preference изменившаяся опция.
-	 * @param newValue новое значение.
-	 * @return принять ли изменения.
+	 * РћР±СЂР°Р±РѕС‚С‡РёРє Р»РёСЃС‚РЅРµСЂР° РёР·РµРЅРµРЅРёР№ РЅР°СЃС‚СЂРѕРµРє.
+	 * @param preference РёР·РјРµРЅРёРІС€Р°СЏСЃСЏ РѕРїС†РёСЏ.
+	 * @param newValue РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ.
+	 * @return РїСЂРёРЅСЏС‚СЊ Р»Рё РёР·РјРµРЅРµРЅРёСЏ.
 	 */
 	public boolean onPreferenceChange(final Preference preference, final Object newValue) {
 		if (preference == null) {
