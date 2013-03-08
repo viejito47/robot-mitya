@@ -5,9 +5,8 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: DmitryDzz (Eclipse)
-    Description: 
-Slightly modified version of Sun Checks that better matches the default code formatter setting of Eclipse.
+    Checkstyle-Configuration: RoboHead Code Style
+    Description: none
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
@@ -32,9 +31,6 @@ Slightly modified version of Sun Checks that better matches the default code for
     <module name="IllegalImport"/>
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
-    <module name="LineLength">
-      <property name="max" value="160"/>
-    </module>
     <module name="MethodLength"/>
     <module name="ParameterNumber"/>
     <module name="EmptyForIteratorPad"/>
@@ -80,6 +76,11 @@ Slightly modified version of Sun Checks that better matches the default code for
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="UpperEll"/>
+    <module name="LineLength">
+      <property name="severity" value="ignore"/>
+      <property name="max" value="160"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
   </module>
   <module name="JavadocPackage"/>
   <module name="NewlineAtEndOfFile">

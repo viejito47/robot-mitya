@@ -11,13 +11,13 @@ import ru.dzakhov.BluetoothHelper;
 import ru.dzakhov.Settings;
 
 /**
- * Тест класса BluetoothHelper.
- * @author Дмитрий Дзахов
+ * РўРµСЃС‚ РєР»Р°СЃСЃР° BluetoothHelper.
+ * @author Р”РјРёС‚СЂРёР№ Р”Р·Р°С…РѕРІ
  *
  */
 public final class BluetoothHelperTest extends TestCase {
 	/**
-	 * Тест 1 метода getMessagesFromStrream.
+	 * РўРµСЃС‚ 1 РјРµС‚РѕРґР° getMessagesFromStrream.
 	 */
 	public void testGetMessagesFromStream1() {
 		String inputMessagesPortion = "L0012";
@@ -28,12 +28,12 @@ public final class BluetoothHelperTest extends TestCase {
 			assertEquals(1, messages.size());
 			assertEquals(true, messages.get(0).equals("L0012"));
 		} catch (IOException e) {
-			assertEquals("Не должно быть исключения", "Есть исключение");
+			assertEquals("РќРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РёСЃРєР»СЋС‡РµРЅРёСЏ", "Р•СЃС‚СЊ РёСЃРєР»СЋС‡РµРЅРёРµ");
 		}
 	}
 
 	/**
-	 * Тест 2 метода getMessagesFromStrream.
+	 * РўРµСЃС‚ 2 РјРµС‚РѕРґР° getMessagesFromStrream.
 	 */
 	public void testGetMessagesFromStream2() {
 		String inputMessagesPortion = "L0000" + "R0123";
@@ -45,15 +45,15 @@ public final class BluetoothHelperTest extends TestCase {
 			assertEquals(true, messages.get(0).equals("L0000"));
 			assertEquals(true, messages.get(1).equals("R0123"));
 		} catch (IOException e) {
-			assertEquals("Не должно быть исключения", "Есть исключение");
+			assertEquals("РќРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РёСЃРєР»СЋС‡РµРЅРёСЏ", "Р•СЃС‚СЊ РёСЃРєР»СЋС‡РµРЅРёРµ");
 		}
 	}
 
 	/**
-	 * Тест 3 метода getMessagesFromStrream.
+	 * РўРµСЃС‚ 3 РјРµС‚РѕРґР° getMessagesFromStrream.
 	 */
 	public void testGetMessagesFromStream3() {
-		String inputMessagesPortion = "L0000R0123F00";
+		String inputMessagesPortion = "L0000R0123V00";
 		InputStream inputStream = new ByteArrayInputStream(inputMessagesPortion.getBytes());
 
 		try {
@@ -66,7 +66,7 @@ public final class BluetoothHelperTest extends TestCase {
 			inputStream = new ByteArrayInputStream(inputMessagesPortion.getBytes());
 			messages = BluetoothHelper.getMessagesFromStream(inputStream, Settings.MESSAGE_LENGTH);
 			assertEquals(2, messages.size());
-			assertEquals(true, messages.get(0).equals("F0000"));
+			assertEquals(true, messages.get(0).equals("V0000"));
 			assertEquals(true, messages.get(1).equals("R0012"));
 	
 			inputMessagesPortion = "I000";
@@ -80,7 +80,7 @@ public final class BluetoothHelperTest extends TestCase {
 			assertEquals(1, messages.size());
 			assertEquals(true, messages.get(0).equals("I0000"));
 		} catch (IOException e) {
-			assertEquals("Не должно быть исключения", "Есть исключение");
+			assertEquals("РќРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РёСЃРєР»СЋС‡РµРЅРёСЏ", "Р•СЃС‚СЊ РёСЃРєР»СЋС‡РµРЅРёРµ");
 		}
 	}
 }

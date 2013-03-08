@@ -7,38 +7,38 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 
 /**
- * Класс, управляющий звуком.
- * @author Не Дмитрий.
+ * РљР»Р°СЃСЃ, СѓРїСЂР°РІР»СЏСЋС‰РёР№ Р·РІСѓРєРѕРј.
+ * @author РќРµ Р”РјРёС‚СЂРёР№.
  *
  */
 public final class SoundManager {
 	/**
-	 * Объект SoundManager.
+	 * РћР±СЉРµРєС‚ SoundManager.
 	 */
 	private static SoundManager mInstance;
 	
 	/**
-	 * Пул звуков.
+	 * РџСѓР» Р·РІСѓРєРѕРІ.
 	 */
 	private static SoundPool mSoundPool; 
 
 	/**
-	 * HashMap звуков.
+	 * HashMap Р·РІСѓРєРѕРІ.
 	 */
 	private static HashMap<Integer, Integer> mSoundPoolMap; 
 
 	/**
-	 * Системный аудио-менеджер.
+	 * РЎРёСЃС‚РµРјРЅС‹Р№ Р°СѓРґРёРѕ-РјРµРЅРµРґР¶РµСЂ.
 	 */
 	private static AudioManager  mAudioManager;
 	
 	/**
-	 * Контекст.
+	 * РљРѕРЅС‚РµРєСЃС‚.
 	 */
 	private static Context mContext;
 	
 	/**
-	 * Закрытый конструктор класса.
+	 * Р—Р°РєСЂС‹С‚С‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєР»Р°СЃСЃР°.
 	 */
 	private SoundManager() {   
 	}
@@ -93,17 +93,17 @@ public final class SoundManager {
 	}
 	
 	/**
-	 * Индекс звука выстрела.
+	 * РРЅРґРµРєСЃ Р·РІСѓРєР° РІС‹СЃС‚СЂРµР»Р°.
 	 */
 	public static final int GUN = 1;
 	
 	/**
-	 * Индекс крика Вильгельма.
+	 * РРЅРґРµРєСЃ РєСЂРёРєР° Р’РёР»СЊРіРµР»СЊРјР°.
 	 */
 	public static final int SCREAM = 2;
 	
 	/**
-	 * Индекс звука клаксона.
+	 * РРЅРґРµРєСЃ Р·РІСѓРєР° РєР»Р°РєСЃРѕРЅР°.
 	 */
 	public static final int BEEP = 3;
 	
@@ -128,7 +128,7 @@ public final class SoundManager {
 	}
 	
 	/**
-	 * Освобождение ресурсов.
+	 * РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ.
 	 */
 	public static void cleanup() {
 		if (mSoundPool != null) {
@@ -141,8 +141,8 @@ public final class SoundManager {
 	}
 	
 	/**
-	 * Включение вибрации на заданное время.
-	 * @param millis время вибрации в миллисекундах.
+	 * Р’РєР»СЋС‡РµРЅРёРµ РІРёР±СЂР°С†РёРё РЅР° Р·Р°РґР°РЅРЅРѕРµ РІСЂРµРјСЏ.
+	 * @param millis РІСЂРµРјСЏ РІРёР±СЂР°С†РёРё РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С….
 	 */
 	public static void vibrate(final long millis) {
 //		Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);

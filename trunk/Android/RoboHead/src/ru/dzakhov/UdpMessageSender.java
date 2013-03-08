@@ -77,7 +77,7 @@ public final class UdpMessageSender extends Thread {
 		}
 
 		Logger.d("UdpMessageSender: started");
-		Logger.d("UdpMessageSender: recipient address – " + inetAddress.getHostAddress());
+		Logger.d("UdpMessageSender: recipient address â€“ " + inetAddress.getHostAddress());
 			
 		String message = "";
 //		while (!Thread.currentThread().isInterrupted()) {

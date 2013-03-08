@@ -4,13 +4,13 @@ import ru.dzakhov.MessageHelper;
 import junit.framework.TestCase;
 
 /**
- * Тест класса MessageHelper.
- * @author Дмитрий Дзахов
+ * РўРµСЃС‚ РєР»Р°СЃСЃР° MessageHelper.
+ * @author Р”РјРёС‚СЂРёР№ Р”Р·Р°С…РѕРІ
  *
  */
 public final class MessageHelperTest extends TestCase {
 	/**
-	 * Тест метода correctLength.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° correctLength.
 	 */
 	public void testCorrectLength() {
 		String valueToTest = MessageHelper.correctLength("DIMA", 6, '-');
@@ -27,7 +27,7 @@ public final class MessageHelperTest extends TestCase {
 	}
 	
 	/**
-	 * Тест метода makeMessage.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° makeMessage.
 	 */
 	public void testMakeMessage() {
 		String message = MessageHelper.makeMessage("L", "74");
@@ -38,7 +38,7 @@ public final class MessageHelperTest extends TestCase {
 	}
 	
 	/**
-	 * Тест метода getMessageIdentifier.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° getMessageIdentifier.
 	 */
 	public void testGetMessageIdentifier() {
 		String identifier = MessageHelper.getMessageIdentifier("DI123");
@@ -52,7 +52,7 @@ public final class MessageHelperTest extends TestCase {
 	}
 	
 	/**
-	 * Тест метода getMessageValue.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° getMessageValue.
 	 */
 	public void testGetMessageValue() {
 		String value = MessageHelper.getMessageValue("G1234");
@@ -72,7 +72,7 @@ public final class MessageHelperTest extends TestCase {
 	}
 	
 	/**
-	 * Тест метода skipFirstBrokenMessage.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° skipFirstBrokenMessage.
 	 */
 	public void testSkipFirstBrokenMessage() {
 		String value = MessageHelper.skipFirstBrokenMessage("G1234I00");
@@ -98,7 +98,7 @@ public final class MessageHelperTest extends TestCase {
 	}
 
 	/**
-	 * Тест метода getFirstMessagePosition.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° getFirstMessagePosition.
 	 */
 	public void testGetFirstMessagePosition() {
 		int value = MessageHelper.getFirstMessagePosition("G1234I00");

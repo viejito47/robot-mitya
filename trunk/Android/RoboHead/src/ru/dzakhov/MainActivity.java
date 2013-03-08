@@ -14,19 +14,19 @@ import android.widget.Button;
 import android.widget.Toast;
 
 /**
- * Главная активити приложения.
- * @author Дмитрий
+ * Р“Р»Р°РІРЅР°СЏ Р°РєС‚РёРІРёС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ.
+ * @author Р”РјРёС‚СЂРёР№
  *
  */
 public final class MainActivity extends Activity {
 	/**
-	 * Хэндлер активити.
+	 * РҐСЌРЅРґР»РµСЂ Р°РєС‚РёРІРёС‚Рё.
 	 */
 	private Handler mHandler = new Handler();
 
 	/**
-	 * Вызывается при создании активити.
-	 * @param savedInstanceState ранее сохранённое состояние экземпляра. 
+	 * Р’С‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃРѕР·РґР°РЅРёРё Р°РєС‚РёРІРёС‚Рё.
+	 * @param savedInstanceState СЂР°РЅРµРµ СЃРѕС…СЂР°РЅС‘РЅРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°. 
 	 */
 	public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +40,7 @@ public final class MainActivity extends Activity {
 	}
 	
 	/**
-	 * Установка обработчика кнопки "Запуск".
+	 * РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРЅРѕРїРєРё "Р—Р°РїСѓСЃРє".
 	 */
 	private void setRunClickHandler() {
 		final Button button = (Button) findViewById(R.id.buttonRun);
@@ -63,23 +63,23 @@ public final class MainActivity extends Activity {
     			}
     			ipwebcam.putExtra("hidebtn1", true);
     			
-    			// Запуск активити с мордочкой:
+    			// Р—Р°РїСѓСЃРє Р°РєС‚РёРІРёС‚Рё СЃ РјРѕСЂРґРѕС‡РєРѕР№:
     			mHandler.post(new Runnable() {
     				public void run() {
     					startActivity(new Intent(MainActivity.this, RoboHeadActivity.class));
     				}
     			});
     			
-    			// Запуск активити с отображением картинки IP Webcam.
-    			// К сожалению, IP Webcam не работает в фоновом режиме на Android 4.0.3.
-    			// Поэтому пришлось поверх активити IP Webcam открывать активити с мордочкой.
+    			// Р—Р°РїСѓСЃРє Р°РєС‚РёРІРёС‚Рё СЃ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµРј РєР°СЂС‚РёРЅРєРё IP Webcam.
+    			// Рљ СЃРѕР¶Р°Р»РµРЅРёСЋ, IP Webcam РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РІ С„РѕРЅРѕРІРѕРј СЂРµР¶РёРјРµ РЅР° Android 4.0.3.
+    			// РџРѕСЌС‚РѕРјСѓ РїСЂРёС€Р»РѕСЃСЊ РїРѕРІРµСЂС… Р°РєС‚РёРІРёС‚Рё IP Webcam РѕС‚РєСЂС‹РІР°С‚СЊ Р°РєС‚РёРІРёС‚Рё СЃ РјРѕСЂРґРѕС‡РєРѕР№.
     			startActivityForResult(ipwebcam, 1);
     		}
         });
 	}
 
 	/**
-	 * Установка обработчика кнопки "Настройки". 
+	 * РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРЅРѕРїРєРё "РќР°СЃС‚СЂРѕР№РєРё". 
 	 */
     private void setSettingsClickHandler() {
 		final Button button = (Button) findViewById(R.id.buttonSettings);
@@ -92,7 +92,7 @@ public final class MainActivity extends Activity {
     }
 
 	/**
-	 * Установка обработчика кнопки "О приложении". 
+	 * РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРЅРѕРїРєРё "Рћ РїСЂРёР»РѕР¶РµРЅРёРё". 
 	 */
     private void setAboutClickHandler() {
 		final Button button = (Button) findViewById(R.id.buttonAbout);

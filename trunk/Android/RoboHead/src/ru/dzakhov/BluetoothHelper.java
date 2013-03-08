@@ -18,71 +18,75 @@ import android.os.Message;
 import android.widget.Toast;
 
 /**
- * Вспомогательный класс для обеспечения связи между Android-приложением и Arduino-скетчем робота.
- * @author Дмитрий Дзахов
+ * Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РґР»СЏ РѕР±РµСЃРїРµС‡РµРЅРёСЏ СЃРІСЏР·Рё РјРµР¶РґСѓ Android-РїСЂРёР»РѕР¶РµРЅРёРµРј Рё 
+ * Arduino-СЃРєРµС‚С‡РµРј СЂРѕР±РѕС‚Р°.
+ * @author Р”РјРёС‚СЂРёР№ Р”Р·Р°С…РѕРІ
  *
  */
 public final class BluetoothHelper {
 	/**
-	 * Константа для обработчика интента включения Bluetooth.
+	 * РљРѕРЅСЃС‚Р°РЅС‚Р° РґР»СЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РёРЅС‚РµРЅС‚Р° РІРєР»СЋС‡РµРЅРёСЏ Bluetooth.
 	 */
 	public static final int REQUEST_ENABLE_BT = 1;
 	
 	/**
-	 * MAC-адрес bluetooth-модуля, подключаемого к контроллеру робота.
+	 * MAC-Р°РґСЂРµСЃ bluetooth-РјРѕРґСѓР»СЏ, РїРѕРґРєР»СЋС‡Р°РµРјРѕРіРѕ Рє РєРѕРЅС‚СЂРѕР»Р»РµСЂСѓ СЂРѕР±РѕС‚Р°.
 	 */
 	// private static final String ROBOBODY_MAC = "00:12:03:31:01:22";
 	
 	/**
-	 * Handler обрабатывающий все сообщения в Android-приложении робота. Передаётся классу в методе Initialize.
+	 * Handler РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰РёР№ РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ РІ Android-РїСЂРёР»РѕР¶РµРЅРёРё СЂРѕР±РѕС‚Р°. 
+	 * РџРµСЂРµРґР°С‘С‚СЃСЏ РєР»Р°СЃСЃСѓ РІ РјРµС‚РѕРґРµ Initialize.
 	 */
 	private static Handler mMessageHandler = null;
 	
 	/**
-	 * Bluetooth-адаптер телефона.
+	 * Bluetooth-Р°РґР°РїС‚РµСЂ С‚РµР»РµС„РѕРЅР°.
 	 */
 	private static BluetoothAdapter mBluetoothAdapter = null;
 	
 	/**
-	 * Bluetooth-модуль, подключенный к контроллеру.
+	 * Bluetooth-РјРѕРґСѓР»СЊ, РїРѕРґРєР»СЋС‡РµРЅРЅС‹Р№ Рє РєРѕРЅС‚СЂРѕР»Р»РµСЂСѓ.
 	 */
 	private static BluetoothDevice mBluetoothDevice = null;
 	
 	/**
-	 * Сокет.
+	 * РЎРѕРєРµС‚.
 	 */
 	private static BluetoothSocket mBluetoothSocket = null;
 	
 	/**
-	 * Входной поток сообщений. В него поступают сообщения от контроллера робота.
+	 * Р’С…РѕРґРЅРѕР№ РїРѕС‚РѕРє СЃРѕРѕР±С‰РµРЅРёР№. Р’ РЅРµРіРѕ РїРѕСЃС‚СѓРїР°СЋС‚ СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЂРѕР±РѕС‚Р°.
 	 */
 	private static InputStream mInputStream = null;
 	
 	/**
-	 * Выходной поток сообщений. В него помещаются сообщения для контроллера робота.
+	 * Р’С‹С…РѕРґРЅРѕР№ РїРѕС‚РѕРє СЃРѕРѕР±С‰РµРЅРёР№. Р’ РЅРµРіРѕ РїРѕРјРµС‰Р°СЋС‚СЃСЏ СЃРѕРѕР±С‰РµРЅРёСЏ РґР»СЏ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЂРѕР±РѕС‚Р°.
 	 */
 	private static OutputStream mOutputStream = null;
 	
 	/**
-	 * Признак активности Bluetooth-адаптера.
+	 * РџСЂРёР·РЅР°Рє Р°РєС‚РёРІРЅРѕСЃС‚Рё Bluetooth-Р°РґР°РїС‚РµСЂР°.
 	 */
 	private static boolean mBluetoothAdapterIsEnabled = false;
 	
 	/**
-	 * Признак установления соединения с Bluetooth-модулем контроллера робота.
+	 * РџСЂРёР·РЅР°Рє СѓСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ Bluetooth-РјРѕРґСѓР»РµРј РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЂРѕР±РѕС‚Р°.
 	 */
 	private static boolean mConnected = false;
 	
 	/**
-	 * Признак того, что контроллер робота выключен. Устанавливается при неудачной попытке установления соединения с 
-	 * удалённым bluetooth-модулем робота.
+	 * РџСЂРёР·РЅР°Рє С‚РѕРіРѕ, С‡С‚Рѕ РєРѕРЅС‚СЂРѕР»Р»РµСЂ СЂРѕР±РѕС‚Р° РІС‹РєР»СЋС‡РµРЅ. РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РїСЂРё 
+	 * РЅРµСѓРґР°С‡РЅРѕР№ РїРѕРїС‹С‚РєРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ СѓРґР°Р»С‘РЅРЅС‹Рј bluetooth-РјРѕРґСѓР»РµРј 
+	 * СЂРѕР±РѕС‚Р°.
 	 */
 	//private static boolean mControllerIsTurnedOff = false;
 	
 	/**
-	 * При чтении сообщений, поступающих от контроллера робота последнее сообщение может быть получео ещё не полностью.
-	 * Тогда принятый неполный кусок последней команды запоминаем в это поле. При обработке следующей партии сообщений
-	 * мы вспомним его и прибавим справа.
+	 * РџСЂРё С‡С‚РµРЅРёРё СЃРѕРѕР±С‰РµРЅРёР№, РїРѕСЃС‚СѓРїР°СЋС‰РёС… РѕС‚ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЂРѕР±РѕС‚Р° РїРѕСЃР»РµРґРЅРµРµ
+	 * СЃРѕРѕР±С‰РµРЅРёРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕР»СѓС‡РµРѕ РµС‰С‘ РЅРµ РїРѕР»РЅРѕСЃС‚СЊСЋ. РўРѕРіРґР° РїСЂРёРЅСЏС‚С‹Р№ РЅРµРїРѕР»РЅС‹Р№
+	 * РєСѓСЃРѕРє РїРѕСЃР»РµРґРЅРµР№ РєРѕРјР°РЅРґС‹ Р·Р°РїРѕРјРёРЅР°РµРј РІ СЌС‚Рѕ РїРѕР»Рµ. РџСЂРё РѕР±СЂР°Р±РѕС‚РєРµ СЃР»РµРґСѓСЋС‰РµР№
+	 * РїР°СЂС‚РёРё СЃРѕРѕР±С‰РµРЅРёР№ РјС‹ РІСЃРїРѕРјРЅРёРј РµРіРѕ Рё РїСЂРёР±Р°РІРёРј СЃРїСЂР°РІР°.
 	 */
 	private static String mPreviousMessagesRest = "";
 	
@@ -92,20 +96,21 @@ public final class BluetoothHelper {
 	private static Thread mReceiveThread = null;
 	
 	/**
-	 * Класс будет статическим, поэтому конструктор закрываю.
+	 * РљР»Р°СЃСЃ Р±СѓРґРµС‚ СЃС‚Р°С‚РёС‡РµСЃРєРёРј, РїРѕСЌС‚РѕРјСѓ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р·Р°РєСЂС‹РІР°СЋ.
 	 */
 	private BluetoothHelper() {		
 	}
 
 	/**
-	 * Начальная инициализация bluetooth-адаптера телефона. Должно вызываться только один раз, например, в onCreate главной активити.
-	 * @param parentActivity родительское активити.
+	 * РќР°С‡Р°Р»СЊРЅР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ bluetooth-Р°РґР°РїС‚РµСЂР° С‚РµР»РµС„РѕРЅР°.
+	 * Р”РѕР»Р¶РЅРѕ РІС‹Р·С‹РІР°С‚СЊСЃСЏ С‚РѕР»СЊРєРѕ РѕРґРёРЅ СЂР°Р·, РЅР°РїСЂРёРјРµСЂ, РІ onCreate РіР»Р°РІРЅРѕР№ Р°РєС‚РёРІРёС‚Рё.
+	 * @param parentActivity СЂРѕРґРёС‚РµР»СЊСЃРєРѕРµ Р°РєС‚РёРІРёС‚Рё.
 	 */
 	public static void initialize(final Activity parentActivity) {
 		mBluetoothAdapterIsEnabled = false;
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
-			Toast.makeText(parentActivity, "В устройстве отсутствует Bluetooth-адаптер", Toast.LENGTH_LONG).show();
+			Toast.makeText(parentActivity, "Р’ СѓСЃС‚СЂРѕР№СЃС‚РІРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Bluetooth-Р°РґР°РїС‚РµСЂ", Toast.LENGTH_LONG).show();
 			return;
 		}
 
@@ -118,20 +123,21 @@ public final class BluetoothHelper {
 	}
 	
 	/**
-	 * Соединение с bluetooth-модулем робота. Приём от контроллера робота и передача на обработку сообщений.
-	 * @param messageHandler handler, обрабатывающий все сообщения робота.
-	 * @return true, если соединение выполнено.
+	 * РЎРѕРµРґРёРЅРµРЅРёРµ СЃ bluetooth-РјРѕРґСѓР»РµРј СЂРѕР±РѕС‚Р°. РџСЂРёС‘Рј РѕС‚ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЂРѕР±РѕС‚Р° Рё 
+	 * РїРµСЂРµРґР°С‡Р° РЅР° РѕР±СЂР°Р±РѕС‚РєСѓ СЃРѕРѕР±С‰РµРЅРёР№.
+	 * @param messageHandler handler, РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰РёР№ РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ СЂРѕР±РѕС‚Р°.
+	 * @return true, РµСЃР»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІС‹РїРѕР»РЅРµРЅРѕ.
 	 */
 	public static boolean start(final Handler messageHandler) {
 		mMessageHandler = messageHandler;
 		
 		if (mBluetoothAdapter == null) {
-			Logger.e("В устройстве отсутствует Bluetooth-адаптер");
+			Logger.e("Р’ СѓСЃС‚СЂРѕР№СЃС‚РІРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Bluetooth-Р°РґР°РїС‚РµСЂ");
 			return false;
 		}
 		
 		if (!mBluetoothAdapterIsEnabled) {
-			Logger.e("Не включен Bluetooth-адаптер");
+			Logger.e("РќРµ РІРєР»СЋС‡РµРЅ Bluetooth-Р°РґР°РїС‚РµСЂ");
 			return false;
 		}
 		
@@ -145,8 +151,9 @@ public final class BluetoothHelper {
 					}
 					
 	    			if (!mConnected) { 
-	    			    // Это - единственный метод подключиться напрямую, не используя поиска всех устройств в округе.
-	    				// createRfcommSocketToServiceRecord(), к сожалению, не работает
+	    			    // Р­С‚Рѕ - РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РјРµС‚РѕРґ РїРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ РЅР°РїСЂСЏРјСѓСЋ, РЅРµ РёСЃРїРѕР»СЊР·СѓСЏ РїРѕРёСЃРєР°
+	    				// РІСЃРµС… СѓСЃС‚СЂРѕР№СЃС‚РІ РІ РѕРєСЂСѓРіРµ.
+	    				// createRfcommSocketToServiceRecord(), Рє СЃРѕР¶Р°Р»РµРЅРёСЋ, РЅРµ СЂР°Р±РѕС‚Р°РµС‚
 	    				try {
 	    					connect();
 	    					Logger.d("BluetoothHelper: started");
@@ -165,7 +172,7 @@ public final class BluetoothHelper {
 	    					
 	    					List<String> messageList = null;
 	    	    			try {
-		    					// Получить список принятых на данный момент команд:
+		    					// РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РїСЂРёРЅСЏС‚С‹С… РЅР° РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РєРѕРјР°РЅРґ:
 		    					messageList = getMessagesFromStream(mInputStream, Settings.MESSAGE_LENGTH);
 	    	    			} catch (Exception e) {
 	    	    				Logger.e("BluetoothHelper input error: " + e.getMessage());
@@ -173,11 +180,11 @@ public final class BluetoothHelper {
 	    	    			}
 
 	    					if ((messageList != null) && (mMessageHandler != null)) {		    					
-		    					// Выполнить каждую принятую команду:
+		    					// Р’С‹РїРѕР»РЅРёС‚СЊ РєР°Р¶РґСѓСЋ РїСЂРёРЅСЏС‚СѓСЋ РєРѕРјР°РЅРґСѓ:
 		    					for (int i = 0; i < messageList.size(); i++) {
 		    						String messageText = messageList.get(i);
 		    						
-		    						// Команды передаются в RoboHeadActivity:
+		    						// РљРѕРјР°РЅРґС‹ РїРµСЂРµРґР°СЋС‚СЃСЏ РІ RoboHeadActivity:
 		    						Message message = new Message();
 		    						message.obj = messageText;
 		    						mMessageHandler.sendMessage(message);
@@ -198,7 +205,7 @@ public final class BluetoothHelper {
 	}
 	
 	/**
-	 * Разрыв bluetooth-соединения.
+	 * Р Р°Р·СЂС‹РІ bluetooth-СЃРѕРµРґРёРЅРµРЅРёСЏ.
 	 */
 	public static void stop() {
 		mReceiveThread.interrupt();
@@ -214,8 +221,8 @@ public final class BluetoothHelper {
 		Method m = mBluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
 		mBluetoothSocket = (BluetoothSocket) m.invoke(mBluetoothDevice, Integer.valueOf(1));
 		
-		// Если контроллер робота недоступен, connect() вызывает исключение и тормозит работу 
-		// приложения, несмотря на отдельный поток!
+		// Р•СЃР»Рё РєРѕРЅС‚СЂРѕР»Р»РµСЂ СЂРѕР±РѕС‚Р° РЅРµРґРѕСЃС‚СѓРїРµРЅ, connect() РІС‹Р·С‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёРµ Рё С‚РѕСЂРјРѕР·РёС‚ СЂР°Р±РѕС‚Сѓ 
+		// РїСЂРёР»РѕР¶РµРЅРёСЏ, РЅРµСЃРјРѕС‚СЂСЏ РЅР° РѕС‚РґРµР»СЊРЅС‹Р№ РїРѕС‚РѕРє!
 		mBluetoothSocket.connect();
 		
 		mInputStream = mBluetoothSocket.getInputStream();
@@ -241,8 +248,8 @@ public final class BluetoothHelper {
 	}
 	
 	/**
-	 * Отправка сообщения. Один вызов допускает отправку сразу нескольких сообщений.
-	 * @param message сообщение или последовательность сообщений без разделителей.
+	 * РћС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ. РћРґРёРЅ РІС‹Р·РѕРІ РґРѕРїСѓСЃРєР°РµС‚ РѕС‚РїСЂР°РІРєСѓ СЃСЂР°Р·Сѓ РЅРµСЃРєРѕР»СЊРєРёС… СЃРѕРѕР±С‰РµРЅРёР№.
+	 * @param message СЃРѕРѕР±С‰РµРЅРёРµ РёР»Рё РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ СЃРѕРѕР±С‰РµРЅРёР№ Р±РµР· СЂР°Р·РґРµР»РёС‚РµР»РµР№.
 	 */
 	public static void send(final String message) {
 		if (mConnected) {
@@ -257,13 +264,14 @@ public final class BluetoothHelper {
 	}
 
 	/**
-	 * Извлекает из входного потока пятибайтовые команды, разделённые символами #13, #10.
-	 * Команда, ещё неполностью попавшая во входной поток не возвращается в выходной список команд.
-	 * Попавший в выходной поток кусок команды откладывается до следующего вызова метода.
-	 * @param inputStream поток ввода (поступает из сокета).
-	 * @param messageLength длина сообщения (константа).
-	 * @return список команд роботу.
-	 * @throws IOException ошибка чтения из потока ввода (из сокета).
+	 * РР·РІР»РµРєР°РµС‚ РёР· РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РїСЏС‚РёР±Р°Р№С‚РѕРІС‹Рµ РєРѕРјР°РЅРґС‹, СЂР°Р·РґРµР»С‘РЅРЅС‹Рµ СЃРёРјРІРѕР»Р°РјРё #13, #10.
+	 * РљРѕРјР°РЅРґР°, РµС‰С‘ РЅРµРїРѕР»РЅРѕСЃС‚СЊСЋ РїРѕРїР°РІС€Р°СЏ РІРѕ РІС…РѕРґРЅРѕР№ РїРѕС‚РѕРє РЅРµ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РІ РІС‹С…РѕРґРЅРѕР№ 
+	 * СЃРїРёСЃРѕРє РєРѕРјР°РЅРґ. РџРѕРїР°РІС€РёР№ РІ РІС‹С…РѕРґРЅРѕР№ РїРѕС‚РѕРє РєСѓСЃРѕРє РєРѕРјР°РЅРґС‹ РѕС‚РєР»Р°РґС‹РІР°РµС‚СЃСЏ РґРѕ СЃР»РµРґСѓСЋС‰РµРіРѕ
+	 * РІС‹Р·РѕРІР° РјРµС‚РѕРґР°.
+	 * @param inputStream РїРѕС‚РѕРє РІРІРѕРґР° (РїРѕСЃС‚СѓРїР°РµС‚ РёР· СЃРѕРєРµС‚Р°).
+	 * @param messageLength РґР»РёРЅР° СЃРѕРѕР±С‰РµРЅРёСЏ (РєРѕРЅСЃС‚Р°РЅС‚Р°).
+	 * @return СЃРїРёСЃРѕРє РєРѕРјР°РЅРґ СЂРѕР±РѕС‚Сѓ.
+	 * @throws IOException РѕС€РёР±РєР° С‡С‚РµРЅРёСЏ РёР· РїРѕС‚РѕРєР° РІРІРѕРґР° (РёР· СЃРѕРєРµС‚Р°).
 	 */
 	public static List<String> getMessagesFromStream(final InputStream inputStream, final int messageLength) throws IOException {
 		List<String> result = new ArrayList<String>();
@@ -279,7 +287,7 @@ public final class BluetoothHelper {
 		dataInputStream.readFully(buffer);
 		String messages = new String(buffer);
 		
-		// Если на предыдущей итерации часть команды была прочитана, дочитываю команду:
+		// Р•СЃР»Рё РЅР° РїСЂРµРґС‹РґСѓС‰РµР№ РёС‚РµСЂР°С†РёРё С‡Р°СЃС‚СЊ РєРѕРјР°РЅРґС‹ Р±С‹Р»Р° РїСЂРѕС‡РёС‚Р°РЅР°, РґРѕС‡РёС‚С‹РІР°СЋ РєРѕРјР°РЅРґСѓ:
 		if (!mPreviousMessagesRest.equals("")) {
 			messages = mPreviousMessagesRest + messages;
 		}

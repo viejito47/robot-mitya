@@ -9,20 +9,20 @@ import android.os.Handler;
 import android.os.Message;
 
 /**
- * Класс, реализующий приём и исполнение команд от уровня Windows-приложения.
- * @author Дмитрий
+ * РљР»Р°СЃСЃ, СЂРµР°Р»РёР·СѓСЋС‰РёР№ РїСЂРёС‘Рј Рё РёСЃРїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґ РѕС‚ СѓСЂРѕРІРЅСЏ Windows-РїСЂРёР»РѕР¶РµРЅРёСЏ.
+ * @author Р”РјРёС‚СЂРёР№
  *
  */
 public final class UdpMessageReceiver extends Thread {
 	/**
-	 * Ссылка на объект Handler из RoboHeadActivity. Им обрабатываются все поступающие
-	 * в Android-приложение сообщения: и от Arduino, и от Windows.
+	 * РЎСЃС‹Р»РєР° РЅР° РѕР±СЉРµРєС‚ Handler РёР· RoboHeadActivity. РРј РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РІСЃРµ РїРѕСЃС‚СѓРїР°СЋС‰РёРµ
+	 * РІ Android-РїСЂРёР»РѕР¶РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ: Рё РѕС‚ Arduino, Рё РѕС‚ Windows.
 	 */
 	private Handler mHandler;
 	
 	/**
-	 * Конструктор класса.
-	 * @param handler ссылка на объект Handler из RoboHeadActivity.
+	 * РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєР»Р°СЃСЃР°.
+	 * @param handler СЃСЃС‹Р»РєР° РЅР° РѕР±СЉРµРєС‚ Handler РёР· RoboHeadActivity.
 	 */
 	public UdpMessageReceiver(final Handler handler) {
 		super();
@@ -30,7 +30,7 @@ public final class UdpMessageReceiver extends Thread {
 	}
 	
 	/**
-	 * Реализация интерфейса Runnable.
+	 * Р РµР°Р»РёР·Р°С†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР° Runnable.
 	 */
 	public void run() {
 		DatagramSocket datagramSocket = null;
@@ -55,7 +55,7 @@ public final class UdpMessageReceiver extends Thread {
 			String receivedText = new String(receivePacket.getData());
 			
 			if (MessageUniqueFilter.isNewMessage(receivedText)) {
-				// Команды передаются в RoboHeadActivity:
+				// РљРѕРјР°РЅРґС‹ РїРµСЂРµРґР°СЋС‚СЃСЏ РІ RoboHeadActivity:
 				Message message = new Message();					
 				message.obj = receivedText;
 				mHandler.sendMessage(message);

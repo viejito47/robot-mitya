@@ -1,34 +1,35 @@
 package ru.dzakhov;
 
 /**
- * Набор методов для сборки и разбора с сообщений.
- * @author Дмитрий Дзахов
+ * РќР°Р±РѕСЂ РјРµС‚РѕРґРѕРІ РґР»СЏ СЃР±РѕСЂРєРё Рё СЂР°Р·Р±РѕСЂР° СЃ СЃРѕРѕР±С‰РµРЅРёР№.
+ * @author Р”РјРёС‚СЂРёР№ Р”Р·Р°С…РѕРІ
  *
  */
 public final class MessageHelper {
 	/**
-	 * Конструктор спрятан.
+	 * РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃРїСЂСЏС‚Р°РЅ.
 	 */
 	private MessageHelper() {		
 	}
 	
 	/**
-	 * Символ, которым дополняется идентификатор сообщения если ему не хватает длины до Settings.MESSAGE_IDENTIFIER_LENGTH.
+	 * РЎРёРјРІРѕР», РєРѕС‚РѕСЂС‹Рј РґРѕРїРѕР»РЅСЏРµС‚СЃСЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРѕРѕР±С‰РµРЅРёСЏ РµСЃР»Рё РµРјСѓ РЅРµ С…РІР°С‚Р°РµС‚
+	 * РґР»РёРЅС‹ РґРѕ Settings.MESSAGE_IDENTIFIER_LENGTH.
 	 */
 	private static final char IDENTIFIER_PREFIX = ' ';
 	
 	/**
-	 * Символ, которым дополняется значение из сообщения если ему не хватает длины до Settings.MESSAGE_VALUE_LENGTH.
+	 * РЎРёРјРІРѕР», РєРѕС‚РѕСЂС‹Рј РґРѕРїРѕР»РЅСЏРµС‚СЃСЏ Р·РЅР°С‡РµРЅРёРµ РёР· СЃРѕРѕР±С‰РµРЅРёСЏ РµСЃР»Рё РµРјСѓ РЅРµ С…РІР°С‚Р°РµС‚ РґР»РёРЅС‹ РґРѕ Settings.MESSAGE_VALUE_LENGTH.
 	 */
 	private static final char VALUE_PREFIX = '0';
 	
 	/**
-	 * Дополняет заданный текст справа указанными символами до указанной длины.
-	 * Если длина превышает указанный размер, текст обрезается. 
-	 * @param text исходный текст.
-	 * @param length требуемая длина.
-	 * @param prefixChar символ, добавляемый справа.
-	 * @return скорректированный текст.
+	 * Р”РѕРїРѕР»РЅСЏРµС‚ Р·Р°РґР°РЅРЅС‹Р№ С‚РµРєСЃС‚ СЃРїСЂР°РІР° СѓРєР°Р·Р°РЅРЅС‹РјРё СЃРёРјРІРѕР»Р°РјРё РґРѕ СѓРєР°Р·Р°РЅРЅРѕР№ РґР»РёРЅС‹.
+	 * Р•СЃР»Рё РґР»РёРЅР° РїСЂРµРІС‹С€Р°РµС‚ СѓРєР°Р·Р°РЅРЅС‹Р№ СЂР°Р·РјРµСЂ, С‚РµРєСЃС‚ РѕР±СЂРµР·Р°РµС‚СЃСЏ. 
+	 * @param text РёСЃС…РѕРґРЅС‹Р№ С‚РµРєСЃС‚.
+	 * @param length С‚СЂРµР±СѓРµРјР°СЏ РґР»РёРЅР°.
+	 * @param prefixChar СЃРёРјРІРѕР», РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРїСЂР°РІР°.
+	 * @return СЃРєРѕСЂСЂРµРєС‚РёСЂРѕРІР°РЅРЅС‹Р№ С‚РµРєСЃС‚.
 	 */
 	public static String correctLength(final String text, final int length, final char prefixChar) {
 		String result = text;
@@ -46,10 +47,10 @@ public final class MessageHelper {
 	}
 	
 	/**
-	 * Сборка сообщения по идентификатору и значению.
-	 * @param messageIdentifier идентификатор сообщения.
-	 * @param messageValue значение сообщения.
-	 * @return сообщение.
+	 * РЎР±РѕСЂРєР° СЃРѕРѕР±С‰РµРЅРёСЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ Рё Р·РЅР°С‡РµРЅРёСЋ.
+	 * @param messageIdentifier РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРѕРѕР±С‰РµРЅРёСЏ.
+	 * @param messageValue Р·РЅР°С‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ.
+	 * @return СЃРѕРѕР±С‰РµРЅРёРµ.
 	 */
 	public static String makeMessage(final String messageIdentifier, final String messageValue) {
 		String identifier = correctLength(messageIdentifier, Settings.MESSAGE_IDENTIFIER_LENGTH, IDENTIFIER_PREFIX);
@@ -58,9 +59,9 @@ public final class MessageHelper {
 	}
 	
 	/**
-	 * Извлечение идентификатора из сообщения.
-	 * @param message сообщение.
-	 * @return идентификатор сообщения.
+	 * РР·РІР»РµС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РёР· СЃРѕРѕР±С‰РµРЅРёСЏ.
+	 * @param message СЃРѕРѕР±С‰РµРЅРёРµ.
+	 * @return РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРѕРѕР±С‰РµРЅРёСЏ.
 	 */
 	public static String getMessageIdentifier(final String message) {
 		int realLength = Math.min(message.length(), Settings.MESSAGE_IDENTIFIER_LENGTH);
@@ -70,14 +71,14 @@ public final class MessageHelper {
 	}
 	
 	/**
-	 * Извлечение значения из сообщения.
-	 * @param message сообщение.
-	 * @return значение из сообщения.
+	 * РР·РІР»РµС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РёР· СЃРѕРѕР±С‰РµРЅРёСЏ.
+	 * @param message СЃРѕРѕР±С‰РµРЅРёРµ.
+	 * @return Р·РЅР°С‡РµРЅРёРµ РёР· СЃРѕРѕР±С‰РµРЅРёСЏ.
 	 */
 	public static String getMessageValue(final String message) {
 		String result;
 		
-		// Первые символы считаем идентификатором.
+		// РџРµСЂРІС‹Рµ СЃРёРјРІРѕР»С‹ СЃС‡РёС‚Р°РµРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј.
 		if (message.length() <= Settings.MESSAGE_IDENTIFIER_LENGTH) {
 			result = "";
 		} else {

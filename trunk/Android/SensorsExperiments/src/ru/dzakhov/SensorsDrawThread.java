@@ -48,10 +48,10 @@ public class SensorsDrawThread extends Thread implements SensorEventListener {
         mPrevTime = System.currentTimeMillis();
 
     	if (!mSensorsRegistered) {
-    		// Замеры количества срабатываний в секунду на HTC Sensation Android 4.0.1:
-    		// SensorManager.SENSOR_DELAY_FASTEST: 49-50 раз
-    		// SensorManager.SENSOR_DELAY_GAME:    49-50 раз
-    		// SensorManager.SENSOR_DELAY_NORMAL:  5 раз
+    		// Р—Р°РјРµСЂС‹ РєРѕР»РёС‡РµСЃС‚РІР° СЃСЂР°Р±Р°С‚С‹РІР°РЅРёР№ РІ СЃРµРєСѓРЅРґСѓ РЅР° HTC Sensation Android 4.0.1:
+    		// SensorManager.SENSOR_DELAY_FASTEST: 49-50 СЂР°Р·
+    		// SensorManager.SENSOR_DELAY_GAME:    49-50 СЂР°Р·
+    		// SensorManager.SENSOR_DELAY_NORMAL:  5 СЂР°Р·
     		final int rate = SensorManager.SENSOR_DELAY_GAME;
 	    	mSensorManager.registerListener(this, mAccelerometerSensor, rate);
 	    	mSensorManager.registerListener(this, mMagneticFieldSensor, rate);
@@ -77,17 +77,17 @@ public class SensorsDrawThread extends Thread implements SensorEventListener {
     public void run() {
         Canvas canvas;
         while (mRunFlag) {
-            // получаем текущее время и вычисляем разницу с предыдущим 
-            // сохраненным моментом времени
+            // РїРѕР»СѓС‡Р°РµРј С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ Рё РІС‹С‡РёСЃР»СЏРµРј СЂР°Р·РЅРёС†Сѓ СЃ РїСЂРµРґС‹РґСѓС‰РёРј 
+            // СЃРѕС…СЂР°РЅРµРЅРЅС‹Рј РјРѕРјРµРЅС‚РѕРј РІСЂРµРјРµРЅРё
             long now = System.currentTimeMillis();
             long elapsedTime = now - mPrevTime;
             if (elapsedTime > 40) {
-                // если прошло больше 40 миллисекунд
+                // РµСЃР»Рё РїСЂРѕС€Р»Рѕ Р±РѕР»СЊС€Рµ 40 РјРёР»Р»РёСЃРµРєСѓРЅРґ
                 mPrevTime = now;
 
 	            canvas = null;
 	            try {
-	                // получаем объект Canvas и выполняем отрисовку
+	                // РїРѕР»СѓС‡Р°РµРј РѕР±СЉРµРєС‚ Canvas Рё РІС‹РїРѕР»РЅСЏРµРј РѕС‚СЂРёСЃРѕРІРєСѓ
 	                canvas = mSurfaceHolder.lockCanvas(null);
 	                if (canvas != null) {
 		                synchronized (mSurfaceHolder) {
@@ -100,7 +100,7 @@ public class SensorsDrawThread extends Thread implements SensorEventListener {
    	            } 
 	            finally {
 	                if (canvas != null) {
-	                    // отрисовка выполнена. выводим результат на экран
+	                    // РѕС‚СЂРёСЃРѕРІРєР° РІС‹РїРѕР»РЅРµРЅР°. РІС‹РІРѕРґРёРј СЂРµР·СѓР»СЊС‚Р°С‚ РЅР° СЌРєСЂР°РЅ
 	                    mSurfaceHolder.unlockCanvasAndPost(canvas);
 	                }
 	            }

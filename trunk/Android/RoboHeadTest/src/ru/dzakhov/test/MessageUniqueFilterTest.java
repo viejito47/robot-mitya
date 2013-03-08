@@ -4,13 +4,13 @@ import ru.dzakhov.MessageUniqueFilter;
 import junit.framework.TestCase;
 
 /**
- * Тесты класса CommandFilter.
- * @author Дмитрий Дзахов
+ * РўРµСЃС‚С‹ РєР»Р°СЃСЃР° CommandFilter.
+ * @author Р”РјРёС‚СЂРёР№ Р”Р·Р°С…РѕРІ
  *
  */
 public final class MessageUniqueFilterTest extends TestCase {
 	/**
-	 * Тест метода isNewMessage.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° isNewMessage.
 	 */
 	public void testIsNewMessage1() {
 		assertEquals(true, MessageUniqueFilter.isNewMessage("R1234"));
@@ -22,7 +22,7 @@ public final class MessageUniqueFilterTest extends TestCase {
 	}
 	
 	/**
-	 * Тест метода isNewMessage.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° isNewMessage.
 	 */
 	public void testIsNewMessage2() {
 		assertEquals(true, MessageUniqueFilter.isNewMessage("F0001"));
@@ -31,7 +31,7 @@ public final class MessageUniqueFilterTest extends TestCase {
 	}
 	
 	/**
-	 * Тест метода isNewMessage.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° isNewMessage.
 	 */
 	public void testIsNewMessage3() {
 		assertEquals(true, MessageUniqueFilter.isNewMessage("F0001"));
@@ -40,7 +40,7 @@ public final class MessageUniqueFilterTest extends TestCase {
 	}
 
 	/**
-	 * Тест метода isNewMessage.
+	 * РўРµСЃС‚ РјРµС‚РѕРґР° isNewMessage.
 	 */
 	public void testIsNewMessageCaseSensitive() {
 		assertEquals(true, MessageUniqueFilter.isNewMessage("H0000"));

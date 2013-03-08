@@ -4,14 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 
 /**
- * Активити для вывода информации о приложении.
- * @author Дмитрий
+ * РђРєС‚РёРІРёС‚Рё РґР»СЏ РІС‹РІРѕРґР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ РїСЂРёР»РѕР¶РµРЅРёРё.
+ * @author Р”РјРёС‚СЂРёР№
  *
  */
 public class About extends Activity {
 	/**
-	 * Вызывается при старте активити.
-	 * @param savedInstanceState ранее сохранённое состояние экземпляра. 
+	 * Р’С‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃС‚Р°СЂС‚Рµ Р°РєС‚РёРІРёС‚Рё.
+	 * @param savedInstanceState СЂР°РЅРµРµ СЃРѕС…СЂР°РЅС‘РЅРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°. 
 	 */
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
