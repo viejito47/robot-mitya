@@ -127,7 +127,7 @@ namespace RoboCommon
             string correctedMessage;
             try
             {
-                if (!this.CorrectMessage(message, out correctedMessage))
+                if (!this.CorrectMessage2(message, out correctedMessage))
                 {
                     return false;
                 }
@@ -226,42 +226,19 @@ namespace RoboCommon
         /// <param name="message">Исходное значение. В значении могут отсутствовать лидирующие нули.</param>
         /// <param name="correctedMessage">Скорректированное пятисимвольное сообщение.</param>
         /// <returns>true, если удалось, false и LastErrorMessage если нет.</returns>
-        protected bool CorrectMessage(string message, out string correctedMessage)
+        protected bool CorrectMessage2(string message, out string correctedMessage)
         {
-            const int IdentifierLength = 1;
-            const int ValueLength = 4;
-
-            correctedMessage = string.Empty;
-
-            if ((message.Length == 0) || (message.Length > IdentifierLength + ValueLength))
-            {
-                this.LastErrorMessage = "Неверный размер сообщения.";
-                return false;
-            }
-
-            string valueText = message.Remove(0, IdentifierLength);
-            valueText = valueText.ToUpper();
-            if (valueText.Length < ValueLength)
-            {
-                int charsToAdd = ValueLength - valueText.Length;
-                for (int i = 0; i < charsToAdd; i++)
-                {
-                    valueText = "0" + valueText;
-                }
-            }
-
             try
             {
-                int.Parse(valueText, System.Globalization.NumberStyles.AllowHexSpecifier);
+                correctedMessage = MessageHelper.CorrectMessage(message);
+                return true;
             }
-            catch (Exception)
+            catch (RoboMessageException e)
             {
-                this.LastErrorMessage = "Неверно задано значение сообщения.";
+                correctedMessage = string.Empty;
+                this.LastErrorMessage = e.Message;
                 return false;
             }
-
-            correctedMessage = message[0] + valueText;
-            return true;
         }
 
         /// <summary>

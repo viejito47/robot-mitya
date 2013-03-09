@@ -118,7 +118,6 @@
     <Compile Include="FlashlightHelper.cs" />
     <Compile Include="GunHelper.cs" />
     <Compile Include="LookHelper.cs" />
-    <Compile Include="MessageHelper.cs" />
     <Compile Include="MoodHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
