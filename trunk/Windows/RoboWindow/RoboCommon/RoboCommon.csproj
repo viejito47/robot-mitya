@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RoboMessageException.cs" />
+    <Compile Include="MessageHelper.cs" />
     <Compile Include="TextReceivedEventArgs.cs" />
     <Compile Include="ComPortCommunicationHelper.cs" />
     <Compile Include="ICommunicationHelper.cs" />
