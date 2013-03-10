@@ -42,6 +42,11 @@ public final class MessageConstant {
 	public static final String FACETYPE_ILL = "M0005";
 
 	/**
+	 * Команда управления настроением: "виляет хвостом".
+	 */
+	public static final String FACETYPE_VERY_HAPPY = "M0101";
+
+	/**
 	 * Команда управления настроением: "готов играть".
 	 */
 	public static final String FACETYPE_READY_TO_PLAY = "M0102";

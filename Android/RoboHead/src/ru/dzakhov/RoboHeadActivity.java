@@ -106,11 +106,11 @@ public class RoboHeadActivity extends Activity {
 						} else if (message.equals(MessageConstant.FACETYPE_ILL)) {
 					        mFaceHelper.setFace(FaceType.ftIll);
 					        mUdpMessageSender.send(message);
+						} else if (message.equals(MessageConstant.FACETYPE_VERY_HAPPY)) {
+							sendMessageToRobot(message);
 						} else if (message.equals(MessageConstant.FACETYPE_READY_TO_PLAY)) {
-					        mFaceHelper.setFace(FaceType.ftReadyToPlay);
 							sendMessageToRobot(message);
 						} else if (message.equals(MessageConstant.FACETYPE_VERY_BLUE)) {
-					        mFaceHelper.setFace(FaceType.ftBlue);
 							sendMessageToRobot(message);
 						} else if (message.equals(MessageConstant.FACETYPE_ANGRY_JUMP_BACK)) {
 							sendMessageToRobot(message);
