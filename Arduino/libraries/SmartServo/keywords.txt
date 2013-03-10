@@ -1,0 +1,37 @@
+#######################################
+# SmartServo library. Freeware.
+# Copyright (c) Dmitry Dzakhov 2013.
+# www.robot-mitya.ru
+# info@robot-mitya.ru
+#######################################
+
+#######################################
+# Syntax Coloring Map For SmartServo
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+SmartServo	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+attach		KEYWORD2
+getDegree	KEYWORD2
+setDegree	KEYWORD2
+startSwing	KEYWORD2
+startTurn	KEYWORD2
+stop		KEYWORD2
+update		KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
