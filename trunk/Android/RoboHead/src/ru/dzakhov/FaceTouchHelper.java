@@ -1,7 +1,7 @@
 package ru.dzakhov;
 
-import android.os.Handler;
-import android.os.Message;
+//import android.os.Handler;
+//import android.os.Message;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
@@ -73,15 +73,15 @@ public final class FaceTouchHelper implements OnTouchListener {
 	 */
 	private float mStrokeSize;
 	
-	/**
-	 * Хэндлер, принимающий сообщения, сигнализирующие о необходимости что-то сделать. 
-	 */
-	private Handler mHandlerDelayedAction = new Handler() {
-		@Override
-		public void handleMessage(final Message msg) {
-			mFaceHelper.setFace(FaceType.ftOk);
-		}
-	};
+//	/**
+//	 * Хэндлер, принимающий сообщения, сигнализирующие о необходимости что-то сделать. 
+//	 */
+//	private Handler mHandlerDelayedAction = new Handler() {
+//		@Override
+//		public void handleMessage(final Message msg) {
+//			mFaceHelper.setFace(FaceType.ftOk);
+//		}
+//	};
 
 	/**
 	 * Конструктор класса.
@@ -139,13 +139,14 @@ public final class FaceTouchHelper implements OnTouchListener {
 					mStrokeSize = 0;
 					mInTouch = false;
 					
-					// Сделать счастливое лицо:
-					mFaceHelper.setFace(FaceType.ftHappy);
-					final int happyFaceDuration = 5000;
-					mHandlerDelayedAction.sendEmptyMessageDelayed(0, happyFaceDuration);
-					
+//					// Сделать счастливое лицо:
+//					mFaceHelper.setFace(FaceType.ftHappy);
+//					final int happyFaceDuration = 5000;
+//					mHandlerDelayedAction.sendEmptyMessageDelayed(0, happyFaceDuration);
+//					
 					// Повилять хвостом:
-					BluetoothHelper.send(MessageConstant.WAG_TAIL_SIN);
+//					BluetoothHelper.send(MessageConstant.WAG_TAIL_SIN);
+					BluetoothHelper.send(MessageConstant.FACETYPE_VERY_HAPPY);
 				}
 			} else {
 				mInTouch = false;
@@ -246,9 +247,9 @@ public final class FaceTouchHelper implements OnTouchListener {
 	 */
 	private void pushEye() {
 		// Злое лицо на 5 секунд:
-		mFaceHelper.setFace(FaceType.ftAngry);
-		final int happyFaceDuration = 5000;
-		mHandlerDelayedAction.sendEmptyMessageDelayed(0, happyFaceDuration);
+//		mFaceHelper.setFace(FaceType.ftAngry);
+//		final int happyFaceDuration = 5000;
+//		mHandlerDelayedAction.sendEmptyMessageDelayed(0, happyFaceDuration);
 		
 		// Порычать секунду:
 		final int vibrateDuration = 800;

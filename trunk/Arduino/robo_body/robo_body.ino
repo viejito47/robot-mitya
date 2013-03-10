@@ -8,8 +8,8 @@
 // -------------------------------------------------------------------------------------
 
 #include <Servo.h>
+#include <SmartServo.h>
 #include <IRremote.h>
-#include <Swinger.h>
 #include <RoboScript.h>
 #include <EEPROM.h>
   
@@ -43,9 +43,9 @@ int servoTailPin = 11;
 int lightPin = 13;
 
 // Objects to control servodrives.
-Servo servoHeadHorizontal;
-Servo servoHeadVertical;
-Servo servoTail;
+SmartServo servoHeadHorizontal;
+SmartServo servoHeadVertical;
+SmartServo servoTail;
 
 int servoHeadHorizontalMinDegree = 0;
 int servoHeadHorizontalMaxDegree = 180;
@@ -58,9 +58,6 @@ int servoHeadCurrentHorizontalDegree;
 int servoHeadCurrentVerticalDegree;
 int servoTailCurrentDegree;
 
-Swinger tailSwinger; // object to control tail swinging
-Swinger headVerticalSwinger; // object to control head vertical swinging
-Swinger headHorizontalSwinger; // object to control head horizontal swinging
 const int musicPeriod = 535;
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
@@ -69,7 +66,9 @@ decode_results results;
 IRsend irsend;
 
 // Программа для робота: РобоСкрипт.
+RoboScript happyReflex;
 RoboScript readyToPlayReflex;
+RoboScript sadReflex;
 RoboScript angryReflex;
 RoboScript musicReflex;
 
@@ -133,23 +132,25 @@ void setup()
 
   // Установка горизонтального сервопривода в положение для установки телефона:
   pinMode(servoHeadHorizontalPin, OUTPUT);
-  servoHeadHorizontal.attach(servoHeadHorizontalPin);
+  servoHeadHorizontal.attach(servoHeadHorizontalPin, servoHeadHorizontalMinDegree, servoHeadHorizontalMaxDegree);
   moveHead("H", 90);
 
   // Установка вертикального сервопривода в положение для установки телефона:
   pinMode(servoHeadVerticalPin, OUTPUT);
-  servoHeadVertical.attach(servoHeadVerticalPin);
+  servoHeadVertical.attach(servoHeadVerticalPin, servoHeadVerticalMinDegree, servoHeadVerticalMaxDegree);
   moveHead("V", 90);
 
   // Установка хвоста пистолетом:
   pinMode(servoTailPin, OUTPUT);
-  servoTail.attach(servoTailPin);
+  servoTail.attach(servoTailPin, servoTailMinDegree, servoTailMaxDegree);
   moveTail(90);
   
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
   
+  happyReflexInitialize();
   readyToPlayReflexInitialize();
+  sadReflexInitialize();
   angryReflexInitialize();
   musicReflexInitialize();  
   
@@ -168,7 +169,9 @@ void processEvents()
 
   ProcessSwinging();
 
+  happyReflexRun();
   readyToPlayReflexRun();
+  sadReflexRun();
   angryReflexRun();
   musicReflexRun();
   
@@ -241,13 +244,13 @@ void executeIrCommand(int cmd)
       moveHead( "V", servoHeadVertical.read()+IrServoStep );
       break;
     case 9: //no
-      headHorizontalSwinger.startSwing(90, 1, 400, 2.5, 60, 0.75, true);      
+      servoHeadHorizontal.startSwing(1, 400, 2.5, 60, 0.75, true);      
       break;
     case 10: //yes
-      headVerticalSwinger.startSwing(60, 1, 400, 2.5, 30, 0.8, true);
+      servoHeadVertical.startSwing(1, 400, 2.5, 30, 0.8, true);
       break;
     case 11: //tail
-      tailSwinger.startSwing(90, 1, 250, 6, 70, 0.9, true);
+      servoTail.startSwing(1, 250, 6, 70, 0.9, true);
       break;
     case 12: // Mood 
       executeAction("M", 0x0102, true );
@@ -645,7 +648,7 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     {
       if (value != 0)
       {
-        tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
+        servoTail.startSwing(value, 250, 6, 70, 0.9, true);
       }
       break;
     }
@@ -653,7 +656,7 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     {
       if (value != 0)
       {
-        headHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, value, 400, 2.5, 60, 0.75, true);
+        servoHeadHorizontal.startSwing(value, 400, 2.5, 60, 0.75, true);
       }
       break;
     }
@@ -661,7 +664,7 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     {
       if (value != 0)
       {
-        headVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, value, 400, 2.5, 30, 0.8, true);
+        servoHeadVertical.startSwing(value, 400, 2.5, 30, 0.8, true);
       }
       break;
     }
@@ -669,54 +672,64 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     {
       switch(value)
       {
+        case 0x0101:
+        {
+          happyReflexStart();
+          if (inPlaybackMode)
+          {
+            sendMessageToRobot(command, value);
+          }
+          break; 
+        }
         case 0x0102:
         {
           const int ReadyToPlayVerticalDegree = 70;
-          int verticalAmplitude = abs((ReadyToPlayVerticalDegree - servoHeadCurrentVerticalDegree) * 2);
-          boolean swingDirection = ReadyToPlayVerticalDegree > servoHeadCurrentVerticalDegree;
-          headVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 400, 0.25, verticalAmplitude, 1, swingDirection);
-          headHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 250, 3.5, 40, 0.8, true);
-          tailSwinger.startSwing(servoTailCurrentDegree, value, 250, 6, 70, 0.9, true);
+          int verticalAmplitude = abs((ReadyToPlayVerticalDegree - servoHeadVertical.read()) * 2);
+          boolean swingDirection = ReadyToPlayVerticalDegree > servoHeadVertical.read();
+          servoHeadVertical.startSwing(2, 400, 0.25, verticalAmplitude, 1, swingDirection);
+          servoHeadHorizontal.startSwing(2, 250, 3.5, 40, 0.8, true);
+          servoTail.startSwing(value, 250, 6, 70, 0.9, true);
           readyToPlayReflexStart();
           if (inPlaybackMode)
           {
             sendMessageToRobot(command, value);
           }
-         break; 
+          break; 
         }
-       case 0x0103:
-       {
-          int verticalAmplitude = (servoHeadCurrentVerticalDegree - servoHeadVerticalMinDegree) * 2;
-          headVerticalSwinger.startSwing(servoHeadCurrentVerticalDegree, 2, 6000, 0.25, verticalAmplitude, 1, false);
-          headHorizontalSwinger.startSwing(servoHeadCurrentHorizontalDegree, 2, 750, 2, 60, 0.6, true);
+        case 0x0103:
+        {
+          int verticalAmplitude = (servoHeadVertical.read() - servoHeadVerticalMinDegree) * 2;
+          servoHeadVertical.startSwing(2, 6000, 0.25, verticalAmplitude, 1, false);
+          servoHeadHorizontal.startSwing(2, 750, 2, 60, 0.6, true);
+          sadReflexStart();
           if (inPlaybackMode)
           {
             sendMessageToRobot(command, value);
           }
           break;
-       }
-       case 0x0104:
-       {
+        }
+        case 0x0104:
+        {
           angryReflexStart();
           if (inPlaybackMode)
           {
             sendMessageToRobot(command, value);
           }
           break;
-       }
-       case 0x0105:  
-       {
+        }
+        case 0x0105:  
+        {
           int musicTacts = 12;
-          headVerticalSwinger.startSwing(45, 1, musicPeriod, musicTacts, 30, 1, true);
-          headHorizontalSwinger.startSwing(90, 2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
-          tailSwinger.startSwing(servoTailCurrentDegree, value, musicPeriod, musicTacts, 70, 1, true);
+          servoHeadVertical.startSwing(1, musicPeriod, musicTacts, 30, 1, true);
+          servoHeadHorizontal.startSwing(2, musicPeriod * musicTacts / 1.5, 1.5, 50, 1, true);
+          servoTail.startSwing(value, musicPeriod, musicTacts, 70, 1, true);
           musicReflexStart();
-          /*if (inPlaybackMode)
-          {
-            sendMessageToRobot(command, value);
-          }*/
           break;
-       }
+        }
+        default:
+        {
+          sendMessageToRobot(command, value);
+        }
       } // (M-command's switch)
       break;
     }
@@ -755,40 +768,22 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
   Serial.print("#0000"); // Успешное выполнение команды, (потом можно удалить.)
 }
 
-int correctDegree(int degree, int minValue, int maxValue)
-{
-  if (degree < minValue)
-  {
-    return minValue;
-  }
-  
-  if (degree > maxValue)
-  {
-    return maxValue;
-  }
-  
-  return degree;
-}
-
 // Поворот головы.
 void moveHead(String plane, int degree)
 {
   if (plane == "H") // (горизонтальная плоскость)
   {
-    servoHeadCurrentHorizontalDegree = correctDegree(degree, servoHeadHorizontalMinDegree, servoHeadHorizontalMaxDegree);
-    servoHeadHorizontal.write(servoHeadCurrentHorizontalDegree);
+    servoHeadHorizontal.write(degree);
   }
   else if (plane == "V") // (вертикальная плоскость)
   {
-    servoHeadCurrentVerticalDegree = correctDegree(degree, servoHeadVerticalMinDegree, servoHeadVerticalMaxDegree);
-    servoHeadVertical.write(servoHeadCurrentVerticalDegree);
+    servoHeadVertical.write(degree);
   }
 }
 
 // Поворот хвоста.
 void moveTail(int degree)
 {
-  servoTailCurrentDegree = correctDegree(degree, servoTailMinDegree, servoTailMaxDegree);
   servoTail.write(degree);
 }
 
@@ -836,23 +831,19 @@ void setHeadlightState(int value)
 // Process swinging on three servodrives.
 void ProcessSwinging()
 {
-  int degree;
   // Tail swinging.
-  if (tailSwinger.swing(degree))
+  if (servoTail.update())
   {
-    moveTail(degree);
   }
   
   // Swinging head in horizontal plane.
-  if (headHorizontalSwinger.swing(degree))
+  if (servoHeadHorizontal.update())
   {
-    moveHead("H", degree);
   }
 
   // Swinging head in vertical plane.
-  if (headVerticalSwinger.swing(degree))
+  if (servoHeadVertical.update())
   {
-    moveHead("V", degree);
   }
 }
 
@@ -863,13 +854,54 @@ signed long sign(double value)
   return 0;
 }
 
+void happyReflexInitialize()
+{
+  happyReflex.initialize(3);
+  RoboAction actionHappyFace;
+  actionHappyFace.Command = 'M';
+  actionHappyFace.Value = 2;
+  actionHappyFace.Delay = 0;
+  RoboAction actionWagTail;
+  actionWagTail.Command = 't';
+  actionWagTail.Value = 1;
+  actionWagTail.Delay = 4000;
+  RoboAction actionNormalFace = actionHappyFace;
+  actionNormalFace.Value = 1;
+  actionNormalFace.Delay = 0;
+  happyReflex.addAction(actionHappyFace);
+  happyReflex.addAction(actionWagTail);
+  happyReflex.addAction(actionNormalFace);
+}
+
+void happyReflexRun()
+{
+  String command;
+  int value;
+  if (happyReflex.hasActionToExecute(command, value))
+  {
+    executeAction(command, value, true);
+  }
+}
+
+void happyReflexStart()
+{
+  happyReflex.startExecution();
+}
+
 void readyToPlayReflexInitialize()
 {
   const int kickSpeed = 192;
   const int kickDuration = 90;
   const int freezeDuration = 200;
   
-  readyToPlayReflex.initialize(8);
+  readyToPlayReflex.initialize(10);
+  RoboAction actionSmile;
+  actionSmile.Command = 'M';
+  actionSmile.Value = 2;
+  actionSmile.Delay = 200;
+  RoboAction actionNormalFace = actionSmile;
+  actionNormalFace.Value = 1;
+  actionNormalFace.Delay = 0;
   RoboAction actionLeftKick;
   actionLeftKick.Command = 'L';
   actionLeftKick.Value = kickSpeed;
@@ -882,6 +914,7 @@ void readyToPlayReflexInitialize()
   actionLeftStop.Delay = freezeDuration;
   RoboAction actionRightStop = actionLeftStop;
   actionRightStop.Command = 'R';
+  readyToPlayReflex.addAction(actionSmile);
   readyToPlayReflex.addAction(actionLeftKick);
   readyToPlayReflex.addAction(actionLeftStop);
   readyToPlayReflex.addAction(actionRightKick);
@@ -889,7 +922,9 @@ void readyToPlayReflexInitialize()
   readyToPlayReflex.addAction(actionLeftKick);
   readyToPlayReflex.addAction(actionLeftStop);
   readyToPlayReflex.addAction(actionRightKick);
+  actionRightStop.Delay = 2000;
   readyToPlayReflex.addAction(actionRightStop);
+  readyToPlayReflex.addAction(actionNormalFace);
 }
 
 void readyToPlayReflexRun()
@@ -907,10 +942,43 @@ void readyToPlayReflexStart()
   readyToPlayReflex.startExecution();
 }
 
+void sadReflexInitialize()
+{
+  sadReflex.initialize(2);
+  RoboAction actionSadFace;
+  actionSadFace.Command = 'M';
+  actionSadFace.Value = 3;
+  actionSadFace.Delay = 5000;
+  RoboAction actionNormalFace = actionSadFace;
+  actionNormalFace.Value = 1;
+  actionNormalFace.Delay = 0;
+  sadReflex.addAction(actionSadFace);
+  sadReflex.addAction(actionNormalFace);
+}
+
+void sadReflexRun()
+{
+  String command;
+  int value;
+  if (sadReflex.hasActionToExecute(command, value))
+  {
+    executeAction(command, value, true);
+  }
+}
+
+void sadReflexStart()
+{
+  sadReflex.startExecution();
+}
+
 void angryReflexInitialize()
 {
-  angryReflex.initialize(3);
+  angryReflex.initialize(5);
   RoboAction action;
+  action.Command = 'M';
+  action.Value = 4;
+  action.Delay = 700;
+  angryReflex.addAction(action);
   action.Command = 'G';
   action.Value = -192;
   action.Delay = 100;
@@ -919,6 +987,10 @@ void angryReflexInitialize()
   action.Delay = 20;
   angryReflex.addAction(action);
   action.Value = 0;
+  action.Delay = 4000;
+  angryReflex.addAction(action);
+  action.Command = 'M';
+  action.Value = 1;
   action.Delay = 0;
   angryReflex.addAction(action);
 }
