@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LookWidget</class>
+ <widget class="QWidget" name="LookWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>844</width>
+    <height>473</height>
+   </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Control</string>
+  </property>
+  <widget class="VlcWidgetVideo" name="video" native="true">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>20</y>
+     <width>781</width>
+     <height>441</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>VlcWidgetVideo</class>
+   <extends>QWidget</extends>
+   <header>vlc-qt/WidgetVideo.h</header>
+   <container>1</container>
+   <slots>
+    <signal>fullscreen()</signal>
+    <slot>toggleFullscreen()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
