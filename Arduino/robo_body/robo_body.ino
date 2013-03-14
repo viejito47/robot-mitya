@@ -639,6 +639,24 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       moveHead(command, value);
       break;
     }
+    case 'h':
+    {
+      // startTurn method requires a signed millisecond parameter.
+      // And the command 'h' has value stored in centiseconds (1/100
+      // of a second). That's why we need to multiply by 10.
+      signed long sentiSeconds = (signed int)value;
+      servoHeadHorizontal.startTurn(sentiSeconds * 10, true);
+      break;
+    }
+    case 'v':
+    {
+      // startTurn method requires a signed millisecond parameter.
+      // And the command 'v' has value stored in centiseconds (1/100
+      // of a second). That's why we need to multiply by 10.
+      signed long sentiSeconds = (signed int)value;
+      servoHeadVertical.startTurn(sentiSeconds * 10, true);
+      break;
+    }
     case 'T':  
     {
       moveTail(value);
