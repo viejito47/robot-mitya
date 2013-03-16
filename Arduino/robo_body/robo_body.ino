@@ -99,7 +99,7 @@ const int IR_MOVE_SPEED = 255; // Speed set to maximum, when control from IR rem
 const int IR_SERVO_STEP_DEFAULT = 5; // Step for changing servo head (Horizontal and Vertical) position, when controling from IR remote
 const int IR_SERVO_STEP_PROGRAM_MODE = 180; // Step for changing servo head (Horizontal and Vertical) position, when in programm mode. (Set to Maximum, so that user will 100% notice it.
 int IrServoStep = IR_SERVO_STEP_DEFAULT; // Step for rotating head from remote
-const int IR_TOTAL_COMMANDS = 17; // Total Number of commands, that can be send by IR control
+const int IR_TOTAL_COMMANDS = 12; // Total Number of commands, that can be send by IR control
 unsigned long IrCommands[IR_TOTAL_COMMANDS]; // All command from remote control
 
 unsigned long IrRemoteLastCommand = 0; // Last command received by IR receiver (except IR_COMMAND_SEPARATOR)
@@ -221,6 +221,8 @@ boolean checkIrHit()
 
 void executeIrCommand(int cmd)
 {
+//  Serial1.print(cmd); //DEBGUG FOR LEONARDO
+//  Serial.print(cmd); // DEBUG FOR OTHER BOARDS
   switch(cmd)
   {
     case 0: // move forward
@@ -286,6 +288,14 @@ void IrProgrammatorProcess()
   {
       if((results.value!=IR_COMMAND_SEPARATOR)&&(results.value!=0)&&(results.value!=IrLastCommandsValue[0]))
       {
+        if(IrProgrammatorStep>0)
+        {
+          if(IrCommands[IrProgrammatorStep-1]==results.value) // To avoid pressing the same button as in previous command
+          {
+            irrecv.resume();
+            return;            
+          }
+        }
         IrCommands[IrProgrammatorStep]=results.value;
         if(IrProgrammatorStep==IR_TOTAL_COMMANDS-1) // Was it the last command?
         {
@@ -301,7 +311,6 @@ void IrProgrammatorProcess()
         {
           executeIrCommand(++IrProgrammatorStep);
         }
-
       }            
       irrecv.resume();        
   }
@@ -320,9 +329,9 @@ void ProcessIrCommands()
       return;
     }
   }
-  // We recieved unknown command. Let's check if we need to enter in programmator mode. (Same button should be pressed in the following order: LONG->SHORT->LONG->SHORT
-  if((IrLastCommandsValue[0]==IrLastCommandsValue[1])&&(IrLastCommandsValue[0]==IrLastCommandsValue[2])&&(IrLastCommandsValue[0]==IrLastCommandsValue[3])
-    &&(IrLastCommandsState[0]==2)&&(IrLastCommandsState[1]==3)&&(IrLastCommandsState[2]==2)&&(IrLastCommandsState[1]==3))
+  // We recieved unknown command. Let's check if we need to enter in programmator mode. (Same button should be pressed in the following order: SHORT->LONG->SHORT
+  if(( IrLastCommandsValue[0]==IrLastCommandsValue[1] )&&( IrLastCommandsValue[0]==IrLastCommandsValue[2] )
+    &&( IrLastCommandsState[0]==2 || IrLastCommandsState[0]==1 )&&( IrLastCommandsState[1]==3 )&&( IrLastCommandsState[2]==2 || IrLastCommandsState[2]==1 ))
   {
     // Starting Programmator mode.
     IrServoStep = IR_SERVO_STEP_PROGRAM_MODE; // Maximun step for Programm mode, so that user will notice servo movement
