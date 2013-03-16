@@ -119,8 +119,12 @@ byte IrProgrammatorStep = 0; // Number of command we're processing now
 // Функция инициализации скетча:
 void setup()
 {
-  // Установка скорости последовательного порта (для отладочной информации):
-  Serial.begin(9600);
+  // Set speed for serial port on pins 0,1 :
+  #ifdef USBCON   // For Leonardo (Romeo V2) board support
+      Serial1.begin(9600);
+  #else
+      Serial.begin(9600);
+  #endif
 
   // Инициализация ИК-приёмника:
   irrecv.enableIRIn(); // Start the receiver
@@ -204,8 +208,14 @@ boolean checkIrHit()
       // сообщений Android-приложения. Там используется хэш-таблица
       // сообщений для исключения из обработки повторяющихся команд
       // с одинаковыми значениями.
-      Serial.print("h0001");
-      Serial.print("h0000");
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("h0001");
+        Serial1.print("h0000");
+      #else
+        Serial.print("h0001");
+        Serial.print("h0000");
+      #endif
+
     }
 }
 
@@ -369,10 +379,17 @@ void processMessageBuffer()
 {
     
 // Если что пришло из буфера, добавляем.
-  while (Serial.available() > 0)
-  {
-    MessageBuffer += (char)Serial.read();
-  }
+  #ifdef USBCON   // For Leonardo (Romeo V2) board support
+    while (Serial1.available() > 0)
+    {
+      MessageBuffer += (char)Serial1.read();
+    }
+  #else
+    while (Serial.available() > 0)
+    {
+      MessageBuffer += (char)Serial.read();
+    }
+  #endif
 // Размер буфера
   int bufferLength = MessageBuffer.length();
 
@@ -380,7 +397,7 @@ void processMessageBuffer()
   {
     return;
   }
-//  Serial.println("MessageBuffer: " + MessageBuffer);
+//  Serial1.println("MessageBuffer: " + MessageBuffer);
 
   // Последовательно извлекаю из полученной строки команды длиной MESSAGELENGTH символов.
   // Что не уместилось пойдёт снова в MessageBuffer.
@@ -391,19 +408,22 @@ void processMessageBuffer()
   { //Ищем первый символ не-цифру в шестнадцатиричом исчислении. Это будет комманда значит.
     if(((MessageBuffer[i]>='0')&&(MessageBuffer[i]<='9'))||((MessageBuffer[i]>='A')&&(MessageBuffer[i]<='F'))||((MessageBuffer[i]>='a')&&(MessageBuffer[i]<='f')))
     {  //Оказалась цифра
-          Serial.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
+          #ifdef USBCON   // For Leonardo (Romeo V2) board support
+             Serial1.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
+          #else
+             Serial.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
+          #endif          
+
           i++;
     } else
     {  //Попалась не цифра
         message = MessageBuffer.substring(i, i+MESSAGELENGTH);
-//        Serial.println("message: " + message);
       
         processMessage( message );
         i += MESSAGELENGTH;        
     }
   }
   MessageBuffer = MessageBuffer.substring(i, bufferLength); 
-//  Serial.println("NewMessageBuffer: " + MessageBuffer);
 }
 
 boolean parseMessage(String message, String &command, int &value)
@@ -453,7 +473,12 @@ void processMessage(String message)
 {
   if (ECHO_MODE)
   {
-    Serial.print(message);
+    #ifdef USBCON   // For Leonardo (Romeo V2) board support
+      Serial1.print(message);
+    #else
+      Serial.print(message);
+    #endif
+
   }  
   
   // Парсер команды:
@@ -461,9 +486,13 @@ void processMessage(String message)
   int value;
   if (! parseMessage(message, command, value))
   {
-    Serial.flush();
-//Serial.print(message); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
-    Serial.print("#0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
+    #ifdef USBCON   // For Leonardo (Romeo V2) board support
+      Serial1.flush();
+      Serial1.print("#0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
+    #else
+      Serial.flush();
+      Serial.print("#0001"); // неверное сообщение – возникает, если сообщение не удалось разобрать на команды/событие и значение
+    #endif
     if (recordingRoboScript)
     {
       stopRecording();
@@ -487,7 +516,12 @@ void stopRecording()
   customRoboScript[currentRoboScriptIndex].finalize();
   currentRoboScriptIndex = -1;
   recordingRoboScript = false;
-  Serial.print("r0200");
+  #ifdef USBCON   // For Leonardo (Romeo V2) board support
+    Serial1.print("r0200");
+  #else
+    Serial.print("r0200");
+  #endif
+
 }
 
 void addActionToRoboScript(String command, unsigned int value)
@@ -498,20 +532,33 @@ void addActionToRoboScript(String command, unsigned int value)
     {
       if (actionStarted)
       {
-        Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
+        #ifdef USBCON   // For Leonardo (Romeo V2) board support
+          Serial1.print("#0004"); // неверная последовательность команд в РобоСкрипт
+        #else
+          Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
+        #endif
         stopRecording();
         return;
       }
       
       recordingRoboScript = false;
-      Serial.print("r0200");
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("r0200");
+      #else
+        Serial.print("r0200");
+      #endif      
     }
     else // Zxxxx - команда на выделение памяти для хранения РобоСкрипта (siZe)
     {
       int result = customRoboScript[currentRoboScriptIndex].initialize(value);
       if (result != ROBOSCRIPT_OK)
       {
-        Serial.print("#0005"); // невозможно выделить необходимый объём памяти
+        #ifdef USBCON   // For Leonardo (Romeo V2) board support
+          Serial1.print("#0005"); // невозможно выделить необходимый объём памяти
+        #else
+          Serial.print("#0005"); // невозможно выделить необходимый объём памяти
+        #endif
+        
         stopRecording();
         return;
       }
@@ -519,7 +566,12 @@ void addActionToRoboScript(String command, unsigned int value)
   }
   else if (command == "r")
   {
-    Serial.print("#0003"); // недопустимая команда в РобоСкрипт
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("#0003"); // недопустимая команда в РобоСкрипт
+      #else
+        Serial.print("#0003"); // недопустимая команда в РобоСкрипт
+      #endif
+
     stopRecording();
     return;
   }
@@ -527,7 +579,12 @@ void addActionToRoboScript(String command, unsigned int value)
   {
     if (!actionStarted)
     {
-      Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("#0004"); // неверная последовательность команд в РобоСкрипт
+      #else
+        Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
+      #endif
+
       stopRecording();
       return;
     }
@@ -537,7 +594,12 @@ void addActionToRoboScript(String command, unsigned int value)
     int result = customRoboScript[currentRoboScriptIndex].addAction(recordedAction);
     if (result != ROBOSCRIPT_OK)
     {
-      Serial.print("#0006"); // выход за границы выделенной для РобоСкрипт памяти
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("#0006"); // выход за границы выделенной для РобоСкрипт памяти
+      #else
+        Serial.print("#0006"); // выход за границы выделенной для РобоСкрипт памяти
+      #endif
+
       stopRecording();
       return;
     }
@@ -546,7 +608,11 @@ void addActionToRoboScript(String command, unsigned int value)
   {
     if (actionStarted)
     {
-      Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("#0004"); // неверная последовательность команд в РобоСкрипт
+      #else
+        Serial.print("#0004"); // неверная последовательность команд в РобоСкрипт
+      #endif
       stopRecording();
       return;
     }
@@ -580,7 +646,7 @@ void CheckVCCTimer()
   }
 }
 
-// Starts the timer for every 'time' miliseconds to send VCC of the Battery to Serial.
+// Starts the timer for every 'time' miliseconds to send VCC of the Battery to Serial1.
 // TO switch off the timer call SetVCCTimer(0);
 void SetVCCTimer(unsigned int time)
 {
@@ -621,7 +687,12 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     case 'W':
     case 'Z':
     {
-      Serial.print("#0007"); // недопустимая команда вне РобоСкрипт
+      #ifdef USBCON   // For Leonardo (Romeo V2) board support
+        Serial1.print("#0007"); // недопустимая команда вне РобоСкрипт
+      #else
+        Serial.print("#0007"); // недопустимая команда вне РобоСкрипт
+      #endif
+
       return;
     }
     case 'L':
@@ -777,13 +848,22 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       }
       else
       {
-        ////Serial.flush();
-        Serial.print("#0002"); // неизвестная команда
+        ////Serial1.flush();
+        #ifdef USBCON   // For Leonardo (Romeo V2) board support
+          Serial1.print("#0002"); // неизвестная команда
+        #else
+          Serial.print("#0002"); // неизвестная команда
+        #endif        
         return;
       }
     }
   }//main switch
-  Serial.print("#0000"); // Успешное выполнение команды, (потом можно удалить.)
+  #ifdef USBCON   // For Leonardo (Romeo V2) board support
+    Serial1.print("#0000"); // Успешное выполнение команды, (потом можно удалить.)
+  #else
+    Serial.print("#0000"); // Успешное выполнение команды, (потом можно удалить.)
+  #endif
+
 }
 
 // Поворот головы.
@@ -1130,6 +1210,10 @@ void sendMessageToRobot(String command, unsigned int value)
   String hexValue = String(value, HEX);
   hexValue.toUpperCase();
   while (hexValue.length() < 4) hexValue = "0" + hexValue;
-  Serial.print(command + hexValue);
+  #ifdef USBCON   // For Leonardo (Romeo V2) board support
+    Serial1.print(command + hexValue);
+  #else
+    Serial.print(command + hexValue);
+  #endif
 }
 
