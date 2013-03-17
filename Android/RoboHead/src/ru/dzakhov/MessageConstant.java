@@ -69,7 +69,7 @@ public final class MessageConstant {
 	/**
 	 * Сигнал попадания.
 	 */
-	public static final String HIT = "h0001";
+	public static final String HIT = "*0001";
 	
 	/**
 	 * Команда выстрела.

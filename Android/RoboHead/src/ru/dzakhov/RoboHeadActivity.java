@@ -123,7 +123,7 @@ public class RoboHeadActivity extends Activity {
 				} else if (command.equals("I")) { // I [illumination] – фары
 			        mUdpMessageSender.send(message);
 					sendMessageToRobot(message);
-				} else if (command.equals("h")) { // h [hit] – попадание
+				} else if (command.equals("*")) { // * [hit] – попадание
 					if (message.equals(MessageConstant.HIT)) {
 				        mUdpMessageSender.send(message);
 		                new Thread() {
