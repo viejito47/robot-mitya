@@ -1,0 +1,5 @@
+Assembled by Stepan. (bsnjoy@gmail.com)
+You can't use Timer2 (Which used in default IRremote library) for Leonardo (Romeo v2).
+So 
+1. I changed Timer2 to Timer1 in IRremote library
+2. Removed Timer1 use in Servo library (one Timer3 is enough), because they had conflict with IRRemote because of 1.

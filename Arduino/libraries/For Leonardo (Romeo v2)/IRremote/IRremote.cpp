@@ -1,10 +1,10 @@
 /*
- * Revised for Leonardo to Timer 4 be Stepan.
- * TODO: Check WGM41 on line 210 and INIT_TIMER_COUNT on line 21 - I think should be something different
  * IRremote
  * Version 0.11 August, 2009
  * Copyright 2009 Ken Shirriff
  * For details, see http://arcfn.com/2009/08/multi-protocol-infrared-remote-library.html
+ *
+ * Modified by Paul Stoffregen <paul@pjrc.com> to support other boards and timers
  *
  * Interrupt code based on NECIRrcv by Joe Knapp
  * http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1210243556
@@ -18,7 +18,7 @@
 #include <avr/interrupt.h>
 
 volatile irparams_t irparams;
-#define INIT_TIMER_COUNT 6 
+
 // These versions of MATCH, MATCH_MARK, and MATCH_SPACE are only for debugging.
 // To use them, set DEBUG in IRremoteInt.h
 // Normally macros are used for efficiency
@@ -171,7 +171,7 @@ void IRsend::sendRC6(unsigned long data, int nbits)
 void IRsend::mark(int time) {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
-  TCCR4A |= _BV(COM4B1); // Enable pin 3 PWM output
+  TIMER_ENABLE_PWM; // Enable pin 3 PWM output
   delayMicroseconds(time);
 }
 
@@ -179,7 +179,7 @@ void IRsend::mark(int time) {
 void IRsend::space(int time) {
   // Sends an IR space for the specified number of microseconds.
   // A space is no output, so the PWM output is disabled.
-  TCCR4A &= ~(_BV(COM4B1)); // Disable pin 3 PWM output
+  TIMER_DISABLE_PWM; // Disable pin 3 PWM output
   delayMicroseconds(time);
 }
 
@@ -188,30 +188,26 @@ void IRsend::enableIROut(int khz) {
   // The IR output will be on pin 3 (OC2B).
   // This routine is designed for 36-40KHz; if you use it for other values, it's up to you
   // to make sure it gives reasonable results.  (Watch out for overflow / underflow / rounding.)
-  // TIMER2 is used in phase-correct PWM mode, with OCR4A controlling the frequency and OCR4B
+  // TIMER2 is used in phase-correct PWM mode, with OCR2A controlling the frequency and OCR2B
   // controlling the duty cycle.
-  // There is no prescaling, so the output frequency is 16MHz / (2 * OCR4A)
+  // There is no prescaling, so the output frequency is 16MHz / (2 * OCR2A)
   // To turn the output on and off, we leave the PWM running, but connect and disconnect the output pin.
   // A few hours staring at the ATmega documentation and this will all make sense.
   // See my Secrets of Arduino PWM at http://arcfn.com/2009/07/secrets-of-arduino-pwm.html for details.
 
   
   // Disable the Timer2 Interrupt (which is used for receiving IR)
-  TIMSK4 &= ~_BV(TOIE4); //Timer2 Overflow Interrupt
+  TIMER_DISABLE_INTR; //Timer2 Overflow Interrupt
   
-  pinMode(3, OUTPUT);
-  digitalWrite(3, LOW); // When not sending PWM, we want it low
+  pinMode(TIMER_PWM_PIN, OUTPUT);
+  digitalWrite(TIMER_PWM_PIN, LOW); // When not sending PWM, we want it low
   
   // COM2A = 00: disconnect OC2A
   // COM2B = 00: disconnect OC2B; to send signal set to 10: OC2B non-inverted
   // WGM2 = 101: phase-correct PWM with OCRA as top
   // CS2 = 000: no prescaling
-  TCCR4A = _BV(WGM40);
-  TCCR4B = _BV(WGM41) | _BV(CS40);
-
-  // The top value for the timer.  The modulation frequency will be SYSCLOCK / 2 / OCR4A.
-  OCR4A = SYSCLOCK / 2 / khz / 1000;
-  OCR4B = OCR4A / 3; // 33% duty cycle
+  // The top value for the timer.  The modulation frequency will be SYSCLOCK / 2 / OCR2A.
+  TIMER_CONFIG_KHZ(khz);
 }
 
 IRrecv::IRrecv(int recvpin)
@@ -222,28 +218,23 @@ IRrecv::IRrecv(int recvpin)
 
 // initialization
 void IRrecv::enableIRIn() {
+  cli();
   // setup pulse clock timer interrupt
-  TCCR4A = 0;  // normal mode
-
   //Prescale /8 (16M/8 = 0.5 microseconds per tick)
   // Therefore, the timer interval can range from 0.5 to 128 microseconds
   // depending on the reset value (255 to 0)
-  cbi(TCCR4B,CS42);
-  sbi(TCCR4B,CS41);
-  cbi(TCCR4B,CS40);
+  TIMER_CONFIG_NORMAL();
 
   //Timer2 Overflow Interrupt Enable
-  sbi(TIMSK2,TOIE2);
+  TIMER_ENABLE_INTR;
 
-  //RESET_TIMER2;
-  TCNT4 = INIT_TIMER_COUNT;
+  TIMER_RESET;
 
   sei();  // enable interrupts
 
   // initialize state machine variables
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
-
 
   // set pin modes
   pinMode(irparams.recvpin, INPUT);
@@ -264,10 +255,9 @@ void IRrecv::blink13(int blinkflag)
 // First entry is the SPACE between transmissions.
 // As soon as a SPACE gets long, ready is set, state switches to IDLE, timing of SPACE continues.
 // As soon as first MARK arrives, gap width is recorded, ready is cleared, and new logging starts
-ISR(TIMER2_OVF_vect)
+ISR(TIMER_INTR_NAME)
 {
-  //RESET_TIMER4;
-  TCNT4 = INIT_TIMER_COUNT;
+  TIMER_RESET;
 
   uint8_t irdata = (uint8_t)digitalRead(irparams.recvpin);
 
@@ -324,10 +314,10 @@ ISR(TIMER2_OVF_vect)
 
   if (irparams.blinkflag) {
     if (irdata == MARK) {
-      PORTB |= B00100000;  // turn pin 13 LED on
+      BLINKLED_ON();  // turn pin 13 LED on
     } 
     else {
-      PORTB &= B11011111;  // turn pin 13 LED off
+      BLINKLED_OFF();  // turn pin 13 LED off
     }
   }
 }
