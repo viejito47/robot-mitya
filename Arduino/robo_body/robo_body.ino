@@ -164,17 +164,17 @@ boolean checkIrHit()
     if((results.decode_type == SONY) && (results.value == hitValue))
     {
           // Шлю сообщения Android-приложению об ИК-попадании в нас:
-      // один раз 'h0001' и один раз 'h0000' (hit - попадание).
-      // 'h0000' нужно чтобы сбросить значение в хэш-таблице 
+      // один раз '*0001' и один раз '*0000' (hit - попадание).
+      // '*0000' нужно чтобы сбросить значение в хэш-таблице 
       // сообщений Android-приложения. Там используется хэш-таблица
       // сообщений для исключения из обработки повторяющихся команд
       // с одинаковыми значениями.
       #ifdef USBCON   // For Leonardo (Romeo V2) board support
-        Serial1.print("h0001");
-        Serial1.print("h0000");
+        Serial1.print("*0001");
+        Serial1.print("*0000");
       #else
-        Serial.print("h0001");
-        Serial.print("h0000");
+        Serial.print("*0001");
+        Serial.print("*0000");
       #endif
 
     }
