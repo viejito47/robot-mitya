@@ -12,6 +12,7 @@
 #include <IRremote.h>
 #include <RoboScript.h>
 #include <EEPROM.h>
+#include "robo_body.h"
   
 // Эхо-режим. Возврат всех полученных сообщений.
 const boolean ECHO_MODE = false;
@@ -21,44 +22,14 @@ const int MESSAGELENGTH = 5;
 // Текущий необработанный текст из буфера, прочитанного на предыдущей итерации чтения:
 String MessageBuffer = "";
 
-// Пин контроллера, использующийся для ИК-выстрела (цифровой выход).
-int gunPin = 3;
-// Пин, использующийся для фиксации попаданий (аналоговый вход).
-int targetPin = A0;
-// Pin for measuring battery voltage (analog in).
-int batterySensorPin = A5;
-
-// Пины контроллера для управления двигателями робота (цифровые выходы).
-int motorLeftSpeedPin = 5;
-int motorLeftDirectionPin = 4;
-int motorRightSpeedPin = 6;
-int motorRightDirectionPin = 7;
-
-// Пины контроллера для управления сервоприводами робота (цифровые выходы).
-int servoHeadHorizontalPin = 9;
-int servoHeadVerticalPin = 10;
-int servoTailPin = 11;
-
-// Пин управления фарами.
-int lightPin = 13;
-
 // Objects to control servodrives.
 SmartServo servoHeadHorizontal;
 SmartServo servoHeadVertical;
 SmartServo servoTail;
 
-int servoHeadHorizontalMinDegree = 0;
-int servoHeadHorizontalMaxDegree = 180;
-int servoHeadVerticalMinDegree = 0;
-int servoHeadVerticalMaxDegree = 90;
-int servoTailMinDegree = 10;   // Not ZERO, because in the boundary position servo is vibrating a lot
-int servoTailMaxDegree = 170;   // Not 180, because in the boundary position servo is vibrating a lot
-
 int servoHeadCurrentHorizontalDegree;
 int servoHeadCurrentVerticalDegree;
 int servoTailCurrentDegree;
-
-const int musicPeriod = 535;
 
 // Объекты управления ИК-приёмником и ИК-передатчиком.
 IRrecv irrecv(targetPin);
@@ -88,18 +59,8 @@ RoboAction recordedAction;
 boolean useVCCTimer = false;
 unsigned long VCCTimerInterval=0;
 unsigned long timerTimeOld;  // Store previous timer value
-const long MINIMAL_INTERVAL_VALUE = 1000; // Minimum interval in milliseconds for Timer
 
-// Constants for Voltage Devidor
-const float voltPerUnit = 0.004883; // 5V/1024 values = 0,004883 V/value
-const float dividerRatio = 2; // (R1+R2)/R2
-const float voltRatio = voltPerUnit * dividerRatio*100; // This coefficient we will use
-
-const int IR_MOVE_SPEED = 255; // Speed set to maximum, when control from IR remote
-const int IR_SERVO_STEP_DEFAULT = 5; // Step for changing servo head (Horizontal and Vertical) position, when controling from IR remote
-const int IR_SERVO_STEP_PROGRAM_MODE = 180; // Step for changing servo head (Horizontal and Vertical) position, when in programm mode. (Set to Maximum, so that user will 100% notice it.
 int IrServoStep = IR_SERVO_STEP_DEFAULT; // Step for rotating head from remote
-const int IR_TOTAL_COMMANDS = 12; // Total Number of commands, that can be send by IR control
 unsigned long IrCommands[IR_TOTAL_COMMANDS]; // All command from remote control
 
 unsigned long IrRemoteLastCommand = 0; // Last command received by IR receiver (except IR_COMMAND_SEPARATOR)
@@ -109,7 +70,7 @@ byte IrRemoteButtonState = 0; // 0 = Boot state. No buttons were ever pressed,
                               // 2 = Button pressed for short time, we received first IR_COMMAND_SEPARATOR for the first time after IrRemoteLastCommand received.
                               // 3 = Button pressed for long time, we received IR_COMMAND_SEPARATOR for more then one time after IrRemoteLastCommand received.
 
-const int IR_LAST_COMMANDS_BUFFER_SIZE = 4; // Last commands and their state to determine when to enter Programmator mode
+const int IR_LAST_COMMANDS_BUFFER_SIZE = 3; // Last commands and their state to determine when to enter Programmator mode
 byte IrLastCommandsState[IR_LAST_COMMANDS_BUFFER_SIZE]={0}; // Last command state (LONG, SHORT or VERY SHORT press)
 unsigned long IrLastCommandsValue[IR_LAST_COMMANDS_BUFFER_SIZE]={0}; // Last command value
 
@@ -137,17 +98,17 @@ void setup()
   // Установка горизонтального сервопривода в положение для установки телефона:
   pinMode(servoHeadHorizontalPin, OUTPUT);
   servoHeadHorizontal.attach(servoHeadHorizontalPin, servoHeadHorizontalMinDegree, servoHeadHorizontalMaxDegree);
-  moveHead("H", 90);
+  moveHead("H", servoHeadHorizontalDefaultState);
 
   // Установка вертикального сервопривода в положение для установки телефона:
   pinMode(servoHeadVerticalPin, OUTPUT);
   servoHeadVertical.attach(servoHeadVerticalPin, servoHeadVerticalMinDegree, servoHeadVerticalMaxDegree);
-  moveHead("V", 90);
+  moveHead("V", servoHeadVerticalDefaultState);
 
   // Установка хвоста пистолетом:
   pinMode(servoTailPin, OUTPUT);
   servoTail.attach(servoTailPin, servoTailMinDegree, servoTailMaxDegree);
-  moveTail(90);
+  moveTail(servoTailDefaultState);
   
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
