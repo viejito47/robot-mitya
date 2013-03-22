@@ -3,3 +3,5 @@ You can't use Timer2 (Which used in default IRremote library) for Leonardo (Rome
 So 
 1. I changed Timer2 to Timer1 in IRremote library
 2. Removed Timer1 use in Servo library (one Timer3 is enough), because they had conflict with IRRemote because of 1.
+
+Servo library given just for option. Don't use it. Use SoftwareServo instead.

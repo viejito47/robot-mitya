@@ -9,7 +9,12 @@
 #define Swinger_h
 
 #include <Arduino.h>
-#include <Servo.h>
+
+#ifdef USBCON
+  #include <SoftwareServo.h>
+#else
+  #include <Servo.h>
+#endif
 
 // Класс, реализующий колебания например, сервоприводом.
 class SmartServo
@@ -43,7 +48,12 @@ class SmartServo
 	// не производятся.
 	bool update();
   private:
-    Servo servo;
+	#ifdef USBCON
+	  SoftwareServo servo;
+	#else
+	  Servo servo;
+	#endif
+    
     int degree;
 	int minDegree;
 	int maxDegree;
