@@ -7,13 +7,18 @@
 //   уровень Android-приложения.
 // -------------------------------------------------------------------------------------
 
-#include <Servo.h>
+#ifdef USBCON    // For Leonardo (Romeo V2) board we use SoftwareServo library, because of lack of Timers.
+  #include <SoftwareServo.h>
+#else
+  #include <Servo.h>
+#endif
+
 #include <SmartServo.h>
 #include <IRremote.h>
 #include <RoboScript.h>
 #include <EEPROM.h>
 #include "robo_body.h"
-  
+
 // Эхо-режим. Возврат всех полученных сообщений.
 const boolean ECHO_MODE = false;
 
@@ -147,7 +152,10 @@ void processEvents()
 void loop()
 {
   processMessageBuffer(); // Receive all messages and process them
-  processEvents();        
+  processEvents();
+  #ifdef USBCON  // For Leonardo (Romeo V2) board we use SoftwareServo library, because of lack of Timers.
+    SoftwareServo::refresh();
+  #endif
 }
 
 
