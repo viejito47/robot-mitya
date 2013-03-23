@@ -466,6 +466,17 @@ namespace RoboControl
         }
 
         /// <summary>
+        /// Обнаружение отпускания клавиши клавиатуры.
+        /// </summary>
+        /// <param name="keyboardState">Текущее состояние клавиатуры.</param>
+        /// <param name="key">Отслеживаемая клавиша.</param>
+        /// <returns>true, если клавиша была отпущена.</returns>
+        private bool IsKeyChangedToUp(KeyboardState keyboardState, Keys key)
+        {
+            return (keyboardState.IsKeyDown(key) == false) && this.previousKeyboardState.IsKeyDown(key);
+        }
+
+        /// <summary>
         /// Проверка зажата ли кнопка клавиатуры.
         /// </summary>
         /// <param name="keyboardState">Текущее состояние клавиатуры.</param>
@@ -671,28 +682,52 @@ namespace RoboControl
             // голова поворачивается с большей скоростью.
             this.lookHelper.FastModeOn = shiftIsPressed;
 
-            if (this.IsKeyPressed(keyboardState, Keys.Left) && ctrlIsNotPressed && altIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Left) && ctrlIsNotPressed && altIsNotPressed)
             {
                 // Поворот головы влево с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookLeft(gameTime);
+                this.lookHelper.StartLeftTurn();
             }
 
-            if (this.IsKeyPressed(keyboardState, Keys.Right) && ctrlIsNotPressed && altIsNotPressed)
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Right) && ctrlIsNotPressed && altIsNotPressed)
             {
                 // Поворот головы вправо с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookRight(gameTime);
+                this.lookHelper.StartRightTurn();
             }
 
-            if (this.IsKeyPressed(keyboardState, Keys.Up) && ctrlIsNotPressed && altIsNotPressed)
+            if (this.IsKeyChangedToUp(keyboardState, Keys.Left) && ctrlIsNotPressed && altIsNotPressed)
             {
-                // Поворот головы вверх с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookUp(gameTime);
+                // Остановка поворота головы влево с фиксацией.
+                this.lookHelper.StopHorizontalTurn();
             }
 
-            if (this.IsKeyPressed(keyboardState, Keys.Down) && ctrlIsNotPressed && altIsNotPressed)
+            if (this.IsKeyChangedToUp(keyboardState, Keys.Right) && ctrlIsNotPressed && altIsNotPressed)
             {
-                // Поворот головы вниз с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookDown(gameTime);
+                // Остановка поворота головы вправо с фиксацией.
+                this.lookHelper.StopHorizontalTurn();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Up) && ctrlIsNotPressed && altIsNotPressed)
+            {
+                // Поворот головы вверх с фиксацией.
+                this.lookHelper.StartUpTurn();
+            }
+
+            if (this.IsKeyChangedToDown(keyboardState, Keys.Down) && ctrlIsNotPressed && altIsNotPressed)
+            {
+                // Поворот головы вниз с фиксацией.
+                this.lookHelper.StartDownTurn();
+            }
+
+            if (this.IsKeyChangedToUp(keyboardState, Keys.Up) && ctrlIsNotPressed && altIsNotPressed)
+            {
+                // Остановка поворота головы вверх с фиксацией.
+                this.lookHelper.StopVerticalTurn();
+            }
+
+            if (this.IsKeyChangedToUp(keyboardState, Keys.Down) && ctrlIsNotPressed && altIsNotPressed)
+            {
+                // Остановка поворота головы вниз с фиксацией.
+                this.lookHelper.StopVerticalTurn();
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && nothingIsPressed)
@@ -794,28 +829,42 @@ namespace RoboControl
             // голова поворачивается с большей скоростью.
             this.lookHelper.FastModeOn = this.IsButtonPressed(gamePadState, gamePadState.Buttons.RightShoulder);
 
-            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Left))
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.DPadLeft))
             {
-                // Поворот головы влево с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookLeft(gameTime);
+                // Поворот головы влево с постоянной скоростью.
+                this.lookHelper.StartLeftTurn();
             }
 
-            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Right))
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.DPadRight))
             {
-                // Поворот головы вправо с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookRight(gameTime);
+                // Поворот головы вправо с постоянной скоростью.
+                this.lookHelper.StartRightTurn();
             }
 
-            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Up))
+            if (this.IsButtonChangedToUp(gamePadState, Buttons.DPadLeft) || 
+                this.IsButtonChangedToUp(gamePadState, Buttons.DPadRight))
             {
-                // Поворот головы вверх с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookUp(gameTime);
+                // Останов поворота головы в горизонтальной плоскости.
+                this.lookHelper.StopHorizontalTurn();
             }
 
-            if (this.IsButtonPressed(gamePadState, gamePadState.DPad.Down))
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.DPadUp))
             {
-                // Поворот головы вниз с фиксацией. Угол поворота определяется значением gameTime.
-                this.lookHelper.FixedLookDown(gameTime);
+                // Поворот головы вверх с постоянной скоростью.
+                this.lookHelper.StartUpTurn();
+            }
+
+            if (this.IsButtonChangedToDown(gamePadState, Buttons.DPadDown))
+            {
+                // Поворот головы вниз с постоянной скоростью.
+                this.lookHelper.StartDownTurn();
+            }
+
+            if (this.IsButtonChangedToUp(gamePadState, Buttons.DPadUp) ||
+                this.IsButtonChangedToUp(gamePadState, Buttons.DPadDown))
+            {
+                // Останов поворота головы в вертикальной плоскости.
+                this.lookHelper.StopVerticalTurn();
             }
 
             // Скорости двигателей и углы сервоприводов головы определяются и устанавливаются с заданной периодичностью.
@@ -1023,8 +1072,20 @@ namespace RoboControl
             this.controlSettings.Speed3 = Properties.Settings.Default.Speed3;
             this.controlSettings.Speed4 = Properties.Settings.Default.Speed4;
             this.controlSettings.Speed5 = Properties.Settings.Default.Speed5;
+
+            this.controlSettings.SlowHeadTurnPeriod = Properties.Settings.Default.SlowHeadTurnPeriod;
+            this.controlSettings.FastHeadTurnPeriod = Properties.Settings.Default.FastHeadTurnPeriod;
+
+            this.controlSettings.VerticalMinimumDegree1 = Properties.Settings.Default.VerticalMinimumDegree1;
+            this.controlSettings.VerticalForwardDegree1 = Properties.Settings.Default.VerticalForwardDegree1;
+            this.controlSettings.VerticalMaximumDegree1 = Properties.Settings.Default.VerticalMaximumDegree1;
+            this.controlSettings.VerticalMinimumDegree2 = Properties.Settings.Default.VerticalMinimumDegree2;
+            this.controlSettings.VerticalForwardDegree2 = Properties.Settings.Default.VerticalForwardDegree2;
+            this.controlSettings.VerticalMaximumDegree2 = Properties.Settings.Default.VerticalMaximumDegree2;
+
             this.controlSettings.PlayVideo = Properties.Settings.Default.PlayVideo;
             this.controlSettings.PlayAudio = Properties.Settings.Default.PlayAudio;
+
             this.controlSettings.RoboScripts[0].Initialize(Properties.Settings.Default.RoboScript0);
             this.controlSettings.RoboScripts[1].Initialize(Properties.Settings.Default.RoboScript1);
             this.controlSettings.RoboScripts[2].Initialize(Properties.Settings.Default.RoboScript2);
