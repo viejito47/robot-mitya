@@ -68,6 +68,8 @@ namespace RoboControl
             this.Speed3 = 153;
             this.Speed4 = 204;
             this.Speed5 = 255;
+            this.SlowHeadTurnPeriod = 1000;
+            this.FastHeadTurnPeriod = 170;
 
             this.RoboScripts = new RoboScriptItem[10];
             for (int i = this.RoboScripts.GetLowerBound(0); i <= this.RoboScripts.GetUpperBound(0); i++)
@@ -98,36 +100,36 @@ namespace RoboControl
         public int HorizontalMaximumDegree { get; private set; }
 
         /// <summary>
-        /// Gets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (обычный режим).
+        /// Gets or sets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (обычный режим).
         /// </summary>        
-        public int VerticalMinimumDegree1 { get; private set; }
+        public int VerticalMinimumDegree1 { get; set; }
 
         /// <summary>
-        /// Gets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
+        /// Gets or sets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
         /// центральной позиции (обычный режим).
         /// </summary>
-        public int VerticalForwardDegree1 { get; private set; }
+        public int VerticalForwardDegree1 { get; set; }
 
         /// <summary>
-        /// Gets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (обычный режим).
+        /// Gets or sets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (обычный режим).
         /// </summary>
-        public int VerticalMaximumDegree1 { get; private set; }
+        public int VerticalMaximumDegree1 { get; set; }
 
         /// <summary>
-        /// Gets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
+        /// Gets or sets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
         /// </summary>        
-        public int VerticalMinimumDegree2 { get; private set; }
+        public int VerticalMinimumDegree2 { get; set; }
 
         /// <summary>
-        /// Gets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
+        /// Gets or sets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
         /// центральной позиции (прогулочный режим).
         /// </summary>
-        public int VerticalForwardDegree2 { get; private set; }
+        public int VerticalForwardDegree2 { get; set; }
 
         /// <summary>
-        /// Gets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
+        /// Gets or sets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (прогулочный режим).
         /// </summary>
-        public int VerticalMaximumDegree2 { get; private set; }
+        public int VerticalMaximumDegree2 { get; set; }
 
         /// <summary>
         /// Gets or sets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (текущий режим).
@@ -226,6 +228,16 @@ namespace RoboControl
         /// Gets or sets 5-ая скорость при управлении от клавиатуры.
         /// </summary>
         public byte Speed5 { get; set; }
+
+        /// <summary>
+        /// Gets or sets slow head turn period in sentiseconds.
+        /// </summary>
+        public int SlowHeadTurnPeriod { get; set; }
+
+        /// <summary>
+        /// Gets or sets fast head turn period in sentiseconds.
+        /// </summary>
+        public int FastHeadTurnPeriod { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether видео воспроизводится.

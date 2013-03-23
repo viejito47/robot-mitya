@@ -175,15 +175,38 @@ namespace RoboCommon
                 }
             }
 
-            for (int i = 0; i < repetitions; i++)
+            if (voidMessage != string.Empty)
             {
-                if (!this.SendMessageToRobot(voidMessage))
+                for (int i = 0; i < repetitions; i++)
                 {
-                    return false;
+                    if (!this.SendMessageToRobot(voidMessage))
+                    {
+                        return false;
+                    }
                 }
             }
             
             return true;
+        }
+
+        /// <summary>
+        /// Передать роботу неповторяющееся сообщение.
+        /// </summary>
+        /// <param name="message">
+        /// Сообщение, передаваемое роботу.
+        /// </param>
+        /// <returns>
+        /// true, если нет ошибок.
+        /// </returns>
+        /// <remarks>
+        /// Сообщения для управления моторами, например, повторяются постоянно, каждые несколько милисекунд.
+        /// Потеря одного такого сообщения несущественно. А сообщения, например, смены настроения (мордочки)
+        /// передаются по команде оператора. Потеря - пропуск команды. Поэтому такие сообщения повторяются 
+        /// несколько раз.
+        /// </remarks>
+        public bool SendNonrecurrentMessageToRobot(string message)
+        {
+            return this.SendNonrecurrentMessageToRobot(message, string.Empty);
         }
 
         /// <summary>

@@ -454,6 +454,122 @@ namespace RoboControl
         }
 
         /// <summary>
+        /// Поворот головы влево с постоянной скоростью.
+        /// </summary>
+        public void StartLeftTurn()
+        {
+            this.CheckCommunicationHelper();
+
+            if (this.horizontalFixedControl == false)
+            {
+                this.horizontalFixedControl = true;
+                this.lookX = 0;
+            }
+
+            int period = this.fastModeOn ? this.controlSettings.FastHeadTurnPeriod : this.controlSettings.SlowHeadTurnPeriod;
+            this.horizontalServoCommand = "h" + MessageHelper.IntToMessageValue(period);
+            this.communicationHelper.SendNonrecurrentMessageToRobot(this.horizontalServoCommand);
+        }
+
+        /// <summary>
+        /// Поворот головы вправо с постоянной скоростью.
+        /// </summary>
+        public void StartRightTurn()
+        {
+            this.CheckCommunicationHelper();
+
+            if (this.horizontalFixedControl == false)
+            {
+                this.horizontalFixedControl = true;
+                this.lookX = 0;
+            }
+
+            int period = this.fastModeOn ? -this.controlSettings.FastHeadTurnPeriod : -this.controlSettings.SlowHeadTurnPeriod;
+            this.horizontalServoCommand = "h" + MessageHelper.IntToMessageValue(period);
+            this.communicationHelper.SendNonrecurrentMessageToRobot(this.horizontalServoCommand);
+        }
+
+        /// <summary>
+        /// Останов поворота головы в горизонтальной плосткости.
+        /// </summary>
+        public void StopHorizontalTurn()
+        {
+            this.CheckCommunicationHelper();
+
+            if (this.horizontalFixedControl == false)
+            {
+                this.horizontalFixedControl = true;
+                this.lookX = 0;
+            }
+
+            this.horizontalServoCommand = "h" + MessageHelper.IntToMessageValue(0);
+            this.communicationHelper.SendNonrecurrentMessageToRobot(this.horizontalServoCommand);
+        }
+
+        /// <summary>
+        /// Поворот головы вверх с постоянной скоростью.
+        /// </summary>
+        public void StartUpTurn()
+        {
+            this.CheckCommunicationHelper();
+
+            if (this.verticalFixedControl == false)
+            {
+                this.verticalFixedControl = true;
+                this.lookY = 0;
+            }
+
+            int period = this.fastModeOn ? this.controlSettings.FastHeadTurnPeriod : this.controlSettings.SlowHeadTurnPeriod;
+            if (this.controlSettings.ReverseHeadTangage)
+            {
+                period = -period;
+            }
+
+            this.verticalServoCommand = "v" + MessageHelper.IntToMessageValue(period);
+            this.communicationHelper.SendNonrecurrentMessageToRobot(this.verticalServoCommand);
+        }
+
+        /// <summary>
+        /// Поворот головы вниз с постоянной скоростью.
+        /// </summary>
+        public void StartDownTurn()
+        {
+            this.CheckCommunicationHelper();
+
+            if (this.verticalFixedControl == false)
+            {
+                this.verticalFixedControl = true;
+                this.lookY = 0;
+            }
+
+            int period = this.fastModeOn ? -this.controlSettings.FastHeadTurnPeriod : -this.controlSettings.SlowHeadTurnPeriod;
+            if (this.controlSettings.ReverseHeadTangage)
+            {
+                period = -period;
+            }
+
+            this.verticalServoCommand = "v" + MessageHelper.IntToMessageValue(period);
+            this.communicationHelper.SendNonrecurrentMessageToRobot(this.verticalServoCommand);
+        }
+
+        /// <summary>
+        /// Останов поворота головы в вертикальной плоскости.
+        /// </summary>
+        public void StopVerticalTurn()
+        {
+            this.CheckCommunicationHelper();
+
+            if (this.verticalFixedControl == false)
+            {
+                this.verticalFixedControl = true;
+                this.lookY = 0;
+            }
+
+            this.verticalServoCommand = "v" + MessageHelper.IntToMessageValue(0);
+            this.communicationHelper.SendNonrecurrentMessageToRobot(this.verticalServoCommand);
+        }
+
+        /// <summary>
         /// Преобразование координат для первой половины первого квадранта (остальные получаются отражением).
         /// </summary>
         /// <param name="x">Координата x, полученная от джойстика.</param>
