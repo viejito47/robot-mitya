@@ -178,6 +178,10 @@ public class RoboHeadActivity extends Activity {
 						errorMessage += "попытка выхода за границы выделенной для РобоСкрипт памяти";
 					} else if (message.equals(MessageConstant.ILLEGAL_COMMAND)) {
 						errorMessage += "недопустимая команда вне РобоСкрипт";
+					} else if (message.equals(MessageConstant.BROKEN_COMMAND)) {
+						errorMessage += "пропущен символ команды, команда потеряна";
+					} else if (message.equals(MessageConstant.WRONG_VOLTAGE_DEVIDER)) {
+						errorMessage += "неверный номер делителя напряжения";
 					}
 					Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
 					Logger.e(errorMessage);

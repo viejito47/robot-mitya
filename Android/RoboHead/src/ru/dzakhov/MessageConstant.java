@@ -127,6 +127,16 @@ public final class MessageConstant {
 	public static final String ILLEGAL_COMMAND = "#0007";
 	
 	/**
+	 * Пропущен символ команды, команда потеряна.
+	 */
+	public static final String BROKEN_COMMAND = "#0008";
+	
+	/**
+	 * Неверный номер делителя напряжения.
+	 */
+	public static final String WRONG_VOLTAGE_DEVIDER = "#0009";
+	
+	/**
 	 * Закрытый конструктор класса.
 	 */
 	private MessageConstant() {   
