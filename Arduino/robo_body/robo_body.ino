@@ -61,9 +61,9 @@ boolean actionStarted = false;
 RoboAction recordedAction;
 
 // Varibles for Timer to send VCC Battery data
-boolean useVCCTimer = false;
-unsigned long VCCTimerInterval=0;
-unsigned long timerTimeOld;  // Store previous timer value
+boolean useVCCTimer[TOTAL_TIMERS] = {false};
+unsigned long VCCTimerInterval[TOTAL_TIMERS]={0};
+unsigned long timerTimeOld[TOTAL_TIMERS];  // Store previous timer value
 
 int IrServoStep = IR_SERVO_STEP_DEFAULT; // Step for rotating head from remote
 unsigned long IrCommands[IR_TOTAL_COMMANDS]; // All command from remote control
@@ -390,7 +390,7 @@ void processMessageBuffer()
              Serial1.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
           #else
              Serial.print("#0008"); // цифра в шестнадцатеричном исчислении, вместо команды. Если несколько цифр подряд, то придет несколько сообщений.    
-          #endif          
+          #endif
 
           i++;
     } else
@@ -602,43 +602,56 @@ void addActionToRoboScript(String command, unsigned int value)
 }
 
 // Function reads battery VCC, using Voltage divider.
-// I used R1 = R2 = 10 kOhm
+// I used Volatege Deivder from DFRobot with voltage Ratio 5
 // Return value is VCC x 100 in HEX format (voltRatio have *100)
-unsigned int VCCRead()
+unsigned int VCCRead(unsigned int n)
 {
-  return voltRatio*analogRead(batterySensorPin);
+  return voltRatio[n]*analogRead(batterySensorPin[n]);
 }
 
 
-// Check if it's time for timer to send VCC of the Battery;
+// Check if it's time for any of the timers to send VCC of the Battery;
 void CheckVCCTimer()
 {
-  if(!useVCCTimer){return;}
-  
-  unsigned int time = millis();
-  if(timerTimeOld>time){timerTimeOld=time;} // millis() will overflow (go back to zero), after approximately 50 days.
-  if(time-timerTimeOld>VCCTimerInterval)
+  for(unsigned int i=0; i<TOTAL_TIMERS; i++)
   {
-    sendMessageToRobot("~",VCCRead());
-    timerTimeOld=time; //Start timer again
+    if(useVCCTimer[i])
+    {
+      unsigned int time = millis();
+      if(timerTimeOld[i]>time){timerTimeOld[i]=time;} // millis() will overflow (go back to zero), after approximately 50 days.
+      if(time-timerTimeOld[i]>VCCTimerInterval[i])
+      {
+        sendMessageToRobot("~", i<<12 | VCCRead(i));
+        timerTimeOld[i]=time; //Start timer again
+      }
+    }
   }
 }
 
-// Starts the timer for every 'time' miliseconds to send VCC of the Battery to Serial1.
-// TO switch off the timer call SetVCCTimer(0);
-void SetVCCTimer(unsigned int time)
+// Starts the timer with number timerNumber for every 'time' miliseconds to send VCC of the Battery to Serial1.
+// TO switch off timerNumber call SetVCCTimer(timerNumber, 0);
+void SetVCCTimer(unsigned int timerNumber, unsigned int time)
 {
+  if(timerNumber>TOTAL_TIMERS-1)
+  {
+    #ifdef USBCON   // For Leonardo (Romeo V2) board support
+      Serial1.print("#0009"); // Wrong timer number
+    #else
+      Serial.print("#0009"); // Wrong timer number
+    #endif
+    return;
+  }
   if(time==0) // Stop Timer
   {
-    useVCCTimer=false;
+    useVCCTimer[timerNumber]=false;
     return;
   }
 
   if(time<MINIMAL_INTERVAL_VALUE){time=MINIMAL_INTERVAL_VALUE;} // Set Minimum Interval Value 1 second.
   
-  VCCTimerInterval = time;
-  useVCCTimer = true;
-  timerTimeOld = millis();
+  VCCTimerInterval[timerNumber] = time;
+  useVCCTimer[timerNumber] = true;
+  timerTimeOld[timerNumber] = millis();
 }
 
 void executeAction(String command, unsigned int value, boolean inPlaybackMode)
@@ -812,10 +825,10 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       irrecv.enableIRIn(); // (надо для повторной инициализации ИК-приёмника)
       break;
     }
-    case '=':  // '=' checks the battery status, voltage will be send back as "~" command and voltage*100. i.e. for 5.02V the command will be "~01F6". 
-    {          // You can use value to set timer to receive battery status. i.e. "=1000" will send battery status every 4096 millisecons. "=0000" will send battery status only once and will switch off the timer is it was set before.
-      sendMessageToRobot("~",VCCRead());
-      SetVCCTimer(value);
+    case '=':  // "=NDDD" checks the battery status. N=Number of Voltage Devider. DDD=Interval (data will be sent every DDD*10 . voltage will be send back as "~" command + Voltage Devider Number + voltage*100. i.e. for 5.02V for Voltage Devider number 0 the command will be "~01F6", for Devider Number number 1 "~11F6"
+    {          // You can use value to set timer to receive battery status. i.e. "=0100" (timer 0) or "=1100" (timer 1) will send battery status every 4096 millisecons for timer number 0 or 1. "=0000" will send battery status only once and will switch off the timer is it was set before.
+      sendMessageToRobot("~",(value & 0xF000) | VCCRead(value>>12));
+      SetVCCTimer(value>>12, (value & 0x0FFF)*10);
       break;
     }
     default:
