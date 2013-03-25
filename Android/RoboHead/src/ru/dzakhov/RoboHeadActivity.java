@@ -135,6 +135,11 @@ public class RoboHeadActivity extends Activity {
 					} else {
 						sendMessageToRobot(message);
 					}
+				} else if (command.equals("=")) {
+			        mUdpMessageSender.send(message);
+					sendMessageToRobot(message);
+				} else if (command.equals("~")) {
+					mUdpMessageSender.send(message);
 				} else if (command.equals("*")) { // * [hit] – попадание
 					if (message.equals(MessageConstant.HIT)) {
 				        mUdpMessageSender.send(message);
