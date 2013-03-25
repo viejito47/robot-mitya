@@ -831,6 +831,10 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
       SetVCCTimer(value>>12, (value & 0x0FFF)*10);
       break;
     }
+    case '~': // just ignore this command
+    {
+      break;
+    }
     default:
     {
       if (inPlaybackMode)
