@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -88,6 +89,7 @@ public class RoboHeadActivity extends Activity {
 			public void handleMessage(final Message msg) {
 				String message = (String) msg.obj;				
 				String command = MessageHelper.getMessageIdentifier(message);
+				String value = MessageHelper.getMessageValue(message);
 
 				if (command.equals("M")) { // M [mood] – смена мордочки
 					if (!mRecordingRoboScriptMode) {
@@ -120,9 +122,19 @@ public class RoboHeadActivity extends Activity {
 					} else {
 						sendMessageToRobot(message);
 					}
-				} else if (command.equals("I")) { // I [illumination] – фары
+				} else if (command.equals("I")) { // I [instruction] – команда
 			        mUdpMessageSender.send(message);
-					sendMessageToRobot(message);
+					if (value.equals("0002")) { // turn off the screen
+						WindowManager.LayoutParams params = getWindow().getAttributes();
+						params.screenBrightness = 0;
+						getWindow().setAttributes(params);
+					} else if (value.equals("0003")) { // turn on the screen
+						WindowManager.LayoutParams params = getWindow().getAttributes();
+						params.screenBrightness = -1;
+						getWindow().setAttributes(params);
+					} else {
+						sendMessageToRobot(message);
+					}
 				} else if (command.equals("*")) { // * [hit] – попадание
 					if (message.equals(MessageConstant.HIT)) {
 				        mUdpMessageSender.send(message);
