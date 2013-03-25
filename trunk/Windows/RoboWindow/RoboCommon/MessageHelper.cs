@@ -62,14 +62,14 @@ namespace RoboCommon
         }
 
         /// <summary>
-        /// Check and correct message. Message will become 5 symbols length (1 for the identifier and 4 for the value). 
-        /// The value will be converted in HEX format (symbols 0..9, A..F).
+        /// Check and parse message.
         /// </summary>
-        /// <param name="message">Message to be corrected. Message's value length could be less than 4 symbols. There could be '-' or '+' in the value.</param>
-        /// <returns>Corrected message. 1 symbol for the identifier and 4 symbols for the value.</returns>
-        public static string CorrectMessage(string message)
+        /// <param name="message">Message can be shortened. Message's value length could be less than 4 symbols. There could be '-' or '+' in the value.</param>
+        /// <param name="identifier">Idenfifier extracted from the message.</param>
+        /// <param name="value">Value extrected from the message.</param>
+        public static void ParseMessage(string message, out string identifier, out short value)
         {
-            string identifier = MessageHelper.ExtractIdentifier(message);
+            identifier = MessageHelper.ExtractIdentifier(message);
             string valueText = MessageHelper.ExtractValueText(message).ToUpper();
 
             if (valueText.Length == 0)
@@ -88,11 +88,10 @@ namespace RoboCommon
                 valueText = valueText.Remove(0, 1);
             }
 
-            short value;
             if (!short.TryParse(
-                valueText, 
-                System.Globalization.NumberStyles.HexNumber, 
-                CultureInfo.CurrentCulture.NumberFormat, 
+                valueText,
+                System.Globalization.NumberStyles.HexNumber,
+                CultureInfo.CurrentCulture.NumberFormat,
                 out value))
             {
                 throw new RoboMessageException(MessageHelper.ErrorBadValue);
@@ -102,8 +101,31 @@ namespace RoboCommon
             {
                 value = (short)(-value);
             }
+        }
 
+        /// <summary>
+        /// Makes the message from identifier and value.
+        /// </summary>
+        /// <param name="identifier">Message identifier.</param>
+        /// <param name="value">Message value.</param>
+        /// <returns>Full message with identifier and 4 hex digits.</returns>
+        public static string MakeMessage(string identifier, short value)
+        {
             return identifier + value.ToString("X4");
+        }
+
+        /// <summary>
+        /// Check and correct message. Message will become 5 symbols length (1 for the identifier and 4 for the value). 
+        /// The value will be converted in HEX format (symbols 0..9, A..F).
+        /// </summary>
+        /// <param name="message">Message to be corrected. Message's value length could be less than 4 symbols. There could be '-' or '+' in the value.</param>
+        /// <returns>Corrected message. 1 symbol for the identifier and 4 symbols for the value.</returns>
+        public static string CorrectMessage(string message)
+        {
+            string identifier;
+            short value;
+            ParseMessage(message, out identifier, out value);
+            return MakeMessage(identifier, value);
         }
 
         /// <summary>
