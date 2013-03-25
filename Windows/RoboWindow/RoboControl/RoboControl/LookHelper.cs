@@ -340,8 +340,22 @@ namespace RoboControl
             this.lookY = 0;
             
             this.GenerateServoCommand(0, 0, out this.horizontalServoCommand, out this.verticalServoCommand);
-            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
-            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
+
+            // That's a trick. We send double messages. First with a forward degree plus 1 and the second exactly forward degree.
+            // We do that because two and more same H or V commands will be ignored by RoboHead. And LookForward must work anyway.
+            string identifier;
+            short value;
+            MessageHelper.ParseMessage(this.horizontalServoCommand, out identifier, out value);
+            string message = MessageHelper.MakeMessage(identifier, ++value);
+            this.communicationHelper.SendMessageToRobot(message);
+            message = MessageHelper.MakeMessage(identifier, --value);
+            this.communicationHelper.SendMessageToRobot(message);
+
+            MessageHelper.ParseMessage(this.verticalServoCommand, out identifier, out value);
+            message = MessageHelper.MakeMessage(identifier, ++value);
+            this.communicationHelper.SendMessageToRobot(message);
+            message = MessageHelper.MakeMessage(identifier, --value);
+            this.communicationHelper.SendMessageToRobot(message);
         }
         
         /// <summary>
