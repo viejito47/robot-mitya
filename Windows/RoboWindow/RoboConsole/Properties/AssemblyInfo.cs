@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RoboConsole")]
 [assembly: AssemblyDescription("RoboConsole application")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dmitry Dzakhov")]
+[assembly: AssemblyCompany("Robot Mitya")]
 [assembly: AssemblyProduct("RoboConsole")]
 [assembly: AssemblyCopyright("Copyright ©  Dmitry Dzakhov 2012")]
 [assembly: AssemblyTrademark("")]

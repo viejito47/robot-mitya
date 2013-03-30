@@ -50,13 +50,15 @@ namespace RoboControlTest
         }
 
         /// <summary>
-        /// Тест метода Initialize().
+        /// Тест метода Update().
         /// </summary>
         [Test]
-        public void InitializeTest()
+        public void UpdateTest()
         {
             var item = new RoboScriptItem(5);
-            item.Initialize("r0100, Z0001, I0001, W0000, Z0000");
+            item.SetRoboScript("r0100, Z0001, I0001, W0000, Z0000");
+
+            Assert.AreEqual(5, item.RoboScriptNumber);
             Assert.AreEqual("r0105, Z0001, I0001, W0000, Z0000", item.RoboScript);
             Assert.AreEqual("r0005", item.PlayCommand);
         }

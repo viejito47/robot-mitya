@@ -26,6 +26,11 @@ namespace RoboConsole
     public partial class FormMain : Form
     {
         /// <summary>
+        /// Settings helper.
+        /// </summary>
+        private readonly ConsoleSettingsHelper settingsHelper = new ConsoleSettingsHelper();
+
+        /// <summary>
         /// History of inputed commands.
         /// </summary>
         private readonly CommandHistory commandHistory = new CommandHistory();
@@ -135,11 +140,12 @@ namespace RoboConsole
         /// </summary>
         private void InitializeUdpCommunication()
         {
+            this.settingsHelper.Load();
             this.communicationHelper = new UdpCommunicationHelper(
-                Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.UdpSendPort,
-                Properties.Settings.Default.UdpReceivePort,
-                Properties.Settings.Default.SingleMessageRepetitionsCount);
+                this.settingsHelper.Settings.RoboHeadAddress,
+                this.settingsHelper.Settings.UdpSendPort,
+                this.settingsHelper.Settings.UdpReceivePort,
+                this.settingsHelper.Settings.SingleMessageRepetitionsCount);
             this.communicationHelper.TextReceived += this.OnTextReceived;
 
             this.commandProcessor = new CommandProcessor(
@@ -154,10 +160,11 @@ namespace RoboConsole
         /// </summary>
         private void InitializeComPortCommunication()
         {
+            this.settingsHelper.Load();
             this.communicationHelper = new ComPortCommunicationHelper(
-                Properties.Settings.Default.ComPort,
-                Properties.Settings.Default.BaudRate,
-                Properties.Settings.Default.SingleMessageRepetitionsCount);
+                this.settingsHelper.Settings.ComPort,
+                this.settingsHelper.Settings.BaudRate,
+                this.settingsHelper.Settings.SingleMessageRepetitionsCount);
             this.communicationHelper.TextReceived += this.OnTextReceived;
 
             this.commandProcessor = new CommandProcessor(
