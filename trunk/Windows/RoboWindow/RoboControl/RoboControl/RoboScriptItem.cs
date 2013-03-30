@@ -27,11 +27,6 @@ namespace RoboControl
         private const byte MaxRoboScriptNumber = 9;
 
         /// <summary>
-        /// Номер РобоСкрипта от 0 до MaxRoboScriptNumber.
-        /// </summary>
-        private byte roboScriptNumber;
-
-        /// <summary>
         /// Initializes a new instance of the RoboScriptItem class.
         /// </summary>
         /// <param name="roboScriptNumber">Номер РобоСкрипта от 0 до MaxRoboScriptNumber.</param>
@@ -42,10 +37,13 @@ namespace RoboControl
                 throw new ArgumentOutOfRangeException("roboScriptNumber");
             }
 
-            this.roboScriptNumber = roboScriptNumber;
-            this.RoboScript = string.Empty;
-            this.PlayCommand = string.Empty;
+            this.RoboScriptNumber = roboScriptNumber;
         }
+
+        /// <summary>
+        /// Gets Номер РобоСкрипта от 0 до MaxRoboScriptNumber.
+        /// </summary>
+        public byte RoboScriptNumber { get; private set; }
 
         /// <summary>
         /// Gets Текст РобоСкрипта с разделителями-запятыми.
@@ -74,23 +72,28 @@ namespace RoboControl
         }
 
         /// <summary>
-        /// Инициализация элемента текстом РобоСкрипта.
+        /// Sets RoboScript and PlayCommand properties.
         /// </summary>
-        /// <param name="roboScript">Текст РобоСкрипта.</param>
-        public void Initialize(string roboScript)
+        /// <param name="value">RoboScript text.</param>
+        public void SetRoboScript(string value)
         {
             // Текст любого РобоСкрипта начинается с сообщения r01xx. Где хх это номер РобоСкрипта.
-            // В результате ошибки, в опциях приложения номер может стоять неверный.
+            // В результате ошибки, в опциях приложения номер может стоять неверный номер.
             // Поэтому подправляем номер в соответствии с номером this.roboScriptNumber.
-            if (roboScript.Length >= CommunicationHelper.MessageLength)
+            if ((value.Length >= CommunicationHelper.MessageLength) && value.StartsWith("r01"))
             {
-                string numberHex = this.roboScriptNumber.ToString("X2");
+                string numberHex = this.RoboScriptNumber.ToString("X2");
 
-                this.RoboScript = roboScript;
+                this.RoboScript = value;
                 this.RoboScript = this.RoboScript.Insert(CommunicationHelper.MessageLength - 2, numberHex);
                 this.RoboScript = this.RoboScript.Remove(CommunicationHelper.MessageLength, 2);
 
                 this.PlayCommand = "r00" + numberHex;
+            }
+            else
+            {
+                this.RoboScript = string.Empty;
+                this.PlayCommand = string.Empty;
             }
         }
     }

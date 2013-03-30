@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RoboControl")]
 [assembly: AssemblyProduct("RoboControl")]
 [assembly: AssemblyDescription("Application for robot Mitya control")]
-[assembly: AssemblyCompany("Dmitry Dzakhov")]
+[assembly: AssemblyCompany("Robot Mitya")]
 [assembly: AssemblyCopyright("Copyright © Dmitry Dzakhov 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -98,7 +98,7 @@ namespace RoboControl
 
             if (controlSettings == null)
             {
-                throw new ArgumentNullException("controlSettings");
+                throw new ArgumentNullException("controlSettingsHelper");
             }
 
             this.communicationHelper = communicationHelper;
@@ -359,115 +359,6 @@ namespace RoboControl
         }
         
         /// <summary>
-        /// Поворот головы влево в режиме фиксации головы (DPad-джойстик).
-        /// </summary>
-        /// <param name="gameTime">Игровое время (время, прошедшее с момента последнего вызова).</param>
-        /// <remarks>
-        /// Изменение угла поворота головы определяется исходя из времени, прошедшего с момента последнего вызова, и
-        /// константы скорости поворота головы.
-        /// </remarks>
-        public void FixedLookLeft(GameTime gameTime)
-        {
-            this.CheckCommunicationHelper();
-
-            if (this.horizontalFixedControl == false)
-            {
-                this.horizontalFixedControl = true;
-                this.lookX = 0;
-            }
-
-            this.IncrementHorizontalDegree(ref this.fixedLookX, gameTime);
-
-            this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
-            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
-        }
-
-        /// <summary>
-        /// Поворот головы вправо в режиме фиксации головы (DPad-джойстик).
-        /// </summary>
-        /// <param name="gameTime">Игровое время (время, прошедшее с момента последнего вызова).</param>
-        /// <remarks>
-        /// Изменение угла поворота головы определяется исходя из времени, прошедшего с момента последнего вызова, и
-        /// константы скорости поворота головы.
-        /// </remarks>
-        public void FixedLookRight(GameTime gameTime)
-        {
-            this.CheckCommunicationHelper();
-
-            if (this.horizontalFixedControl == false)
-            {
-                this.horizontalFixedControl = true;
-                this.lookX = 0;
-            }
-
-            this.DecrementHorizontalDegree(ref this.fixedLookX, gameTime);
-            this.GenerateHorizontalServoCommandByDegree(this.fixedLookX, out this.horizontalServoCommand);
-            this.communicationHelper.SendMessageToRobot(this.horizontalServoCommand);
-        }
-
-        /// <summary>
-        /// Поворот головы вверх в режиме фиксации головы (DPad-джойстик).
-        /// </summary>
-        /// <param name="gameTime">Игровое время (время, прошедшее с момента последнего вызова).</param>
-        /// <remarks>
-        /// Изменение угла поворота головы определяется исходя из времени, прошедшего с момента последнего вызова, и
-        /// константы скорости поворота головы.
-        /// </remarks>
-        public void FixedLookUp(GameTime gameTime)
-        {
-            this.CheckCommunicationHelper();
-
-            if (this.verticalFixedControl == false)
-            {
-                this.verticalFixedControl = true;
-                this.lookY = 0;
-            }
-
-            if (this.controlSettings.ReverseHeadTangage)
-            {
-                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
-            }
-            else
-            {
-                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
-            }
-
-            this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
-            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
-        }
-
-        /// <summary>
-        /// Поворот головы вниз в режиме фиксации головы (DPad-джойстик).
-        /// </summary>
-        /// <param name="gameTime">Игровое время (время, прошедшее с момента последнего вызова).</param>
-        /// <remarks>
-        /// Изменение угла поворота головы определяется исходя из времени, прошедшего с момента последнего вызова, и
-        /// константы скорости поворота головы.
-        /// </remarks>
-        public void FixedLookDown(GameTime gameTime)
-        {
-            this.CheckCommunicationHelper();
-
-            if (this.verticalFixedControl == false)
-            {
-                this.verticalFixedControl = true;
-                this.lookY = 0;
-            }
-
-            if (this.controlSettings.ReverseHeadTangage)
-            {
-                this.IncrementVerticalDegree(ref this.fixedLookY, gameTime);
-            }
-            else
-            {
-                this.DecrementVerticalDegree(ref this.fixedLookY, gameTime);
-            }
-
-            this.GenerateVerticalServoCommandByDegree(this.fixedLookY, out this.verticalServoCommand);
-            this.communicationHelper.SendMessageToRobot(this.verticalServoCommand);
-        }
-
-        /// <summary>
         /// Поворот головы влево с постоянной скоростью.
         /// </summary>
         public void StartLeftTurn()
@@ -705,54 +596,6 @@ namespace RoboControl
         {
             this.GenerateHorizontalServoCommandByDegree(this.controlSettings.HorizontalForwardDegree, out horizontalServoCommand);
             this.GenerateVerticalServoCommandByDegree(this.controlSettings.VerticalForwardDegree, out verticalServoCommand);
-        }
-
-        /// <summary>
-        /// Уменьшение горизонтального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Уменьшаемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void DecrementHorizontalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.fastModeOn ? this.controlSettings.HorizontalHighSpeed : this.controlSettings.HorizontalLowSpeed;
-            degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree < this.controlSettings.HorizontalMinimumDegree) ? this.controlSettings.HorizontalMinimumDegree : degree;
-        }
-
-        /// <summary>
-        /// Увеличение горизонтального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Увеличиваемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void IncrementHorizontalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.fastModeOn ? this.controlSettings.HorizontalHighSpeed : this.controlSettings.HorizontalLowSpeed;
-            degree += gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree > this.controlSettings.HorizontalMaximumDegree) ? this.controlSettings.HorizontalMaximumDegree : degree;
-        }
-
-        /// <summary>
-        /// Уменьшение вертикального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Уменьшаемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void DecrementVerticalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.fastModeOn ? this.controlSettings.VerticalHighSpeed : this.controlSettings.VerticalLowSpeed;
-            degree -= gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree < this.controlSettings.VerticalMinimumDegree) ? this.controlSettings.VerticalMinimumDegree : degree;
-        }
-
-        /// <summary>
-        /// Увеличение вертикального угла обзора на основе константы скорости поворота головы и времени, прошедшего с последнего вызова.
-        /// </summary>
-        /// <param name="degree">Увеличиваемая переменная, инициированная значением угла на момент последнего вызова.</param>
-        /// <param name="gameTime">Игровое время (время, прошедшее с последнего вызова).</param>
-        private void IncrementVerticalDegree(ref float degree, GameTime gameTime)
-        {
-            float speed = this.fastModeOn ? this.controlSettings.VerticalHighSpeed : this.controlSettings.VerticalLowSpeed;
-            degree += gameTime.ElapsedGameTime.Milliseconds * speed;
-            degree = (degree > this.controlSettings.VerticalMaximumDegree) ? this.controlSettings.VerticalMaximumDegree : degree;
         }
 
         /// <summary>

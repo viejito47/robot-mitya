@@ -85,7 +85,7 @@ namespace RoboControl
 
             if (controlSettings == null)
             {
-                throw new ArgumentNullException("controlSettings");
+                throw new ArgumentNullException("controlSettingsHelper");
             }
 
             this.communicationHelper = communicationHelper;

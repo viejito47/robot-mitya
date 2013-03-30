@@ -12,6 +12,7 @@ namespace RoboControl
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
 
     using Microsoft.Xna.Framework;
@@ -132,9 +133,9 @@ namespace RoboControl
         private static Vector2 debugStringPosition8 = new Vector2(20, debugStringPosition7.Y + debugStringInterval);
 
         /// <summary>
-        /// Опции управления роботом.
+        /// Settings helper.
         /// </summary>
-        private ControlSettings controlSettings;
+        private ControlSettingsHelper controlSettingsHelper;
 
         /// <summary>
         /// Объект для взаимодействия с роботом.
@@ -239,22 +240,22 @@ namespace RoboControl
             // this.IsMouseVisible = false;
             Content.RootDirectory = "Content";
 
-            this.controlSettings = new ControlSettings();
-            this.LoadControlSettingsFromFile();
+            this.controlSettingsHelper = new ControlSettingsHelper();
+            this.controlSettingsHelper.Load();
 
             this.communicationHelper = new UdpCommunicationHelper(
-                Properties.Settings.Default.RoboHeadAddress,
-                Properties.Settings.Default.UdpSendPort,
-                Properties.Settings.Default.UdpReceivePort,
-                Properties.Settings.Default.SingleMessageRepetitionsCount);
+                this.controlSettingsHelper.Settings.RoboHeadAddress,
+                this.controlSettingsHelper.Settings.UdpSendPort,
+                this.controlSettingsHelper.Settings.UdpReceivePort,
+                this.controlSettingsHelper.Settings.SingleMessageRepetitionsCount);
 
             this.flashlightHelper = new FlashlightHelper(this.communicationHelper);
-            this.driveHelper = new DriveHelper(this.communicationHelper, this.controlSettings);
-            this.lookHelper = new LookHelper(this.communicationHelper, this.controlSettings);
-            this.moodHelper = new MoodHelper(this.communicationHelper, this.controlSettings);
-            this.gunHelper = new GunHelper(this.communicationHelper, this.controlSettings);
-            this.videoHelper = new VideoHelper(this.communicationHelper, this.controlSettings);
-            this.audioHelper = new AudioHelper(this.communicationHelper, this.controlSettings);
+            this.driveHelper = new DriveHelper(this.communicationHelper, this.controlSettingsHelper.Settings);
+            this.lookHelper = new LookHelper(this.communicationHelper, this.controlSettingsHelper.Settings);
+            this.moodHelper = new MoodHelper(this.communicationHelper, this.controlSettingsHelper.Settings);
+            this.gunHelper = new GunHelper(this.communicationHelper, this.controlSettingsHelper.Settings);
+            this.videoHelper = new VideoHelper(this.communicationHelper, this.controlSettingsHelper.Settings);
+            this.audioHelper = new AudioHelper(this.communicationHelper, this.controlSettingsHelper.Settings);
         }
 
         /// <summary>
@@ -555,52 +556,52 @@ namespace RoboControl
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D0) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[0]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript0);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[1]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript1);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[2]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript2);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[3]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript3);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[4]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript4);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[5]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript5);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D6) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[6]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript6);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D7) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[7]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript7);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D8) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[8]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript8);
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D9) && onlyCtrlIsPressed)
             {
-                this.PlayRoboScript(this.controlSettings.RoboScripts[9]);
+                this.PlayRoboScript(this.controlSettingsHelper.Settings.RoboScript9);
             }
         }
 
@@ -732,32 +733,32 @@ namespace RoboControl
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D1) && nothingIsPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed1;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettingsHelper.Settings.Speed1;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D2) && nothingIsPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed2;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettingsHelper.Settings.Speed2;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D3) && nothingIsPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed3;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettingsHelper.Settings.Speed3;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D4) && nothingIsPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed4;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettingsHelper.Settings.Speed4;
             }
 
             if (this.IsKeyChangedToDown(keyboardState, Keys.D5) && nothingIsPressed)
             {
-                this.driveHelper.SpeedForKeyboardControl = this.controlSettings.Speed5;
+                this.driveHelper.SpeedForKeyboardControl = this.controlSettingsHelper.Settings.Speed5;
             }
 
             DateTime nowTime = DateTime.Now;
             TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
-            if (timePassed >= this.controlSettings.MinCommandInterval)
+            if (timePassed >= this.controlSettingsHelper.Settings.MinCommandInterval)
             {
                 this.driveHelper.Drive(
                     this.IsKeyPressed(keyboardState, Keys.W), 
@@ -872,7 +873,7 @@ namespace RoboControl
             {
                 DateTime nowTime = DateTime.Now;
                 TimeSpan timePassed = nowTime - this.lastTimeCommandSent;
-                if (timePassed >= this.controlSettings.MinCommandInterval)
+                if (timePassed >= this.controlSettingsHelper.Settings.MinCommandInterval)
                 {
                     this.driveHelper.RotationModeOn = gamePadState.Buttons.LeftShoulder == ButtonState.Pressed;
                     this.driveHelper.Drive(gamePadState.ThumbSticks.Left.X, gamePadState.ThumbSticks.Left.Y);
@@ -1058,44 +1059,45 @@ namespace RoboControl
             return this.IsKeyPressed(keyboardState, Keys.LeftAlt) || this.IsKeyPressed(keyboardState, Keys.RightAlt);
         }
 
+        /*
         /// <summary>
         /// Чтение епций приложения из файла конфигурации.
         /// </summary>
         private void LoadControlSettingsFromFile()
         {
-            this.controlSettings.ReverseHeadTangage = Properties.Settings.Default.ReverseHeadTangage;
-            this.controlSettings.IpWebcamPort = Properties.Settings.Default.IpWebcamPort;
-            this.controlSettings.DriveModeNormalMaxSpeed = Properties.Settings.Default.DriveModeNormalMaxSpeed;
-            this.controlSettings.DriveModeTurboMaxSpeed = Properties.Settings.Default.DriveModeTurboMaxSpeed;
-            this.controlSettings.Speed1 = Properties.Settings.Default.Speed1;
-            this.controlSettings.Speed2 = Properties.Settings.Default.Speed2;
-            this.controlSettings.Speed3 = Properties.Settings.Default.Speed3;
-            this.controlSettings.Speed4 = Properties.Settings.Default.Speed4;
-            this.controlSettings.Speed5 = Properties.Settings.Default.Speed5;
+            this.controlSettingsHelper.ReverseHeadTangage = Properties.Settings.Default.ReverseHeadTangage;
+            this.controlSettingsHelper.IpWebcamPort = Properties.Settings.Default.IpWebcamPort;
+            this.controlSettingsHelper.DriveModeNormalMaxSpeed = Properties.Settings.Default.DriveModeNormalMaxSpeed;
+            this.controlSettingsHelper.DriveModeTurboMaxSpeed = Properties.Settings.Default.DriveModeTurboMaxSpeed;
+            this.controlSettingsHelper.Speed1 = Properties.Settings.Default.Speed1;
+            this.controlSettingsHelper.Speed2 = Properties.Settings.Default.Speed2;
+            this.controlSettingsHelper.Speed3 = Properties.Settings.Default.Speed3;
+            this.controlSettingsHelper.Speed4 = Properties.Settings.Default.Speed4;
+            this.controlSettingsHelper.Speed5 = Properties.Settings.Default.Speed5;
 
-            this.controlSettings.SlowHeadTurnPeriod = Properties.Settings.Default.SlowHeadTurnPeriod;
-            this.controlSettings.FastHeadTurnPeriod = Properties.Settings.Default.FastHeadTurnPeriod;
+            this.controlSettingsHelper.SlowHeadTurnPeriod = Properties.Settings.Default.SlowHeadTurnPeriod;
+            this.controlSettingsHelper.FastHeadTurnPeriod = Properties.Settings.Default.FastHeadTurnPeriod;
 
-            this.controlSettings.VerticalMinimumDegree1 = Properties.Settings.Default.VerticalMinimumDegree1;
-            this.controlSettings.VerticalForwardDegree1 = Properties.Settings.Default.VerticalForwardDegree1;
-            this.controlSettings.VerticalMaximumDegree1 = Properties.Settings.Default.VerticalMaximumDegree1;
-            this.controlSettings.VerticalMinimumDegree2 = Properties.Settings.Default.VerticalMinimumDegree2;
-            this.controlSettings.VerticalForwardDegree2 = Properties.Settings.Default.VerticalForwardDegree2;
-            this.controlSettings.VerticalMaximumDegree2 = Properties.Settings.Default.VerticalMaximumDegree2;
+            this.controlSettingsHelper.VerticalMinimumDegree1 = Properties.Settings.Default.VerticalMinimumDegree1;
+            this.controlSettingsHelper.VerticalForwardDegree1 = Properties.Settings.Default.VerticalForwardDegree1;
+            this.controlSettingsHelper.VerticalMaximumDegree1 = Properties.Settings.Default.VerticalMaximumDegree1;
+            this.controlSettingsHelper.VerticalMinimumDegree2 = Properties.Settings.Default.VerticalMinimumDegree2;
+            this.controlSettingsHelper.VerticalForwardDegree2 = Properties.Settings.Default.VerticalForwardDegree2;
+            this.controlSettingsHelper.VerticalMaximumDegree2 = Properties.Settings.Default.VerticalMaximumDegree2;
 
-            this.controlSettings.PlayVideo = Properties.Settings.Default.PlayVideo;
-            this.controlSettings.PlayAudio = Properties.Settings.Default.PlayAudio;
+            this.controlSettingsHelper.PlayVideo = Properties.Settings.Default.PlayVideo;
+            this.controlSettingsHelper.PlayAudio = Properties.Settings.Default.PlayAudio;
 
-            this.controlSettings.RoboScripts[0].Initialize(Properties.Settings.Default.RoboScript0);
-            this.controlSettings.RoboScripts[1].Initialize(Properties.Settings.Default.RoboScript1);
-            this.controlSettings.RoboScripts[2].Initialize(Properties.Settings.Default.RoboScript2);
-            this.controlSettings.RoboScripts[3].Initialize(Properties.Settings.Default.RoboScript3);
-            this.controlSettings.RoboScripts[4].Initialize(Properties.Settings.Default.RoboScript4);
-            this.controlSettings.RoboScripts[5].Initialize(Properties.Settings.Default.RoboScript5);
-            this.controlSettings.RoboScripts[6].Initialize(Properties.Settings.Default.RoboScript6);
-            this.controlSettings.RoboScripts[7].Initialize(Properties.Settings.Default.RoboScript7);
-            this.controlSettings.RoboScripts[8].Initialize(Properties.Settings.Default.RoboScript8);
-            this.controlSettings.RoboScripts[9].Initialize(Properties.Settings.Default.RoboScript9);
-        }
+            this.controlSettingsHelper.RoboScripts[0].Initialize(Properties.Settings.Default.RoboScript0);
+            this.controlSettingsHelper.RoboScripts[1].Initialize(Properties.Settings.Default.RoboScript1);
+            this.controlSettingsHelper.RoboScripts[2].Initialize(Properties.Settings.Default.RoboScript2);
+            this.controlSettingsHelper.RoboScripts[3].Initialize(Properties.Settings.Default.RoboScript3);
+            this.controlSettingsHelper.RoboScripts[4].Initialize(Properties.Settings.Default.RoboScript4);
+            this.controlSettingsHelper.RoboScripts[5].Initialize(Properties.Settings.Default.RoboScript5);
+            this.controlSettingsHelper.RoboScripts[6].Initialize(Properties.Settings.Default.RoboScript6);
+            this.controlSettingsHelper.RoboScripts[7].Initialize(Properties.Settings.Default.RoboScript7);
+            this.controlSettingsHelper.RoboScripts[8].Initialize(Properties.Settings.Default.RoboScript8);
+            this.controlSettingsHelper.RoboScripts[9].Initialize(Properties.Settings.Default.RoboScript9);
+        }*/
     }
 }
