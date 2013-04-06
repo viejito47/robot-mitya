@@ -33,6 +33,11 @@ public final class BluetoothHelper {
 	 * MAC-адрес bluetooth-модуля, подключаемого к контроллеру робота.
 	 */
 	// private static final String ROBOBODY_MAC = "00:12:03:31:01:22";
+
+	/**
+	 * Activity that create and use BluetoothHelper.
+	 */
+	private static Activity mParentActivity;
 	
 	/**
 	 * Handler обрабатывающий все сообщения в Android-приложении робота. 
@@ -107,10 +112,12 @@ public final class BluetoothHelper {
 	 * @param parentActivity родительское активити.
 	 */
 	public static void initialize(final Activity parentActivity) {
+		mParentActivity = parentActivity;
 		mBluetoothAdapterIsEnabled = false;
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
-			Toast.makeText(parentActivity, "В устройстве отсутствует Bluetooth-адаптер", Toast.LENGTH_LONG).show();
+			String errorText = mParentActivity.getResources().getString(R.string.error_no_bluetooth_adapter);
+			Toast.makeText(parentActivity, errorText, Toast.LENGTH_LONG).show();
 			return;
 		}
 
@@ -132,12 +139,14 @@ public final class BluetoothHelper {
 		mMessageHandler = messageHandler;
 		
 		if (mBluetoothAdapter == null) {
-			Logger.e("В устройстве отсутствует Bluetooth-адаптер");
+			String errorText = mParentActivity.getResources().getString(R.string.error_no_bluetooth_adapter);
+			Logger.e(errorText);
 			return false;
 		}
 		
 		if (!mBluetoothAdapterIsEnabled) {
-			Logger.e("Не включен Bluetooth-адаптер");
+			String errorText = mParentActivity.getResources().getString(R.string.error_bluetooth_adapter_is_not_activated);
+			Logger.e(errorText);
 			return false;
 		}
 		
@@ -257,7 +266,10 @@ public final class BluetoothHelper {
 				try {
 					mOutputStream.write(message.getBytes());
 				} catch (IOException e) {
-					Logger.e("Error sending message \"" + message + "\"");
+					String errorText = String.format(
+							mParentActivity.getResources().getString(R.string.error_sending_message_through_bluetooth),
+							message);
+					Logger.e(errorText);
 				}
 			}
 		}

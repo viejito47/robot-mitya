@@ -180,25 +180,25 @@ public class RoboHeadActivity extends Activity {
 						// В ПК отправляем только ошибки.
 						mUdpMessageSender.send(message);
 					}
-					String errorMessage = "Ошибка: ";
+					String errorMessage = getResources().getString(R.string.roboscript_error_unknown);
 					if (message.equals(MessageConstant.WRONG_MESSAGE)) {
-						errorMessage += "неверное сообщение";
+						errorMessage = getResources().getString(R.string.roboscript_error_wrong_message);
 					} else if (message.equals(MessageConstant.UNKNOWN_COMMAND)) {
-						errorMessage += "неизвестная команда";
+						errorMessage = getResources().getString(R.string.roboscript_error_unknown_command);
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_ILLEGAL_COMMAND)) {
-						errorMessage += "недопустимая команда в РобоСкрипт";
+						errorMessage = getResources().getString(R.string.roboscript_error_roboscript_illegal_command);
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_ILLEGAL_COMMAND_SEQUENCE)) {
-						errorMessage += "неверная последовательность команд в РобоСкрипт";
+						errorMessage = getResources().getString(R.string.roboscript_error_roboscript_illegal_command_sequence);
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_NO_MEMORY)) {
-						errorMessage += "невозможно выделить необходимый объём памяти для РобоСкрипта";
+						errorMessage = getResources().getString(R.string.roboscript_error_roboscript_no_memory);
 					} else if (message.equals(MessageConstant.ROBOSCRIPT_OUT_OF_BOUNDS)) {
-						errorMessage += "попытка выхода за границы выделенной для РобоСкрипт памяти";
+						errorMessage = getResources().getString(R.string.roboscript_error_roboscript_out_of_bounds);
 					} else if (message.equals(MessageConstant.ILLEGAL_COMMAND)) {
-						errorMessage += "недопустимая команда вне РобоСкрипт";
+						errorMessage = getResources().getString(R.string.roboscript_error_illegal_command);
 					} else if (message.equals(MessageConstant.BROKEN_COMMAND)) {
-						errorMessage += "пропущен символ команды, команда потеряна";
+						errorMessage = getResources().getString(R.string.roboscript_error_broken_command);
 					} else if (message.equals(MessageConstant.WRONG_VOLTAGE_DEVIDER)) {
-						errorMessage += "неверный номер делителя напряжения";
+						errorMessage = getResources().getString(R.string.roboscript_error_wrong_voltage_devider);
 					}
 					Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
 					Logger.e(errorMessage);
@@ -309,20 +309,20 @@ public class RoboHeadActivity extends Activity {
 	 */
 	private void selectCommand() {
 		final CharSequence[] items = {
-				"Стоп моторы",
-				"Фары вкл.",
-				"Фары выкл.",
-				"Выстрел",
-				"Левый и правый моторы вперёд 100%", 
-				"Левый и правый моторы назад 40%", 
-				"Левый и правый моторы в разные стороны 50%", 
-				"Голова на 45 градусов влево", 
-				"Голова на 45 градусов вправо", 
-				"Голова на 30 градусов вверх", 
-				"Голова на 30 градусов вниз"};
+				getResources().getString(R.string.test_stop_motors),
+				getResources().getString(R.string.test_lights_on),
+				getResources().getString(R.string.test_lights_off),
+				getResources().getString(R.string.test_shoot),
+				getResources().getString(R.string.test_left_right_forward_100),
+				getResources().getString(R.string.test_left_right_backward_40),
+				getResources().getString(R.string.test_left_forward_127_right_backward_127),
+				getResources().getString(R.string.test_head_left_45),
+				getResources().getString(R.string.test_head_right_45),
+				getResources().getString(R.string.test_head_vertical_120),
+				getResources().getString(R.string.test_head_vertical_60)};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Действие:");
+		builder.setTitle(getResources().getString(R.string.test_dialog_title));
 		builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 		    public void onClick(final DialogInterface dialog, final int item) {
 		    	final int cStop = 0;
