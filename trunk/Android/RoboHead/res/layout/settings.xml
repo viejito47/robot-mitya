@@ -5,7 +5,7 @@
     android:layout_height="fill_parent">
 
     <PreferenceCategory 
-        android:title="Приём данных по Wi-Fi">
+        android:title="@string/preference_receive_wifi">
             
 		<EditTextPreference
 	        android:key="@string/option_udp_receive_port_key"
@@ -18,7 +18,7 @@
 
 
     <PreferenceCategory 
-        android:title="Передача данных по Wi-Fi">
+        android:title="@string/preference_send_wifi">
     
 	    <EditTextPreference
 	        android:key="@string/option_udp_send_port_key"
@@ -65,7 +65,7 @@
 
     
     <PreferenceCategory 
-        android:title="Связь с контроллером по Bluetooth">
+        android:title="@string/preference_bluetooth">
     
 	    <EditTextPreference
 	        android:key="@string/option_robobody_mac_key"
