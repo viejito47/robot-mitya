@@ -35,7 +35,7 @@
     <PublisherName>Робот Митя</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -142,6 +142,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="GameRobot.cs" />
     <Compile Include="RoboScriptItem.cs" />
+    <Compile Include="ScreenConstants.cs" />
     <Compile Include="VideoHelper.cs" />
   </ItemGroup>
   <ItemGroup>

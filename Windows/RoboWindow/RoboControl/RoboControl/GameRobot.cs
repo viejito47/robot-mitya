@@ -63,76 +63,6 @@ namespace RoboControl
     public class GameRobot : Microsoft.Xna.Framework.Game
     {
         /// <summary>
-        /// Вертикальный интервал между строками на экране.
-        /// </summary>
-        private static int debugStringInterval = 25;
-
-        /// <summary>
-        /// Ширина строк на экране.
-        /// </summary>
-        private static int debugStringColumnWidth = 190;
-
-        /// <summary>
-        /// Координаты первой ячейки 1-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition1 = new Vector2(20, 20);
-
-        /// <summary>
-        /// Координаты второй ячейки 1-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition1c1 = new Vector2(debugStringPosition1.X + debugStringColumnWidth, debugStringPosition1.Y);
-
-        /// <summary>
-        /// Координаты первой ячейки 2-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition2 = new Vector2(20, debugStringPosition1.Y + debugStringInterval);
-
-        /// <summary>
-        /// Координаты второй ячейки 2-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition2c1 = new Vector2(debugStringPosition2.X + debugStringColumnWidth, debugStringPosition2.Y);
-
-        /// <summary>
-        /// Координаты первой ячейки 3-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition3 = new Vector2(20, debugStringPosition2.Y + debugStringInterval);
-
-        /// <summary>
-        /// Координаты второй ячейки 3-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition3c1 = new Vector2(debugStringPosition3.X + debugStringColumnWidth, debugStringPosition3.Y);
-
-        /// <summary>
-        /// Координаты первой ячейки 4-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition4 = new Vector2(20, debugStringPosition3.Y + debugStringInterval);
-
-        /// <summary>
-        /// Координаты второй ячейки 4-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition4c1 = new Vector2(debugStringPosition4.X + debugStringColumnWidth, debugStringPosition4.Y);
-
-        /// <summary>
-        /// Координаты первой ячейки 5-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition5 = new Vector2(20, debugStringPosition4.Y + debugStringInterval);
-
-        /// <summary>
-        /// Координаты первой ячейки 6-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition6 = new Vector2(20, debugStringPosition5.Y + debugStringInterval);
-
-        /// <summary>
-        /// Координаты первой ячейки 7-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition7 = new Vector2(20, debugStringPosition6.Y + debugStringInterval);
-
-        /// <summary>
-        /// Координаты первой ячейки 8-й строки.
-        /// </summary>
-        private static Vector2 debugStringPosition8 = new Vector2(20, debugStringPosition7.Y + debugStringInterval);
-
-        /// <summary>
         /// Settings helper.
         /// </summary>
         private ControlSettingsHelper controlSettingsHelper;
@@ -396,10 +326,12 @@ namespace RoboControl
             }
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            
-            // Отрисовка экрана пока производится только режиме управления роботом.
-            // В режиме меню экран чистый.
-            if (this.gameState == GameState.gsRobotControl)
+
+            if (this.gameState == GameState.gsMenu)
+            {
+                this.DrawInMenuState(gameTime);
+            }
+            else if (this.gameState == GameState.gsRobotControl)
             {
                 this.DrawInRobotControlState(gameTime);
             }
@@ -886,6 +818,39 @@ namespace RoboControl
         }
 
         /// <summary>
+        /// Draws when the program is in menu mode.
+        /// </summary>
+        /// <param name="gameTime">
+        /// Current game time.
+        /// </param>
+        private void DrawInMenuState(GameTime gameTime)
+        {
+            this.spriteBatch.Begin();
+
+            if (this.IsActive && (this.videoTexture != null))
+            {
+                Rectangle rectangle = new Rectangle(
+                    0,
+                    0,
+                    this.graphics.PreferredBackBufferWidth,
+                    this.graphics.PreferredBackBufferHeight);
+                this.spriteBatch.Draw(this.videoTexture, rectangle, Color.White);
+            }
+
+            Color color = Color.White;
+            this.spriteBatch.DrawString(this.debugFont, "Для управления клавиатурой нажмите Пробел", ScreenConstants.GetTextPosition(0, 0), color);
+            this.spriteBatch.DrawString(this.debugFont, "Для управления геймпэдом XBOX 360 нажмите Start", ScreenConstants.GetTextPosition(0, 1), color);
+
+            color = Color.Yellow;
+            if (this.controlSettingsHelper != null)
+            {
+                this.spriteBatch.DrawString(this.debugFont, "v" + this.controlSettingsHelper.GetProductVersion(), ScreenConstants.GetTextPosition(0, 4), color);
+            }
+
+            this.spriteBatch.End();
+        }
+
+        /// <summary>
         /// Отрисовка экрана в режиме управления роботом.
         /// </summary>
         /// <param name="gameTime">
@@ -911,37 +876,37 @@ namespace RoboControl
 
             motorCommand = this.driveHelper.LeftMotorCommand + speedText;
             color = Color.White;
-            this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition1, color);
+            this.spriteBatch.DrawString(this.debugFont, motorCommand, ScreenConstants.GetTextPosition(0, 0), color);
 
             motorCommand = this.driveHelper.RightMotorCommand;
             color = Color.White;
-            this.spriteBatch.DrawString(this.debugFont, motorCommand, debugStringPosition2, color);
+            this.spriteBatch.DrawString(this.debugFont, motorCommand, ScreenConstants.GetTextPosition(0, 1), color);
 
             if (this.driveHelper.TurboModeOn)
             {
-                this.spriteBatch.DrawString(this.debugFont, "Турбо режим", debugStringPosition1c1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Турбо режим", ScreenConstants.GetTextPosition(1, 0), Color.Orange);
             }
 
             if (this.driveHelper.RotationModeOn)
             {
-                this.spriteBatch.DrawString(this.debugFont, "Режим разворота", debugStringPosition2c1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Режим разворота", ScreenConstants.GetTextPosition(1, 1), Color.Orange);
             }
 
             if (this.lookHelper.FastModeOn)
             {
-                this.spriteBatch.DrawString(this.debugFont, "Быстрый обзор", debugStringPosition3c1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Быстрый обзор", ScreenConstants.GetTextPosition(1, 2), Color.Orange);
             }
 
             if (!this.lookHelper.WalkModeOn)
             {
-                this.spriteBatch.DrawString(this.debugFont, "Режим обзора", debugStringPosition4c1, Color.Orange);
+                this.spriteBatch.DrawString(this.debugFont, "Режим обзора", ScreenConstants.GetTextPosition(1, 3), Color.Orange);
             }
 
-            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.HorizontalServoCommand, debugStringPosition3, Color.White);
-            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.VerticalServoCommand, debugStringPosition4, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.HorizontalServoCommand, ScreenConstants.GetTextPosition(0, 2), Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.lookHelper.VerticalServoCommand, ScreenConstants.GetTextPosition(0, 3), Color.White);
 
             color = this.flashlightHelper.FlashlightTurnedOn ? Color.Yellow : Color.White;
-            this.spriteBatch.DrawString(this.debugFont, this.flashlightHelper.FlashlightCommand, debugStringPosition5, color);
+            this.spriteBatch.DrawString(this.debugFont, this.flashlightHelper.FlashlightCommand, ScreenConstants.GetTextPosition(0, 4), color);
 
             string moodText = "Настроение: ";
             switch (this.moodHelper.Mood)
@@ -963,11 +928,11 @@ namespace RoboControl
                     break;
             }
 
-            this.spriteBatch.DrawString(this.debugFont, moodText, debugStringPosition6, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, moodText, ScreenConstants.GetTextPosition(0, 5), Color.White);
 
-            this.spriteBatch.DrawString(this.debugFont, this.PercentToText(this.gunHelper.GetChargePercent()), debugStringPosition7, Color.White);
+            this.spriteBatch.DrawString(this.debugFont, this.PercentToText(this.gunHelper.GetChargePercent()), ScreenConstants.GetTextPosition(0, 6), Color.White);
 
-            this.spriteBatch.DrawString(this.debugFont, this.communicationHelper.LastErrorMessage, debugStringPosition8, Color.Orange);
+            this.spriteBatch.DrawString(this.debugFont, this.communicationHelper.LastErrorMessage, ScreenConstants.GetTextPosition(0, 7), Color.Orange);
 
             this.spriteBatch.End();
         }
