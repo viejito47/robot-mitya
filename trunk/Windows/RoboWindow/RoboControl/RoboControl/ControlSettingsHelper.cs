@@ -94,6 +94,35 @@ namespace RoboControl
         }
 
         /// <summary>
+        /// Gets version of the product from assembly info.
+        /// </summary>
+        /// <returns>Product version.</returns>
+        public string GetProductVersion()
+        {
+            string result = string.Empty;
+
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly == null)
+            {
+                return string.Empty;
+            }
+
+            AssemblyName assemblyName = assembly.GetName();
+            if (assemblyName == null)
+            {
+                return string.Empty;
+            }
+
+            Version version = assemblyName.Version;
+            if (version == null)
+            {
+                return string.Empty;
+            }
+
+            return version.ToString();
+        }
+
+        /// <summary>
         /// Gets name of the company from assembly info.
         /// </summary>
         /// <returns>Company name.</returns>
@@ -122,7 +151,7 @@ namespace RoboControl
         /// <summary>
         /// Gets name of the product from assembly info.
         /// </summary>
-        /// <returns>Company name.</returns>
+        /// <returns>Product name.</returns>
         private string GetProductName()
         {
             string result = string.Empty;
