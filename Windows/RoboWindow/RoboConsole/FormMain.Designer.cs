@@ -66,9 +66,12 @@ namespace RoboConsole
             this.radioButtonComPort = new System.Windows.Forms.RadioButton();
             this.radioButtonUdpSocket = new System.Windows.Forms.RadioButton();
             this.textBoxHistory = new System.Windows.Forms.RichTextBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.labelVersion = new System.Windows.Forms.Label();
             this.tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBoxCommunicationType.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel
@@ -82,8 +85,8 @@ namespace RoboConsole
             this.tableLayoutPanel.Controls.Add(this.textBoxSend, 1, 4);
             this.tableLayoutPanel.Controls.Add(this.buttonSend, 3, 4);
             this.tableLayoutPanel.Controls.Add(this.pictureBox1, 3, 1);
-            this.tableLayoutPanel.Controls.Add(this.groupBoxCommunicationType, 3, 2);
             this.tableLayoutPanel.Controls.Add(this.textBoxHistory, 1, 1);
+            this.tableLayoutPanel.Controls.Add(this.tableLayoutPanel1, 3, 2);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
@@ -94,17 +97,17 @@ namespace RoboConsole
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 6F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(667, 345);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(524, 298);
             this.tableLayoutPanel.TabIndex = 0;
             // 
             // textBoxSend
             // 
             this.textBoxSend.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBoxSend.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBoxSend.Location = new System.Drawing.Point(9, 316);
+            this.textBoxSend.Location = new System.Drawing.Point(9, 269);
             this.textBoxSend.Margin = new System.Windows.Forms.Padding(3, 2, 3, 3);
             this.textBoxSend.Name = "textBoxSend";
-            this.textBoxSend.Size = new System.Drawing.Size(504, 23);
+            this.textBoxSend.Size = new System.Drawing.Size(361, 23);
             this.textBoxSend.TabIndex = 0;
             this.textBoxSend.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBoxSend_KeyDown);
             // 
@@ -112,7 +115,7 @@ namespace RoboConsole
             // 
             this.buttonSend.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonSend.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonSend.Location = new System.Drawing.Point(526, 314);
+            this.buttonSend.Location = new System.Drawing.Point(383, 267);
             this.buttonSend.Margin = new System.Windows.Forms.Padding(0);
             this.buttonSend.Name = "buttonSend";
             this.buttonSend.Size = new System.Drawing.Size(135, 25);
@@ -124,7 +127,7 @@ namespace RoboConsole
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(529, 9);
+            this.pictureBox1.Location = new System.Drawing.Point(386, 9);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(129, 117);
             this.pictureBox1.TabIndex = 3;
@@ -135,9 +138,9 @@ namespace RoboConsole
             this.groupBoxCommunicationType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBoxCommunicationType.Controls.Add(this.radioButtonComPort);
             this.groupBoxCommunicationType.Controls.Add(this.radioButtonUdpSocket);
-            this.groupBoxCommunicationType.Location = new System.Drawing.Point(529, 231);
+            this.groupBoxCommunicationType.Location = new System.Drawing.Point(3, 47);
             this.groupBoxCommunicationType.Name = "groupBoxCommunicationType";
-            this.groupBoxCommunicationType.Size = new System.Drawing.Size(129, 70);
+            this.groupBoxCommunicationType.Size = new System.Drawing.Size(123, 70);
             this.groupBoxCommunicationType.TabIndex = 3;
             this.groupBoxCommunicationType.TabStop = false;
             this.groupBoxCommunicationType.Text = "Тип связи";
@@ -175,19 +178,45 @@ namespace RoboConsole
             this.textBoxHistory.ReadOnly = true;
             this.tableLayoutPanel.SetRowSpan(this.textBoxHistory, 2);
             this.textBoxHistory.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.textBoxHistory.Size = new System.Drawing.Size(504, 292);
+            this.textBoxHistory.Size = new System.Drawing.Size(361, 245);
             this.textBoxHistory.TabIndex = 4;
             this.textBoxHistory.Text = "";
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.groupBoxCommunicationType, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.labelVersion, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(386, 134);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(129, 120);
+            this.tableLayoutPanel1.TabIndex = 5;
+            // 
+            // labelVersion
+            // 
+            this.labelVersion.AutoSize = true;
+            this.labelVersion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelVersion.Location = new System.Drawing.Point(3, 0);
+            this.labelVersion.Name = "labelVersion";
+            this.labelVersion.Size = new System.Drawing.Size(123, 20);
+            this.labelVersion.TabIndex = 4;
+            this.labelVersion.Text = "ver.1.0.1234.12345";
+            this.labelVersion.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // FormMain
             // 
             this.AcceptButton = this.buttonSend;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(667, 345);
+            this.ClientSize = new System.Drawing.Size(524, 298);
             this.Controls.Add(this.tableLayoutPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(234, 280);
+            this.MinimumSize = new System.Drawing.Size(234, 314);
             this.Name = "FormMain";
             this.Text = "Консоль робота";
             this.tableLayoutPanel.ResumeLayout(false);
@@ -195,6 +224,8 @@ namespace RoboConsole
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBoxCommunicationType.ResumeLayout(false);
             this.groupBoxCommunicationType.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -206,6 +237,8 @@ namespace RoboConsole
         private System.Windows.Forms.RadioButton radioButtonComPort;
         private System.Windows.Forms.RadioButton radioButtonUdpSocket;
         private System.Windows.Forms.RichTextBox textBoxHistory;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Label labelVersion;
 
     }
 }
