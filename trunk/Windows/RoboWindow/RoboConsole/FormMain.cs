@@ -57,6 +57,8 @@ namespace RoboConsole
         {
             this.InitializeComponent();
 
+            labelVersion.Text = "ver." + Application.ProductVersion;
+
             this.historyBox = new HistoryBox(this.textBoxHistory);
             this.InitializeUdpCommunication();
         }
