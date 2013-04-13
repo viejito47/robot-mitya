@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Робот Митя</string>
+    
+    <string name="main_title">- Робот Митя -</string>
+    
+    <string name="error_no_ipwebcam">Установите IP Webcam</string>
+    <string name="error_no_bluetooth_adapter">В устройстве отсутствует Bluetooth-адаптер</string>
+    <string name="error_bluetooth_adapter_is_not_activated">Не включен Bluetooth-адаптер</string>
+    <string name="error_sending_message_through_bluetooth">Ошибка передачи сообщения по Bluetooth (%s)</string>
+    	
+    <string name="roboscript_error_unknown">Ошибка</string>
+    <string name="roboscript_error_wrong_message">Ошибка: неверное сообщение</string>
+    <string name="roboscript_error_unknown_command">Ошибка: неизвестная команда</string>
+    <string name="roboscript_error_roboscript_illegal_command">Ошибка: недопустимая команда в РобоСкрипт</string>
+    <string name="roboscript_error_roboscript_illegal_command_sequence">Ошибка: неверная последовательность команд в РобоСкрипт</string>
+    <string name="roboscript_error_roboscript_no_memory">Ошибка: невозможно выделить необходимый объём памяти для РобоСкрипта</string>
+    <string name="roboscript_error_roboscript_out_of_bounds">Ошибка: попытка выхода за границы выделенной для РобоСкрипт памяти</string>
+    <string name="roboscript_error_illegal_command">Ошибка: недопустимая команда вне РобоСкрипт</string>
+    <string name="roboscript_error_broken_command">Ошибка: пропущен символ команды, команда потеряна</string>
+    <string name="roboscript_error_wrong_voltage_devider">Ошибка: неверный номер делителя напряжения</string>
+    
+    <string name="test_dialog_title">Действие:</string>
+    
+    <string name="test_stop_motors">Стоп моторы</string>
+    <string name="test_lights_on">Фары включить</string>
+    <string name="test_lights_off">Фары выключить</string>
+    <string name="test_shoot">Выстрел</string>
+    <string name="test_left_right_forward_100">Левый и правый моторы вперёд 100%</string>
+    <string name="test_left_right_backward_40">Левый и правый моторы назад 40%</string>
+    <string name="test_left_forward_127_right_backward_127">Левый и правый моторы в разные стороны 50%</string>
+    <string name="test_head_left_45">Голова на 45 градусов влево</string>
+    <string name="test_head_right_45">Голова на 45 градусов вправо</string>
+    <string name="test_head_vertical_120">Голова вертикально на 120 градусов</string>
+    <string name="test_head_vertical_60">Голова вертикально на 60 градусов</string>
+                    
+    <string name="menu_test_control_label">Тест управления</string>
+    <string name="menu_test_animation_label">Тест анимации</string>
+    
+    <string name="button_run_label">Запуск</string>
+    <string name="button_settings_label">Настройки</string>
+    <string name="dialog_settings_title">Настройки приложения</string>
+    <string name="button_about_label">О приложении</string>
+    <string name="dialog_about_title">О приложении Робот Митя</string>
+    <string name="dialog_about_text">Приложение <b>Робот Митя</b> это мозг робота. Головной, естественно. Спинной мозг расположен в Arduino. А ещё есть голоса. Голоса в мозг приходят по каналу WiFi.</string>
+
+    <string name="preference_receive_wifi">Приём данных по Wi-Fi</string>
+    <string name="preference_send_wifi">Передача данных по Wi-Fi</string>
+    <string name="preference_bluetooth">Связь с контроллером по Bluetooth</string>
+    
+    <string name="option_udp_receive_port_title">Порт приёма</string>
+    <string name="option_udp_receive_port_summary">Порт для приёма команд и сообщений от управляющего устройства</string>
+    
+    <string name="option_udp_send_port_title">Порт передачи</string>
+    <string name="option_udp_send_port_summary">Порт для передачи сообщений управляющему устройству</string>
+    
+    <string name="option_udp_sendtype_broadcast_title">Широковещательная передача</string>
+    <string name="option_udp_sendtype_broadcast_summary">Широковещательная передача сообщений на удалённый узел управления роботом</string>
+    
+	<string name="option_udp_sendtype_broadcast_local_title">В пределах ЛВС</string>
+	<string name="option_udp_sendtype_broadcast_local_summary">Некоторые роутеры мобильных устройств могут отправлять широковещательные UDP-пакеты только в пределах локальной вычислительной сети</string>
+	
+	<string name="option_udp_sendtype_p2p_title">Точка-точка</string>
+    <string name="option_udp_sendtype_p2p_summary">Передача сообщений на удалённый узел управления роботом</string>
+    
+    <string name="option_udp_recipient_ip_title">IP-адрес получателя</string>
+    <string name="option_udp_recipient_ip_summary">IP-адрес удалённого узла управления роботом</string>
+        
+    <string name="option_robobody_mac_title">MAC-адрес робота</string>
+    <string name="option_robobody_mac_summary">MAC-адрес Bluetooth-адаптера контроллера робота</string>
+    
+</resources>
