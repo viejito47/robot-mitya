@@ -189,17 +189,20 @@ namespace RoboControl
         /// <summary>
         /// Gets or sets Минимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (текущий режим).
         /// </summary>        
+        [XmlIgnore]
         public int VerticalMinimumDegree { get; set; }
         
         /// <summary>
         /// Gets or sets Угол поворота сервопривода, управляющего вертикальным поворотом головы, соответствующий 
         /// центральной позиции (текущий режим).
         /// </summary>
+        [XmlIgnore]
         public int VerticalForwardDegree { get; set; }
         
         /// <summary>
         /// Gets or sets Максимальный угол поворота сервопривода, управляющего вертикальным поворотом головы (текущий режим).
         /// </summary>
+        [XmlIgnore]
         public int VerticalMaximumDegree { get; set; }
 
         /// <summary>

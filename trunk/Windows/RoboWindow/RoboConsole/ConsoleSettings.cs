@@ -40,12 +40,12 @@ namespace RoboConsole
         /// <summary>
         /// Gets or sets UDP port for datagram output.
         /// </summary>
-        public int UdpSendPort { get; set; }
+        public ushort UdpSendPort { get; set; }
 
         /// <summary>
         /// Gets or sets UDP port for datagram input.
         /// </summary>
-        public int UdpReceivePort { get; set; }
+        public ushort UdpReceivePort { get; set; }
 
         /// <summary>
         /// Gets or sets COM port to communicate directly with Arduino controller.

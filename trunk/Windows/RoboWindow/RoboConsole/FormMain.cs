@@ -56,11 +56,24 @@ namespace RoboConsole
         public FormMain()
         {
             this.InitializeComponent();
-
-            labelVersion.Text = "ver." + Application.ProductVersion;
-
             this.historyBox = new HistoryBox(this.textBoxHistory);
-            this.InitializeUdpCommunication();
+        }
+
+        /// <summary>
+        /// This event handler is called after form creation.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+            this.labelVersion.Text = "ver." + Application.ProductVersion;
+
+            LinkLabel.Link link = new LinkLabel.Link();
+            link.LinkData = "http://www.robot-mitya.ru/articles/?SECTION_ID=98&ELEMENT_ID=386";
+            this.linkLabelHelp.Links.Add(link);
+
+            this.settingsHelper.Load();
+            this.InitializeCommunication();
         }
 
         /// <summary>
@@ -124,6 +137,17 @@ namespace RoboConsole
         {
             this.communicationHelper.Dispose();
 
+            this.InitializeCommunication();
+
+            this.textBoxSend.SelectAll();
+            this.textBoxSend.Focus();
+        }
+
+        /// <summary>
+        /// Initialization of communication with robot through UDP-socket or COM-port.
+        /// </summary>
+        private void InitializeCommunication()
+        {
             if (this.radioButtonComPort.Checked)
             {
                 this.InitializeComPortCommunication();
@@ -132,9 +156,6 @@ namespace RoboConsole
             {
                 this.InitializeUdpCommunication();
             }
-
-            this.textBoxSend.SelectAll();
-            this.textBoxSend.Focus();
         }
 
         /// <summary>
@@ -142,7 +163,6 @@ namespace RoboConsole
         /// </summary>
         private void InitializeUdpCommunication()
         {
-            this.settingsHelper.Load();
             this.communicationHelper = new UdpCommunicationHelper(
                 this.settingsHelper.Settings.RoboHeadAddress,
                 this.settingsHelper.Settings.UdpSendPort,
@@ -162,7 +182,6 @@ namespace RoboConsole
         /// </summary>
         private void InitializeComPortCommunication()
         {
-            this.settingsHelper.Load();
             this.communicationHelper = new ComPortCommunicationHelper(
                 this.settingsHelper.Settings.ComPort,
                 this.settingsHelper.Settings.BaudRate,
@@ -191,6 +210,41 @@ namespace RoboConsole
             }
 
             this.historyBox.AppendTextReceivedFromRobot(e.Text);
+        }
+
+        /// <summary>
+        /// LinkLabelHelp handler.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
+        private void LinkLabelHelpLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Link.LinkData.ToString());
+        }
+
+        /// <summary>
+        /// LinkLabelSettings handler.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event arguments.</param>
+        private void LinkLabelSettingsLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var formSettings = new FormSettings();
+            formSettings.IpAddress = this.settingsHelper.Settings.RoboHeadAddress;
+            formSettings.SendPort = this.settingsHelper.Settings.UdpSendPort;
+            formSettings.ReceivePort = this.settingsHelper.Settings.UdpReceivePort;
+            formSettings.ComPort = this.settingsHelper.Settings.ComPort;
+            formSettings.BaudRate = this.settingsHelper.Settings.BaudRate;
+            if (formSettings.ShowDialog(this) == DialogResult.OK)
+            {
+                this.settingsHelper.Settings.RoboHeadAddress = formSettings.IpAddress;
+                this.settingsHelper.Settings.UdpSendPort = formSettings.SendPort;
+                this.settingsHelper.Settings.UdpReceivePort = formSettings.ReceivePort;
+                this.settingsHelper.Settings.ComPort = formSettings.ComPort;
+                this.settingsHelper.Settings.BaudRate = formSettings.BaudRate;
+                this.InitializeCommunication();
+                this.settingsHelper.Save();
+            }
         }
     }
 }
