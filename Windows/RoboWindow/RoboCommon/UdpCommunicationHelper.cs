@@ -25,7 +25,7 @@ namespace RoboCommon
         /// <summary>
         /// UDP client.
         /// </summary>
-        private UdpClient udpReceiveClient;
+        private static UdpClient udpReceiveClient = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UdpCommunicationHelper" /> class.
@@ -41,10 +41,11 @@ namespace RoboCommon
             this.UdpSendPort = udpSendPort;
             this.UdpReceivePort = udpReceivePort;
 
-            this.udpReceiveClient = new UdpClient(udpReceivePort);
+            this.FinalizePort();            
+            udpReceiveClient = new UdpClient(udpReceivePort);
             try
             {
-                this.udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
+                udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
             }
             catch (Exception e)
             {
@@ -91,13 +92,41 @@ namespace RoboCommon
         /// </summary>
         protected override void FinalizePort()
         {
-            if (this.udpReceiveClient == null)
+            if ((udpReceiveClient == null) || (udpReceiveClient.Client == null))
             {
                 return;
             }
 
-            this.udpReceiveClient.Close();
-            this.udpReceiveClient = null;
+            // Shutdown the socket.
+            try
+            {
+                udpReceiveClient.Client.Shutdown(SocketShutdown.Receive);
+                udpReceiveClient.Client.Close();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            
+            // Wait until the socket is released.
+            while (true)
+            {
+                try
+                {
+                    if ((udpReceiveClient == null) || (udpReceiveClient.Client == null))
+                    {
+                        break;
+                    }
+
+                    int available = udpReceiveClient.Client.Available;
+                }
+                catch (ObjectDisposedException e)
+                {
+                    // ObjectDisposedException means that socket is released.
+                    break;
+                }
+            }
+
+            udpReceiveClient = null;
         }
 
         /// <summary>
@@ -106,7 +135,7 @@ namespace RoboCommon
         /// <param name="result">Callback result</param>
         private void ReceiveCallback(IAsyncResult result)
         {
-            if (this.udpReceiveClient == null)
+            if (udpReceiveClient == null)
             {
                 return;
             }
@@ -114,11 +143,11 @@ namespace RoboCommon
             try
             {
                 IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Any, this.UdpReceivePort);
-                byte[] received = this.udpReceiveClient.EndReceive(result, ref remoteIpEndPoint);
+                byte[] received = udpReceiveClient.EndReceive(result, ref remoteIpEndPoint);
 
                 this.OnTextReceived(new TextReceivedEventArgs(Encoding.UTF8.GetString(received)));
 
-                this.udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
+                udpReceiveClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
             }
             catch (Exception)
             {

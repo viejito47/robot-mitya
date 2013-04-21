@@ -27,7 +27,7 @@ namespace RoboCommon
         /// <summary>
         /// COM-port object.
         /// </summary>
-        private SerialPort serialPort;
+        private static SerialPort serialPort;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ComPortCommunicationHelper" /> class.
@@ -41,9 +41,10 @@ namespace RoboCommon
             this.PortName = portName;
             this.BaudRate = baudRate;
 
-            this.serialPort = new SerialPort(this.PortName, this.BaudRate);
-            this.serialPort.DataReceived += new SerialDataReceivedEventHandler(this.DataReceivedHandler);
-            this.serialPort.Open();
+            this.FinalizePort();
+            serialPort = new SerialPort(this.PortName, this.BaudRate);
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(this.DataReceivedHandler);
+            serialPort.Open();
         }
 
         /// <summary>
@@ -66,17 +67,17 @@ namespace RoboCommon
         protected override void TransmitMessage(string message)
         {
             // todo: Перейти на ресурсы.
-            if (this.serialPort == null)
+            if (serialPort == null)
             {
                 throw new AccessViolationException("Не инициализирован COM-порт.");
             }
 
-            if (!this.serialPort.IsOpen)
+            if (!serialPort.IsOpen)
             {
                 throw new AccessViolationException("Не инициализирован COM-порт.");
             }
 
-            this.serialPort.Write(message);
+            serialPort.Write(message);
         }
 
         /// <summary>
@@ -84,16 +85,16 @@ namespace RoboCommon
         /// </summary>
         protected override void FinalizePort()
         {
-            if (this.serialPort == null)
+            if (serialPort == null)
             {
                 return;
             }
 
-            if (this.serialPort.IsOpen)
+            if (serialPort.IsOpen)
             {
-                this.serialPort.DataReceived -= this.DataReceivedHandler;
-                this.serialPort.Close();
-                this.serialPort = null;
+                serialPort.DataReceived -= this.DataReceivedHandler;
+                serialPort.Close();
+                serialPort = null;
             }
         }
 

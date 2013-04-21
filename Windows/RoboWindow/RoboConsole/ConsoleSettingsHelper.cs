@@ -13,6 +13,7 @@ namespace RoboConsole
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Management;
     using System.Reflection;
     using System.Text;
     using System.Xml.Serialization;
@@ -47,6 +48,61 @@ namespace RoboConsole
         /// Gets application settings.
         /// </summary>
         public ConsoleSettings Settings { get; private set; }
+
+        /// <summary>
+        /// Gets COM port list.
+        /// </summary>
+        /// <returns>Enumerable list of COM ports.</returns>
+        public static IEnumerable<ComPortItem> GetComPorts()
+        {
+            var result = new List<ComPortItem>();
+
+            ManagementScope connectionScope = new ManagementScope();
+            SelectQuery serialQuery = new SelectQuery("SELECT * FROM Win32_SerialPort");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(connectionScope, serialQuery);
+
+            try
+            {
+                foreach (ManagementObject item in searcher.Get())
+                {
+                    string portName = item["DeviceID"].ToString();
+                    string portDescription = item["DeviceID"].ToString();
+
+                    // COM port with Arduino is not detected.
+                    // portDescription.Contains("Arduino") is not working.
+                    // I should find out how to get value "Arduino Uno" from "Описание устройства, предоставленное шиной" parameter.
+                    // And where is this parameter?
+                    result.Add(new ComPortItem(portName, portDescription.Contains("Arduino")));
+                }
+            }
+            catch (ManagementException)
+            {
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets COM port baud rates.
+        /// </summary>
+        /// <returns>Baud rates list.</returns>
+        public static IEnumerable<BaudRateItem> GetBaudRates()
+        {
+            return new List<BaudRateItem>
+            {
+                new BaudRateItem(300),
+                new BaudRateItem(1200),
+                new BaudRateItem(2400),
+                new BaudRateItem(4800),
+                new BaudRateItem(9600),
+                new BaudRateItem(14400),
+                new BaudRateItem(19200),
+                new BaudRateItem(28800),
+                new BaudRateItem(38400),
+                new BaudRateItem(57600),
+                new BaudRateItem(115200)
+            };
+        }
 
         /// <summary>
         /// Saves settings to XML file.

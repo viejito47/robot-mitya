@@ -62,16 +62,18 @@ namespace RoboConsole
             this.textBoxSend = new System.Windows.Forms.TextBox();
             this.buttonSend = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.groupBoxCommunicationType = new System.Windows.Forms.GroupBox();
-            this.radioButtonComPort = new System.Windows.Forms.RadioButton();
-            this.radioButtonUdpSocket = new System.Windows.Forms.RadioButton();
             this.textBoxHistory = new System.Windows.Forms.RichTextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.labelVersion = new System.Windows.Forms.Label();
+            this.groupBoxCommunicationType = new System.Windows.Forms.GroupBox();
+            this.radioButtonComPort = new System.Windows.Forms.RadioButton();
+            this.radioButtonUdpSocket = new System.Windows.Forms.RadioButton();
+            this.linkLabelHelp = new System.Windows.Forms.LinkLabel();
+            this.linkLabelSettings = new System.Windows.Forms.LinkLabel();
             this.tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.groupBoxCommunicationType.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
+            this.groupBoxCommunicationType.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel
@@ -97,17 +99,17 @@ namespace RoboConsole
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 6F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(524, 298);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(566, 335);
             this.tableLayoutPanel.TabIndex = 0;
             // 
             // textBoxSend
             // 
             this.textBoxSend.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBoxSend.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBoxSend.Location = new System.Drawing.Point(9, 269);
+            this.textBoxSend.Location = new System.Drawing.Point(9, 306);
             this.textBoxSend.Margin = new System.Windows.Forms.Padding(3, 2, 3, 3);
             this.textBoxSend.Name = "textBoxSend";
-            this.textBoxSend.Size = new System.Drawing.Size(361, 23);
+            this.textBoxSend.Size = new System.Drawing.Size(403, 23);
             this.textBoxSend.TabIndex = 0;
             this.textBoxSend.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBoxSend_KeyDown);
             // 
@@ -115,7 +117,7 @@ namespace RoboConsole
             // 
             this.buttonSend.Dock = System.Windows.Forms.DockStyle.Fill;
             this.buttonSend.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonSend.Location = new System.Drawing.Point(383, 267);
+            this.buttonSend.Location = new System.Drawing.Point(425, 304);
             this.buttonSend.Margin = new System.Windows.Forms.Padding(0);
             this.buttonSend.Name = "buttonSend";
             this.buttonSend.Size = new System.Drawing.Size(135, 25);
@@ -127,18 +129,62 @@ namespace RoboConsole
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(386, 9);
+            this.pictureBox1.Location = new System.Drawing.Point(428, 9);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(129, 117);
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
+            // 
+            // textBoxHistory
+            // 
+            this.textBoxHistory.BackColor = System.Drawing.SystemColors.Control;
+            this.textBoxHistory.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxHistory.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBoxHistory.Location = new System.Drawing.Point(9, 9);
+            this.textBoxHistory.Name = "textBoxHistory";
+            this.textBoxHistory.ReadOnly = true;
+            this.tableLayoutPanel.SetRowSpan(this.textBoxHistory, 2);
+            this.textBoxHistory.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.textBoxHistory.Size = new System.Drawing.Size(403, 282);
+            this.textBoxHistory.TabIndex = 2;
+            this.textBoxHistory.Text = "";
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.labelVersion, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.groupBoxCommunicationType, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.linkLabelHelp, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.linkLabelSettings, 0, 2);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(428, 134);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(129, 157);
+            this.tableLayoutPanel1.TabIndex = 5;
+            // 
+            // labelVersion
+            // 
+            this.labelVersion.AutoSize = true;
+            this.labelVersion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelVersion.Location = new System.Drawing.Point(3, 0);
+            this.labelVersion.Name = "labelVersion";
+            this.labelVersion.Size = new System.Drawing.Size(123, 20);
+            this.labelVersion.TabIndex = 0;
+            this.labelVersion.Text = "ver.1.0.1234.12345";
+            this.labelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // groupBoxCommunicationType
             // 
             this.groupBoxCommunicationType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBoxCommunicationType.Controls.Add(this.radioButtonComPort);
             this.groupBoxCommunicationType.Controls.Add(this.radioButtonUdpSocket);
-            this.groupBoxCommunicationType.Location = new System.Drawing.Point(3, 47);
+            this.groupBoxCommunicationType.Location = new System.Drawing.Point(3, 84);
             this.groupBoxCommunicationType.Name = "groupBoxCommunicationType";
             this.groupBoxCommunicationType.Size = new System.Drawing.Size(123, 70);
             this.groupBoxCommunicationType.TabIndex = 3;
@@ -168,64 +214,51 @@ namespace RoboConsole
             this.radioButtonUdpSocket.Text = "UDP-сокет";
             this.radioButtonUdpSocket.UseVisualStyleBackColor = true;
             // 
-            // textBoxHistory
+            // linkLabelHelp
             // 
-            this.textBoxHistory.BackColor = System.Drawing.SystemColors.Control;
-            this.textBoxHistory.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxHistory.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBoxHistory.Location = new System.Drawing.Point(9, 9);
-            this.textBoxHistory.Name = "textBoxHistory";
-            this.textBoxHistory.ReadOnly = true;
-            this.tableLayoutPanel.SetRowSpan(this.textBoxHistory, 2);
-            this.textBoxHistory.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.textBoxHistory.Size = new System.Drawing.Size(361, 245);
-            this.textBoxHistory.TabIndex = 4;
-            this.textBoxHistory.Text = "";
+            this.linkLabelHelp.AutoSize = true;
+            this.linkLabelHelp.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.linkLabelHelp.Location = new System.Drawing.Point(3, 20);
+            this.linkLabelHelp.Name = "linkLabelHelp";
+            this.linkLabelHelp.Size = new System.Drawing.Size(123, 20);
+            this.linkLabelHelp.TabIndex = 1;
+            this.linkLabelHelp.TabStop = true;
+            this.linkLabelHelp.Text = "Справка";
+            this.linkLabelHelp.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.linkLabelHelp.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelHelpLinkClicked);
             // 
-            // tableLayoutPanel1
+            // linkLabelSettings
             // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.groupBoxCommunicationType, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.labelVersion, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(386, 134);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(129, 120);
-            this.tableLayoutPanel1.TabIndex = 5;
-            // 
-            // labelVersion
-            // 
-            this.labelVersion.AutoSize = true;
-            this.labelVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelVersion.Location = new System.Drawing.Point(3, 0);
-            this.labelVersion.Name = "labelVersion";
-            this.labelVersion.Size = new System.Drawing.Size(123, 20);
-            this.labelVersion.TabIndex = 4;
-            this.labelVersion.Text = "ver.1.0.1234.12345";
-            this.labelVersion.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.linkLabelSettings.AutoSize = true;
+            this.linkLabelSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.linkLabelSettings.Location = new System.Drawing.Point(3, 40);
+            this.linkLabelSettings.Name = "linkLabelSettings";
+            this.linkLabelSettings.Size = new System.Drawing.Size(123, 25);
+            this.linkLabelSettings.TabIndex = 2;
+            this.linkLabelSettings.TabStop = true;
+            this.linkLabelSettings.Text = "Настройки";
+            this.linkLabelSettings.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.linkLabelSettings.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelSettingsLinkClicked);
             // 
             // FormMain
             // 
             this.AcceptButton = this.buttonSend;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(524, 298);
+            this.ClientSize = new System.Drawing.Size(566, 335);
             this.Controls.Add(this.tableLayoutPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(234, 314);
+            this.MinimumSize = new System.Drawing.Size(234, 373);
             this.Name = "FormMain";
             this.Text = "Консоль робота";
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.tableLayoutPanel.ResumeLayout(false);
             this.tableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.groupBoxCommunicationType.ResumeLayout(false);
-            this.groupBoxCommunicationType.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.groupBoxCommunicationType.ResumeLayout(false);
+            this.groupBoxCommunicationType.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -239,6 +272,8 @@ namespace RoboConsole
         private System.Windows.Forms.RichTextBox textBoxHistory;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label labelVersion;
+        private System.Windows.Forms.LinkLabel linkLabelHelp;
+        private System.Windows.Forms.LinkLabel linkLabelSettings;
 
     }
 }
