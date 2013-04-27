@@ -12,7 +12,6 @@
 #else
   #include <Servo.h>
 #endif
-
 #include <SmartServo.h>
 #include <IRremote.h>
 #include <RoboScript.h>
@@ -21,6 +20,9 @@
 
 // Эхо-режим. Возврат всех полученных сообщений.
 const boolean ECHO_MODE = false;
+
+// Refreshing Servo status. Usefull when on charging or to save battery in idle.
+boolean servoRefresh = true;
 
 // Длина сообщения:
 const int MESSAGELENGTH = 5;
@@ -60,9 +62,9 @@ boolean actionStarted = false;
 // Текущее записываемое действие в РобоСкрипт.
 RoboAction recordedAction;
 
-// Varibles for Timer to send VCC Battery data
-boolean useVCCTimer[TOTAL_TIMERS] = {false};
-unsigned long VCCTimerInterval[TOTAL_TIMERS]={0};
+// Varibles for Timer to send VCC Battery data and Servo position
+boolean timerUse[TOTAL_TIMERS] = {false};
+unsigned long timerInterval[TOTAL_TIMERS]={0};
 unsigned long timerTimeOld[TOTAL_TIMERS];  // Store previous timer value
 
 int IrServoStep = IR_SERVO_STEP_DEFAULT; // Step for rotating head from remote
@@ -82,24 +84,9 @@ unsigned long IrLastCommandsValue[IR_LAST_COMMANDS_BUFFER_SIZE]={0}; // Last com
 boolean IsInIrProgrammMode = false; // Are we in IR command programm mode?
 byte IrProgrammatorStep = 0; // Number of command we're processing now
 
-// Функция инициализации скетча:
-void setup()
+// Servo attach and setup min/max degree
+void servoInit()
 {
-  // Set speed for serial port on pins 0,1 :
-  #ifdef USBCON   // For Leonardo (Romeo V2) board support
-      Serial1.begin(9600);
-  #else
-      Serial.begin(9600);
-  #endif
-
-  // Инициализация ИК-приёмника:
-  irrecv.enableIRIn(); // Start the receiver
-  pinMode(gunPin, OUTPUT);
-  digitalWrite(gunPin, LOW);
-
-  // Инициализация двигателей (установка нулевой скорости):
-  moveMotor("G", 0);
-
   // Установка горизонтального сервопривода в положение для установки телефона:
   pinMode(servoHeadHorizontalPin, OUTPUT);
   servoHeadHorizontal.attach(servoHeadHorizontalPin, servoHeadHorizontalMinDegree, servoHeadHorizontalMaxDegree);
@@ -114,7 +101,29 @@ void setup()
   pinMode(servoTailPin, OUTPUT);
   servoTail.attach(servoTailPin, servoTailMinDegree, servoTailMaxDegree);
   moveTail(servoTailDefaultState);
-  
+} 
+
+// Функция инициализации скетча:
+void setup()
+{
+  // Set speed for serial port on pins 0,1 :
+  #ifdef USBCON   // For Leonardo (Romeo V2) board support
+      Serial1.begin(9600);
+  #else
+      Serial.begin(9600);
+  #endif
+
+  // Инициализация ИК-приёмника:
+//  irrecv.enableIRIn(); // Start the receiver
+//  pinMode(gunPin, OUTPUT);
+//  digitalWrite(gunPin, LOW);
+
+  // Инициализация двигателей (установка нулевой скорости):
+  moveMotor("G", 0);
+
+  // Servo initialization (attach+min/max values)
+  servoInit();
+
   pinMode(lightPin, OUTPUT);
   digitalWrite(lightPin, LOW);
   
@@ -133,9 +142,9 @@ void setup()
 
 void processEvents()
 {
-  CheckIrCommands();
+//  CheckIrCommands();
   
-  CheckVCCTimer();
+  timerCheck();
 
   ProcessSwinging();
 
@@ -151,11 +160,14 @@ void processEvents()
 // Функция главного цикла:
 void loop()
 {
-  processMessageBuffer(); // Receive all messages and process them
-  processEvents();
-  #ifdef USBCON  // For Leonardo (Romeo V2) board we use SoftwareServo library, because of lack of Timers.
-    SoftwareServo::refresh();
-  #endif
+    processMessageBuffer(); // Receive all messages and process them
+    processEvents();
+    #ifdef USBCON  // For Leonardo (Romeo V2) board we use SoftwareServo library, because of lack of Timers.
+        if( servoRefresh )
+        {
+            SoftwareServo::refresh();
+        }
+    #endif
 }
 
 
@@ -609,28 +621,49 @@ unsigned int VCCRead(unsigned int n)
   return voltRatio[n]*analogRead(batterySensorPin[n]);
 }
 
+// Process function for each timer
+void timerFunction(unsigned int timer)
+{
+    unsigned int msg;
+    switch(timer){
+        case 0:
+        case 1:
+            msg = VCCRead(timer);
+            break;
+        case 2:
+            msg = servoHeadHorizontal.read();
+            break;
+        case 3:
+            msg = servoHeadVertical.read();
+            break;
+        case 4:
+            msg = servoTail.read();
+            break;
+    }
+    sendMessageToRobot("~", timer<<12 | msg);
+}
 
 // Check if it's time for any of the timers to send VCC of the Battery;
-void CheckVCCTimer()
+void timerCheck()
 {
   for(unsigned int i=0; i<TOTAL_TIMERS; i++)
   {
-    if(useVCCTimer[i])
+    if(timerUse[i])
     {
       unsigned int time = millis();
       if(timerTimeOld[i]>time){timerTimeOld[i]=time;} // millis() will overflow (go back to zero), after approximately 50 days.
-      if(time-timerTimeOld[i]>VCCTimerInterval[i])
+      if(time-timerTimeOld[i]>timerInterval[i])
       {
-        sendMessageToRobot("~", i<<12 | VCCRead(i));
         timerTimeOld[i]=time; //Start timer again
+        timerFunction(i);
       }
     }
   }
 }
 
-// Starts the timer with number timerNumber for every 'time' miliseconds to send VCC of the Battery to Serial1.
-// TO switch off timerNumber call SetVCCTimer(timerNumber, 0);
-void SetVCCTimer(unsigned int timerNumber, unsigned int time)
+// Starts the timer with number timerNumber for every 'time' miliseconds to send data. (VCC of the Battery to Serial1 and Servo position).
+// TO switch off timerNumber call timerSet(timerNumber, 0);
+void timerSet(unsigned int timerNumber, unsigned int time)
 {
   if(timerNumber>TOTAL_TIMERS-1)
   {
@@ -643,14 +676,14 @@ void SetVCCTimer(unsigned int timerNumber, unsigned int time)
   }
   if(time==0) // Stop Timer
   {
-    useVCCTimer[timerNumber]=false;
+    timerUse[timerNumber]=false;
     return;
   }
 
-  if(time<MINIMAL_INTERVAL_VALUE){time=MINIMAL_INTERVAL_VALUE;} // Set Minimum Interval Value 1 second.
+  if(time<MINIMAL_INTERVAL_VALUE[timerNumber]){time=MINIMAL_INTERVAL_VALUE[timerNumber];} // Set Minimum Interval Value.
   
-  VCCTimerInterval[timerNumber] = time;
-  useVCCTimer[timerNumber] = true;
+  timerInterval[timerNumber] = time;
+  timerUse[timerNumber] = true;
   timerTimeOld[timerNumber] = millis();
 }
 
@@ -815,7 +848,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     }
     case 'I':    
     {
-      setHeadlightState(value);
+      // Light and servoRefresh on/off
+      setDeviceState(value);
       break;
     }
     case 's':    
@@ -827,8 +861,8 @@ void executeAction(String command, unsigned int value, boolean inPlaybackMode)
     }
     case '=':  // "=NDDD" checks the battery status. N=Number of Voltage Devider. DDD=Interval (data will be sent every DDD*10 . voltage will be send back as "~" command + Voltage Devider Number + voltage*100. i.e. for 5.02V for Voltage Devider number 0 the command will be "~01F6", for Devider Number number 1 "~11F6"
     {          // You can use value to set timer to receive battery status. i.e. "=0100" (timer 0) or "=1100" (timer 1) will send battery status every 4096 millisecons for timer number 0 or 1. "=0000" will send battery status only once and will switch off the timer is it was set before.
-      sendMessageToRobot("~",(value & 0xF000) | VCCRead(value>>12));
-      SetVCCTimer(value>>12, (value & 0x0FFF)*10);
+      timerFunction(value & 0xF000);
+      timerSet(value>>12, (value & 0x0FFF)*10);
       break;
     }
     case '~': // just ignore this command
@@ -908,17 +942,34 @@ void moveMotor(String side, int speed)
   }
 }
 
-// Управление фарами.
-void setHeadlightState(int value)
+// Control Robot devices (light, servo)
+void setDeviceState(int value)
 {
-  if (value == 0)
-  {
-    digitalWrite(lightPin, LOW);
-  }
-  else if (value == 1)
-  {
-    digitalWrite(lightPin, HIGH);
-  }
+    switch(value){
+        case 0:     // Turn off lights
+            digitalWrite(lightPin, LOW);
+            break;
+        case 1:     // Turn on lights
+            digitalWrite(lightPin, HIGH);
+            break;
+        case 30:    // Stop updating servo position
+            #ifdef USBCON   // For Leonardo (Romeo V2) board support
+                servoRefresh = false;
+            #else
+                servoHeadHorizontal.detach(servoHeadHorizontalPin);
+                servoHeadVertical.detach(servoHeadVerticalPin);
+                servoTail.detach(servoTailPin);
+            #endif
+            break;
+        case 31:    // Start updating servo position
+            #ifdef USBCON   // For Leonardo (Romeo V2) board support
+                servoRefresh = true;
+            #else
+                // Servo initialization (attach+min/max values)
+                servoInit();
+            #endif
+            break;
+    }
 }
 
 // Process swinging on three servodrives.

@@ -9,6 +9,13 @@ SmartServo::SmartServo()
   this->maxDegree = 180;
 }
 
+void SmartServo::detach(int pin)
+{
+#ifndef USBCON
+  this->servo.detach(pin);
+#endif
+}
+
 uint8_t SmartServo::attach(int pin)
 {
   this->servo.attach(pin);
