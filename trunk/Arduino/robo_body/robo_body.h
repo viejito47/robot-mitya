@@ -1,3 +1,4 @@
+#include "Arduino.h"
 // Пин контроллера, использующийся для ИК-выстрела (цифровой выход).
 const int gunPin = 3;
 // Пин, использующийся для фиксации попаданий (аналоговый вход).
@@ -29,18 +30,20 @@ const int servoHeadHorizontalDefaultState = 90;
 const int servoHeadVerticalDefaultState = 90;
 const int servoTailDefaultState = 90;
 
-// Constants for Voltage Divider
-#define TOTAL_TIMERS 2  // Total Voltage Dividers
+#define TOTAL_TIMERS 5  // 0,1 - Voltage Dividers
+                        // 2,3,4 - Servo position
 
+// Constants for Voltage Divider
+#define TOTAL_DIVIDERS 2
 // Pin for measuring battery voltage (analog in).
-const int batterySensorPin[TOTAL_TIMERS] = {A5, A4};
+const int batterySensorPin[TOTAL_DIVIDERS] = {A5, A4};
 
 const float voltPerUnit = 0.004883; // 5V/1024 values = 0,004883 V/value
 const float dividerRatio0 = 5; // (R1+R2)/R2
 const float dividerRatio1 = 5; // (R1+R2)/R2
-const float voltRatio[TOTAL_TIMERS] = {voltPerUnit * dividerRatio0*100, voltPerUnit * dividerRatio1*100}; // This coefficient we will use
+const float voltRatio[TOTAL_DIVIDERS] = {voltPerUnit * dividerRatio0*100, voltPerUnit * dividerRatio1*100}; // This coefficient we will use
 
-const long MINIMAL_INTERVAL_VALUE = 1000; // Minimum interval in milliseconds for Timer
+const long MINIMAL_INTERVAL_VALUE[TOTAL_TIMERS] = {1000, 1000, 1000, 1000, 1000}; // Minimum interval in milliseconds for Timer
 
 const int IR_MOVE_SPEED = 255; // Speed set to maximum, when control from IR remote
 const int IR_SERVO_STEP_DEFAULT = 5; // Step for changing servo head (Horizontal and Vertical) position, when controling from IR remote

@@ -4,7 +4,6 @@
 // www.robot-mitya.ru
 // info@robot-mitya.ru
 //------------------------------
-
 #ifndef Swinger_h
 #define Swinger_h
 
@@ -24,6 +23,7 @@ class SmartServo
 
 	uint8_t attach(int pin);
 	uint8_t attach(int pin, int minDegree, int maxDegree);
+	void detach(int pin);
 	
 	int read();
 	
